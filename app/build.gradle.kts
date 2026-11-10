@@ -3,6 +3,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+// Backend base URL — override for release builds with: -PPW_API_URL=https://...
+val apiBaseUrl = (project.findProperty("PW_API_URL") as? String) ?: "http://10.0.2.2:3000/"
+
 android {
     namespace = "com.jeiu.puzzleworld"
     compileSdk = 37
@@ -13,6 +16,7 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "1.0.0"
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -26,7 +30,7 @@ android {
         }
     }
 
-    buildFeatures { viewBinding = true }
+    buildFeatures { viewBinding = true; buildConfig = true }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

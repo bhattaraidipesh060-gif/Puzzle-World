@@ -9,6 +9,7 @@ try { process.loadEnvFile(path.join(__dirname, '.env')); } catch { /* optional *
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const { seedIfEmpty } = require('./seed');
 
 app.use(cors());
 app.use(express.json());
@@ -43,6 +44,9 @@ process.on('uncaughtException', (err) => {
   console.error('[uncaughtException]', err && err.stack ? err.stack : err);
   process.exit(1); // undefined state — log and restart rather than lingering as a zombie
 });
+
+// Populate rooms/levels if the database is empty (idempotent — never wipes progress).
+seedIfEmpty();
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`PuzzleWorld backend → http://0.0.0.0:${PORT} (all interfaces)`);

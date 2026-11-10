@@ -7,10 +7,7 @@ const path = require('path');
 const ASSETS_DIR = process.env.ROOMS_ASSETS_DIR
   || path.join(__dirname, '..', 'app', 'src', 'main', 'assets', 'rooms');
 
-function seed() {
-  const db = getDb();
-  db.exec('DELETE FROM daily_challenges; DELETE FROM player_progress; DELETE FROM players; DELETE FROM levels; DELETE FROM rooms;');
-
+function insertRooms(db) {
   const insRoom = db.prepare('INSERT INTO rooms (room_id, room_name, theme, description, puzzle_type, room_graph) VALUES (?,?,?,?,?,?)');
   const insLevel = db.prepare('INSERT INTO levels (level_id, room_id, puzzle_type, title, difficulty, mechanic, hints, sort_order) VALUES (?,?,?,?,?,?,?,?)');
 
@@ -21,7 +18,7 @@ function seed() {
   if (files.length === 0) {
     console.error(`No room asset files found in ${ASSETS_DIR}`);
     console.error('Point ROOMS_ASSETS_DIR at the app/src/main/assets/rooms directory.');
-    process.exit(1);
+    return 0;
   }
 
   let roomCount = 0, levelCount = 0;
@@ -44,8 +41,28 @@ function seed() {
       levelCount++;
     });
   }
-
-  console.log(`Seeded ${roomCount} rooms, ${levelCount} puzzles (mirrored from app assets: ${ASSETS_DIR}).`);
+  return roomCount;
 }
 
-seed();
+// Destructive: wipe rooms/levels/players/progress and reseed. Used by `npm run seed`.
+function seed() {
+  const db = getDb();
+  db.exec('DELETE FROM daily_challenges; DELETE FROM player_progress; DELETE FROM players; DELETE FROM levels; DELETE FROM rooms;');
+  const n = insertRooms(db);
+  console.log(`Seeded ${n} rooms (mirrored from app assets: ${ASSETS_DIR}).`);
+}
+
+// Idempotent: only seeds when the rooms table is empty. Called on server startup so a
+// fresh/empty database (e.g. a new cloud deploy) always has content without wiping progress.
+function seedIfEmpty() {
+  const db = getDb();
+  const { c } = db.prepare('SELECT COUNT(*) AS c FROM rooms').get();
+  if (c > 0) return 0;
+  const n = insertRooms(db);
+  if (n > 0) console.log(`[seed] Empty database — seeded ${n} rooms from app assets.`);
+  return n;
+}
+
+module.exports = { seed, seedIfEmpty };
+
+if (require.main === module) seed();

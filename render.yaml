@@ -1,0 +1,15 @@
+# Render.com blueprint — deploy the backend as a free web service.
+# Used automatically when you connect this repo via "New + → Blueprint".
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: puzzleworld-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: PW_JWT_SECRET
+        generateValue: true

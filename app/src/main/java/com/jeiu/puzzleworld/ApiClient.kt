@@ -14,8 +14,10 @@ import java.util.concurrent.TimeUnit
  */
 object ApiClient {
 
-    // Emulator → host loopback. Physical devices should use the host's LAN IP.
-    const val BASE_URL = "http://10.0.2.2:3000/"
+    // Backend base URL — set at build time via BuildConfig.API_BASE_URL.
+    // Debug defaults to emulator loopback (10.0.2.2); for a release APK pointing at
+    // the hosted backend, build with: ./gradlew assembleRelease -PPW_API_URL=https://your-backend.onrender.com/
+    const val BASE_URL = BuildConfig.API_BASE_URL
 
     private val json = Json {
         ignoreUnknownKeys = true
