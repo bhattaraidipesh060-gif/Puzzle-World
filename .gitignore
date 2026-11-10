@@ -13,6 +13,7 @@ build/
 
 # Android
 .gradle/
+.kotlin/
 build/
 /app/build/
 local.properties
@@ -34,3 +35,4 @@ Thumbs.db
 /*.pptx
 /*.docx
 /puzzleworld/
+keystore.properties

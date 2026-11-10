@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.serialization")
@@ -9,6 +11,20 @@ val apiBaseUrl = (project.findProperty("PW_API_URL") as? String) ?: "http://10.0
 android {
     namespace = "com.jeiu.puzzleworld"
     compileSdk = 37
+
+    signingConfigs {
+        create("release") {
+            val f = rootProject.file("keystore.properties")
+            if (f.exists()) {
+                val props = Properties()
+                props.load(f.inputStream())
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.jeiu.puzzleworld"
@@ -22,6 +38,9 @@ android {
 
     buildTypes {
         release {
+            if (rootProject.file("keystore.properties").exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
