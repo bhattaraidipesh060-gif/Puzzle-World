@@ -36,3 +36,6 @@ Thumbs.db
 /*.docx
 /puzzleworld/
 keystore.properties
+
+# Allow the published APK inside the web portal
+!backend/public/*.apk
