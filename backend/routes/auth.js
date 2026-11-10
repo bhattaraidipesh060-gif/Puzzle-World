@@ -69,8 +69,11 @@ router.post('/register', wrap((req, res) => {
   if (username.length < 3 || username.length > 32) {
     return res.status(400).json({ error: 'Username must be 3–32 characters.' });
   }
-  if (password.length < 4) {
-    return res.status(400).json({ error: 'Password must be at least 4 characters.' });
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  }
+  if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+    return res.status(400).json({ error: 'Password must include an uppercase letter, a lowercase letter, and a number.' });
   }
 
   const existing = db.prepare('SELECT user_id FROM users WHERE username = ?').get(username);

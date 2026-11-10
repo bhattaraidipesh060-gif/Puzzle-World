@@ -1,6 +1,7 @@
 const { getDb } = require('./database');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 // The Android app's bundled assets are the single source of truth for room/level content.
 // Override with ROOMS_ASSETS_DIR if the app lives elsewhere.
@@ -63,6 +64,28 @@ function seedIfEmpty() {
   return n;
 }
 
-module.exports = { seed, seedIfEmpty };
+// Idempotent: guarantee a known demo login exists on every startup. Render's free
+// tier uses ephemeral SQLite, so this account would otherwise vanish on redeploy.
+const DEMO_USERNAME = 'Dipesh';
+const DEMO_PASSWORD = '12345678';
+
+function seedDemoAccount() {
+  const db = getDb();
+  const exists = db.prepare('SELECT user_id FROM users WHERE username = ?').get(DEMO_USERNAME);
+  if (exists) return false;
+  const salt = crypto.randomBytes(16).toString('hex');
+  const passwordHash = crypto.createHash('sha256').update(`${salt}:${DEMO_PASSWORD}`).digest('hex');
+  const userId = 'u_demo_dipesh';
+  db.transaction(() => {
+    db.prepare('INSERT INTO users (user_id, username, password_hash, salt) VALUES (?, ?, ?, ?)')
+      .run(userId, DEMO_USERNAME, passwordHash, salt);
+    db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)')
+      .run(userId, DEMO_USERNAME);
+  })();
+  console.log(`[seed] Demo account "${DEMO_USERNAME}" created.`);
+  return true;
+}
+
+module.exports = { seed, seedIfEmpty, seedDemoAccount };
 
 if (require.main === module) seed();
