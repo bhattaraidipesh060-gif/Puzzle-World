@@ -195,6 +195,8 @@ class LoginActivity : AppCompatActivity() {
     private fun toggleMode() {
         registerMode = !registerMode
         confirmLayout.visibility = if (registerMode) View.VISIBLE else View.GONE
+        findViewById<TextInputLayout>(R.id.login_password_layout).helperText =
+            if (registerMode) "8+ characters — uppercase, lowercase & a number" else null
         subtitleView.text = if (registerMode) "Create your account" else "Sign in to continue"
         btnLogin.text = if (registerMode) "✨  CREATE ACCOUNT" else "🔐  SIGN IN"
         toggleView.text = if (registerMode) "Already have an account? Sign in" else "New here? Create an account"
@@ -223,8 +225,12 @@ class LoginActivity : AppCompatActivity() {
         if (user.isEmpty()) { showError("Enter a username"); return false }
         if (user.length < 3 || user.length > 32) { showError("Username must be 3–32 characters"); return false }
         if (pass.isEmpty()) { showError("Enter a password"); return false }
-        if (pass.length < 4) { showError("Password must be at least 4 characters"); return false }
         if (register) {
+            if (pass.length < 8) { showError("Password must be at least 8 characters"); return false }
+            if (!pass.any { it.isUpperCase() } || !pass.any { it.isLowerCase() } || !pass.any { it.isDigit() }) {
+                showError("Password needs an uppercase letter, a lowercase letter, and a number")
+                return false
+            }
             val confirm = confirmInput.text?.toString().orEmpty()
             if (confirm != pass) { showError("Passwords don't match"); return false }
         }

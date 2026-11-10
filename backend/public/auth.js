@@ -75,7 +75,9 @@
     if (!username) return showMsg('Please enter a username.', 'error');
     if (!password) return showMsg('Please enter a password.', 'error');
     if (mode === 'register') {
-      if (password.length < 4) return showMsg('Password must be at least 4 characters.', 'error');
+      if (password.length < 8) return showMsg('Password must be at least 8 characters.', 'error');
+      if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password))
+        return showMsg('Password needs an uppercase letter, a lowercase letter, and a number.', 'error');
       if (password !== $('#confirm').value) return showMsg('Passwords do not match.', 'error');
       if (!$('#agree').checked) return showMsg('Please accept the Terms of Service and Privacy Policy.', 'error');
     }
