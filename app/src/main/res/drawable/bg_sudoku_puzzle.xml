@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="270"
+                android:startColor="#FF0A1428" android:centerColor="#FF0E1B33"
+                android:endColor="#FF080C14" android:type="linear" />
+        </shape>
+    </item>
+    <item>
+        <bitmap android:src="@drawable/pattern_sudoku"
+            android:tileMode="repeat" android:alpha="0.07" />
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="45"
+                android:startColor="#22004488" android:centerColor="#00000000"
+                android:endColor="#00000000" android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

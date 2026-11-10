@@ -1,0 +1,317 @@
+{
+  "room_id": "room_04_study",
+  "room_name": "The Puzzle Master's Study",
+  "theme": "study",
+  "description": "A warm, wood-paneled study filled with ancient puzzle books, carved wooden boxes, and curious mechanical contraptions. The Puzzle Master left their greatest brain-teasers here — solve them to prove your worth.",
+  "puzzle_type": "sliding_tile",
+  "room_graph": {
+    "room_04_study_01": [
+      "room_04_study_02"
+    ],
+    "room_04_study_02": [
+      "room_04_study_03"
+    ],
+    "room_04_study_03": [
+      "room_04_study_04"
+    ],
+    "room_04_study_04": [
+      "room_04_study_05"
+    ],
+    "room_04_study_05": [
+      "room_04_study_06"
+    ],
+    "room_04_study_06": [
+      "room_04_study_07"
+    ],
+    "room_04_study_07": [
+      "room_04_study_08"
+    ],
+    "room_04_study_08": [
+      "room_04_study_09"
+    ],
+    "room_04_study_09": [
+      "room_04_study_10"
+    ],
+    "room_04_study_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_04_study_01",
+      "title": "Book Shuffle",
+      "difficulty": "Easy",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 3×3 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 3,
+        "tiles": [
+          1,
+          2,
+          3,
+          4,
+          8,
+          5,
+          0,
+          7,
+          6
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_02",
+      "title": "One Tile",
+      "difficulty": "Easy",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 3×3 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 3,
+        "tiles": [
+          1,
+          3,
+          6,
+          4,
+          2,
+          0,
+          7,
+          5,
+          8
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_03",
+      "title": "Slide Left",
+      "difficulty": "Medium",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 3×3 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 3,
+        "tiles": [
+          1,
+          2,
+          3,
+          4,
+          0,
+          6,
+          7,
+          5,
+          8
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_04",
+      "title": "Reorder the Shelf",
+      "difficulty": "Medium",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 3×3 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 3,
+        "tiles": [
+          5,
+          1,
+          2,
+          6,
+          7,
+          0,
+          4,
+          8,
+          3
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_05",
+      "title": "Three Out",
+      "difficulty": "Medium",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 3×3 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 3,
+        "tiles": [
+          4,
+          2,
+          1,
+          6,
+          3,
+          5,
+          0,
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_06",
+      "title": "Half Scrambled",
+      "difficulty": "Hard",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 3×3 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 3,
+        "tiles": [
+          7,
+          1,
+          2,
+          0,
+          5,
+          3,
+          8,
+          4,
+          6
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_07",
+      "title": "The Study Lock",
+      "difficulty": "Hard",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 4×4 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 4,
+        "tiles": [
+          1,
+          2,
+          8,
+          7,
+          3,
+          0,
+          11,
+          4,
+          9,
+          5,
+          14,
+          12,
+          13,
+          6,
+          10,
+          15
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_08",
+      "title": "Almost There",
+      "difficulty": "Hard",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 4×4 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 4,
+        "tiles": [
+          1,
+          0,
+          3,
+          4,
+          6,
+          2,
+          7,
+          8,
+          5,
+          10,
+          11,
+          12,
+          9,
+          13,
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_09",
+      "title": "Great Work",
+      "difficulty": "Expert",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 4×4 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 4,
+        "tiles": [
+          1,
+          2,
+          4,
+          7,
+          5,
+          15,
+          6,
+          3,
+          0,
+          9,
+          11,
+          8,
+          13,
+          10,
+          14,
+          12
+        ]
+      }
+    },
+    {
+      "level_id": "room_04_study_10",
+      "title": "The Perfect Order",
+      "difficulty": "Expert",
+      "hints": [
+        "📚 Slide tiles into the blank space to order them 1..N.",
+        "📚 A 4×4 board — the empty square is your mover.",
+        "📚 The solved board reads 1 2 3 … left-to-right, top-to-bottom."
+      ],
+      "mechanic": {
+        "mechanic_type": "sliding_tile",
+        "size": 4,
+        "tiles": [
+          1,
+          11,
+          6,
+          2,
+          5,
+          3,
+          0,
+          4,
+          9,
+          12,
+          8,
+          7,
+          13,
+          10,
+          14,
+          15
+        ]
+      }
+    }
+  ]
+}

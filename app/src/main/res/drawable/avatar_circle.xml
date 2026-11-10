@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Soft glow ring -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:angle="0"
+                android:startColor="#5522D3EE"
+                android:endColor="#553B82F6" />
+        </shape>
+    </item>
+    <!-- Avatar gradient inset to reveal the ring -->
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape android:shape="oval">
+            <gradient
+                android:angle="0"
+                android:startColor="@color/ps_cyan"
+                android:endColor="@color/ps_blue" />
+        </shape>
+    </item>
+</layer-list>

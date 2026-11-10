@@ -1,0 +1,219 @@
+{
+  "room_id": "room_02_cipher_lab",
+  "room_name": "The Cipher Laboratory",
+  "theme": "laboratory",
+  "description": "A mysterious lab filled with encoded messages, cryptic notes, and strange devices.",
+  "puzzle_type": "cipher_wheel",
+  "room_graph": {
+    "room_02_cipher_lab_01": [
+      "room_02_cipher_lab_02"
+    ],
+    "room_02_cipher_lab_02": [
+      "room_02_cipher_lab_03"
+    ],
+    "room_02_cipher_lab_03": [
+      "room_02_cipher_lab_04"
+    ],
+    "room_02_cipher_lab_04": [
+      "room_02_cipher_lab_05"
+    ],
+    "room_02_cipher_lab_05": [
+      "room_02_cipher_lab_06"
+    ],
+    "room_02_cipher_lab_06": [
+      "room_02_cipher_lab_07"
+    ],
+    "room_02_cipher_lab_07": [
+      "room_02_cipher_lab_08"
+    ],
+    "room_02_cipher_lab_08": [
+      "room_02_cipher_lab_09"
+    ],
+    "room_02_cipher_lab_09": [
+      "room_02_cipher_lab_10"
+    ],
+    "room_02_cipher_lab_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_02_cipher_lab_01",
+      "title": "Spin the Wheel",
+      "difficulty": "Easy",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 3 — watch the letter frequency.",
+        "🔐 The plaintext is \"HELLO WORLD\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "KHOOR ZRUOG",
+        "shift": 3,
+        "answer": "HELLO WORLD",
+        "hint": "Rotate each letter back by 3."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_02",
+      "title": "Rot One",
+      "difficulty": "Easy",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 5 — watch the letter frequency.",
+        "🔐 The plaintext is \"THE LAB IS OPEN\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "YMJ QFG NX TUJS",
+        "shift": 5,
+        "answer": "THE LAB IS OPEN",
+        "hint": "Rotate each letter back by 5."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_03",
+      "title": "Warm Up",
+      "difficulty": "Medium",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 7 — watch the letter frequency.",
+        "🔐 The plaintext is \"OPEN SESAME\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "VWLU ZLZHTL",
+        "shift": 7,
+        "answer": "OPEN SESAME",
+        "hint": "Rotate each letter back by 7."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_04",
+      "title": "Second Wheel",
+      "difficulty": "Medium",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 9 — watch the letter frequency.",
+        "🔐 The plaintext is \"CODE BREAKER\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "LXMN KANJTNA",
+        "shift": 9,
+        "answer": "CODE BREAKER",
+        "hint": "Rotate each letter back by 9."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_05",
+      "title": "Half-Turn",
+      "difficulty": "Medium",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 11 — watch the letter frequency.",
+        "🔐 The plaintext is \"SECRET KEEPER\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "DPNCPE VPPAPC",
+        "shift": 11,
+        "answer": "SECRET KEEPER",
+        "hint": "Rotate each letter back by 11."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_06",
+      "title": "The Long Shift",
+      "difficulty": "Hard",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 4 — watch the letter frequency.",
+        "🔐 The plaintext is \"BROKEN WHEEL\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "FVSOIR ALIIP",
+        "shift": 4,
+        "answer": "BROKEN WHEEL",
+        "hint": "Rotate each letter back by 4."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_07",
+      "title": "Wheel of Words",
+      "difficulty": "Hard",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 6 — watch the letter frequency.",
+        "🔐 The plaintext is \"HIDDEN MESSAGE\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "NOJJKT SKYYGMK",
+        "shift": 6,
+        "answer": "HIDDEN MESSAGE",
+        "hint": "Rotate each letter back by 6."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_08",
+      "title": "Cracked Ring",
+      "difficulty": "Hard",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 8 — watch the letter frequency.",
+        "🔐 The plaintext is \"FINAL CIPHER\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "NQVIT KQXPMZ",
+        "shift": 8,
+        "answer": "FINAL CIPHER",
+        "hint": "Rotate each letter back by 8."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_09",
+      "title": "Frequency Fall",
+      "difficulty": "Expert",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 10 — watch the letter frequency.",
+        "🔐 The plaintext is \"NO MORE SECRETS\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "XY WYBO COMBODC",
+        "shift": 10,
+        "answer": "NO MORE SECRETS",
+        "hint": "Rotate each letter back by 10."
+      }
+    },
+    {
+      "level_id": "room_02_cipher_lab_10",
+      "title": "The Final Decode",
+      "difficulty": "Expert",
+      "hints": [
+        "🔐 Turn the cypher wheel until the letters snap into place.",
+        "🔐 A Caesar shift of 13 — watch the letter frequency.",
+        "🔐 The plaintext is \"YOU CRACKED IT\"."
+      ],
+      "mechanic": {
+        "mechanic_type": "cipher_wheel",
+        "cipher_type": "caesar",
+        "cipher_text": "LBH PENPXRQ VG",
+        "shift": 13,
+        "answer": "YOU CRACKED IT",
+        "hint": "Rotate each letter back by 13."
+      }
+    }
+  ]
+}

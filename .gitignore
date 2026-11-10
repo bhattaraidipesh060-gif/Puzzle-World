@@ -1,0 +1,36 @@
+# Node & Frontend
+node_modules/
+dist/
+build/
+.env
+
+# SQLite Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# Android
+.gradle/
+build/
+/app/build/
+local.properties
+.idea/
+*.apk
+*.jks
+*.keystore
+*.iml
+*.iws
+*.ipr
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Root junk (screenshots, scratch scripts, slides, duplicate project)
+/*.png
+/*.py
+/*.pptx
+/*.docx
+/puzzleworld/

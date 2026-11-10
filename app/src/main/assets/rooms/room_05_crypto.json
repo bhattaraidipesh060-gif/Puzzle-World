@@ -1,0 +1,208 @@
+{
+  "room_id": "room_05_crypto",
+  "room_name": "The Cryptographer's Cache",
+  "theme": "vault",
+  "description": "Deep in a digital-age bunker, a rogue cryptographer left behind a trail of increasingly sophisticated codes. From simple shifts to layered encryptions, each puzzle builds on the last. Crack them all to unlock the cache.",
+  "puzzle_type": "terminal_hack",
+  "room_graph": {
+    "room_05_crypto_01": [
+      "room_05_crypto_02"
+    ],
+    "room_05_crypto_02": [
+      "room_05_crypto_03"
+    ],
+    "room_05_crypto_03": [
+      "room_05_crypto_04"
+    ],
+    "room_05_crypto_04": [
+      "room_05_crypto_05"
+    ],
+    "room_05_crypto_05": [
+      "room_05_crypto_06"
+    ],
+    "room_05_crypto_06": [
+      "room_05_crypto_07"
+    ],
+    "room_05_crypto_07": [
+      "room_05_crypto_08"
+    ],
+    "room_05_crypto_08": [
+      "room_05_crypto_09"
+    ],
+    "room_05_crypto_09": [
+      "room_05_crypto_10"
+    ],
+    "room_05_crypto_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_05_crypto_01",
+      "title": "Boot Sector",
+      "difficulty": "Easy",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is A."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "1010",
+        "answer": "A"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_02",
+      "title": "Root Login",
+      "difficulty": "Easy",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is FF."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "11111111",
+        "answer": "FF"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_03",
+      "title": "Hex Dump",
+      "difficulty": "Medium",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is AC."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "10101100",
+        "answer": "AC"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_04",
+      "title": "Memory Trace",
+      "difficulty": "Medium",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is 1F."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "00011111",
+        "answer": "1F"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_05",
+      "title": "Node Path",
+      "difficulty": "Medium",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is CA."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "11001010",
+        "answer": "CA"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_06",
+      "title": "Stack Trace",
+      "difficulty": "Hard",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is BEE."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "101111101110",
+        "answer": "BEE"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_07",
+      "title": "Kernel Panic",
+      "difficulty": "Hard",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is DAD."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "110110101101",
+        "answer": "DAD"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_08",
+      "title": "Byte by Byte",
+      "difficulty": "Hard",
+      "hints": [
+        "💻 Convert the binary stream into hex to pass the firewall.",
+        "💻 Group the bits into nibbles (4 bits) then read each as hex.",
+        "💻 The answer is F00."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "bin_to_hex",
+        "input": "111100000000",
+        "answer": "F00"
+      }
+    },
+    {
+      "level_id": "room_05_crypto_09",
+      "title": "Ghost in the Cache",
+      "difficulty": "Expert",
+      "hints": [
+        "💻 Watch the node order flash, then replay it in sequence.",
+        "💻 4 nodes light up in a path — memorise it.",
+        "💻 The path is [7,5,6,6]."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "memory_path",
+        "nodes": [
+          7,
+          5,
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "level_id": "room_05_crypto_10",
+      "title": "Root Access",
+      "difficulty": "Expert",
+      "hints": [
+        "💻 Watch the node order flash, then replay it in sequence.",
+        "💻 5 nodes light up in a path — memorise it.",
+        "💻 The path is [1,5,8,2,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "terminal_hack",
+        "mode": "memory_path",
+        "nodes": [
+          1,
+          5,
+          8,
+          2,
+          2
+        ]
+      }
+    }
+  ]
+}

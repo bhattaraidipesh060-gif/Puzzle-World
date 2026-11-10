@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PuzzleWorld — native screens (Play-Store port)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#04101a;font-family:Roboto,"Segoe UI",system-ui,sans-serif;padding:18px}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;max-width:1180px;margin:0 auto}
+  .shot{display:flex;flex-direction:column;align-items:center}
+  .phone{width:290px;height:600px;border-radius:26px;overflow:hidden;position:relative;display:flex;flex-direction:column;
+    background:#0F172A;box-shadow:0 24px 60px rgba(0,0,0,.6),0 0 0 7px #10141c,0 0 0 8px #2a3242;
+    background-image:radial-gradient(420px 420px at 88% -2%,rgba(34,211,238,.18),transparent 70%),
+                     radial-gradient(460px 460px at 6% 100%,rgba(139,92,246,.18),transparent 70%),
+                     linear-gradient(180deg,#111C31,#0F172A 55%,#0B1120)}
+  .status{display:flex;justify-content:space-between;padding:6px 14px 0;font-size:10px;color:#E2E8F0}
+  .cap{margin-top:9px;color:#7d8798;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase}
+  .col{flex:1;display:flex;flex-direction:column;gap:9px;padding:10px 12px;overflow:hidden}
+  .card{background:#1E293B;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px}
+  .ttl{color:#E2E8F0;font-weight:700}
+  .mut{color:#94A3B8}
+  .btn{display:flex;align-items:center;justify-content:center;height:38px;border-radius:12px;font-size:12px;font-weight:700;color:#06131A}
+  .b-cyan{background:linear-gradient(90deg,#22D3EE,#3B82F6)}
+  .b-gold{background:linear-gradient(90deg,#FFD740,#F59E0B)}
+  .b-purple{background:linear-gradient(90deg,#8B5CF6,#A855F7);color:#E2E8F0}
+  .b-emer{background:linear-gradient(90deg,#34D399,#10B981)}
+  .b-ghost{border:1px solid rgba(255,255,255,.15);color:#E2E8F0}
+  .row{display:flex;gap:7px}
+  .row>*{flex:1}
+  .inp{height:38px;border-radius:19px;background:#1E293B;border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;padding:0 13px;color:#64748B;font-size:12px}
+  .chip{display:inline-block;padding:6px 13px;border-radius:15px;font-size:11px;background:#263449;color:#94A3B8;border:1px solid rgba(255,255,255,.08);margin-right:6px}
+  .chip.on{background:linear-gradient(90deg,#22D3EE,#3B82F6);color:#06131A;font-weight:700;border-color:transparent}
+  /* sudoku */
+  .sgrid{display:grid;grid-template-columns:repeat(9,1fr);aspect-ratio:1;border:2px solid #26324a;border-radius:10px;overflow:hidden;background:#101828}
+  .scell{display:grid;place-items:center;font-size:10px;color:#22D3EE;border-right:1px solid #1b2436;border-bottom:1px solid #1b2436}
+  .scell.g{color:#94A3B8}
+  .srow{display:flex;gap:4px}
+  .sku{flex:1;height:32px;border-radius:9px;background:#263449;display:grid;place-items:center;color:#E2E8F0;font-size:13px}
+  /* word tiles */
+  .tiles{display:flex;gap:6px;justify-content:center;padding:14px 0}
+  .tile{width:30px;height:36px;border-radius:9px;background:linear-gradient(180deg,#FF2A1436,#1A0A24);border:1px solid #FF4081;display:grid;place-items:center;color:#FFD740;font-weight:700;font-size:15px}
+  /* wire grid */
+  .wire{aspect-ratio:1;border-radius:12px;background:#101828;position:relative;overflow:hidden;border:1px solid #1b2436}
+  .wire svg{width:100%;height:100%}
+  .nav{display:flex;background:#111C31;border-top:1px solid rgba(255,255,255,.08);padding:4px 0}
+  .nav div{flex:1;text-align:center;font-size:9px;color:#94A3B8;padding:5px 0;line-height:1.4}
+  .nav div.on{color:#22D3EE;font-weight:700}
+  .nav em{font-style:normal;font-size:12px;display:block}
+</style>
+</head>
+<body>
+<div class="gallery">
+
+  <!-- LOGIN -->
+  <div class="shot"><div class="phone">
+    <div class="status"><span>9:41</span><span>▲ ● ▮</span></div>
+    <div class="col" style="justify-content:center;align-items:center;text-align:center">
+      <div style="font-size:44px;margin-top:20px">🧩</div>
+      <div class="ttl" style="font-size:25px;margin-top:6px">PuzzleWorld</div>
+      <div class="mut" style="font-size:12px;margin-top:3px">Sign in to continue</div>
+      <div class="card" style="width:100%;margin-top:22px;padding:16px">
+        <div class="inp" style="margin-bottom:9px">Username</div>
+        <div class="inp" style="margin-bottom:14px">Password</div>
+        <div class="btn b-cyan">🔐&nbsp; SIGN IN</div>
+        <div class="btn b-ghost" style="margin-top:7px">👤&nbsp; Play as Guest</div>
+        <div style="margin-top:13px;font-size:11px;color:#94A3B8">☐ I agree to the <span style="color:#22D3EE;font-weight:700">Terms &amp; Privacy</span></div>
+      </div>
+    </div>
+  </div><div class="cap">Login</div></div>
+
+  <!-- HOME -->
+  <div class="shot"><div class="phone">
+    <div class="status"><span>9:41</span><span>▲ ● ▮</span></div>
+    <div style="display:flex;align-items:center;padding:8px 13px 10px;border-bottom:1px solid rgba(255,255,255,.08)">
+      <div><div class="ttl" style="font-size:18px">PuzzleWorld</div><div class="mut" style="font-size:11px">Welcome, Player 👋</div></div>
+      <div style="margin-left:auto;font-size:15px;padding-right:10px">🔔</div>
+      <div style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#06131A;background:linear-gradient(135deg,#8B5CF6,#22D3EE)">P</div>
+    </div>
+    <div class="col">
+      <div class="inp">🔍&nbsp; Search games…</div>
+      <div style="white-space:nowrap;overflow:hidden"><span class="chip on">All</span><span class="chip">Escape</span><span class="chip">Puzzle</span><span class="chip">Word</span></div>
+      <div class="card" style="background:linear-gradient(135deg,rgba(34,211,238,.2),rgba(139,92,246,.2) 50%,rgba(16,185,129,.2));border-color:rgba(255,255,255,.16)">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.13em;color:#F59E0B">DAILY CHALLENGE</div>
+        <div class="ttl" style="font-size:18px;margin-top:4px">Today's Puzzle</div>
+        <div class="mut" style="font-size:11px;margin-top:3px">Solve today's featured escape room.</div>
+        <div class="btn b-cyan" style="margin-top:9px;width:fit-content;padding:0 14px">▶&nbsp; Play today's puzzle</div>
+      </div>
+      <div class="row">
+        <div class="card" style="text-align:center;padding:9px"><div style="color:#F59E0B;font-weight:700;font-size:17px">0</div><div class="mut" style="font-size:9px">⭐ Score</div></div>
+        <div class="card" style="text-align:center;padding:9px"><div style="color:#22D3EE;font-weight:700;font-size:17px">0</div><div class="mut" style="font-size:9px">🧩 Solved</div></div>
+        <div class="card" style="text-align:center;padding:9px"><div style="color:#F43F5E;font-weight:700;font-size:17px">0/8</div><div class="mut" style="font-size:9px">🏅 Achieve</div></div>
+      </div>
+      <div class="row" style="align-items:center"><div class="ttl" style="font-size:14px">Games</div><div class="mut" style="font-size:10px;text-align:right">4 titles</div></div>
+      <div class="row">
+        <div class="card" style="padding:9px"><div style="height:52px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,rgba(34,211,238,.33),rgba(59,130,246,.1));border:1px solid rgba(34,211,238,.4)">🚪</div><div class="ttl" style="font-size:11px;margin-top:6px">Escape Rooms</div><div class="mut" style="font-size:9px">9 rooms · 90 puzzles</div></div>
+        <div class="card" style="padding:9px"><div style="height:52px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,rgba(139,92,246,.33),rgba(168,85,247,.1));border:1px solid rgba(139,92,246,.4)">🔢</div><div class="ttl" style="font-size:11px;margin-top:6px">Sudoku</div><div class="mut" style="font-size:9px">Logic · 4 levels</div></div>
+      </div>
+    </div>
+    <div class="nav"><div class="on"><em>🏠</em>Home</div><div><em>🚪</em>Rooms</div><div><em>📅</em>Daily</div><div><em>🏆</em>Board</div></div>
+  </div><div class="cap">Home</div></div>
+
+  <!-- MAIN / in-room -->
+  <div class="shot"><div class="phone">
+    <div class="status"><span>9:41</span><span>▲ ● ▮</span></div>
+    <div class="col">
+      <div class="card" style="padding:11px">
+        <div style="display:flex;align-items:center"><div class="ttl" style="flex:1;text-align:center;font-size:14px">The First Vault — Follow the Wires</div><span style="color:#F59E0B">❓</span></div>
+        <div class="mut" style="font-size:10px;text-align:center;margin-top:3px">🔌 Easy · wire maze · ⭐ 10</div>
+        <div style="text-align:center;color:#22D3EE;font-size:10px;margin-top:4px">↺ Restart</div>
+      </div>
+      <div class="wire">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <g stroke="#1E293B" stroke-width="1">
+            <path d="M0 20H100M0 40H100M0 60H100M0 80H100M20 0V100M40 0V100M60 0V100M80 0V100"/>
+          </g>
+          <path d="M10 10H30V50H70V90" fill="none" stroke="#FFD740" stroke-width="3"/>
+          <path d="M90 90V30H50" fill="none" stroke="#FFD740" stroke-width="3" stroke-dasharray="4 3"/>
+          <circle cx="10" cy="10" r="5" fill="#00E676"/>
+          <circle cx="70" cy="90" r="5" fill="#FF4081"/>
+        </svg>
+      </div>
+      <div class="card" style="padding:10px">
+        <div class="inp">🔑&nbsp; Enter your answer...</div>
+        <div class="row" style="margin-top:7px"><div class="btn b-cyan">▶ SUBMIT</div><div class="btn b-gold">💡 HINT</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;padding:8px 12px;background:#111C31">
+      <div class="btn b-ghost" style="flex:1">🏠 ROOMS</div>
+      <div class="btn b-purple" style="flex:1">🌤 DAILY</div>
+      <div class="btn b-emer" style="flex:1">NEXT ▶</div>
+    </div>
+  </div><div class="cap">In-room puzzle</div></div>
+
+  <!-- SUDOKU -->
+  <div class="shot"><div class="phone">
+    <div class="status"><span>9:41</span><span>▲ ● ▮</span></div>
+    <div class="col">
+      <div class="card" style="padding:10px"><div class="ttl" style="text-align:center;font-size:15px">🧩 Sudoku — Medium</div>
+        <div style="display:flex;margin-top:3px"><div class="mut" style="flex:1;font-size:10px">Tap a cell…</div><div style="color:#F59E0B;font-size:11px">⏱ 0:00</div></div></div>
+      <div class="sgrid" id="sudoku"></div>
+      <div class="srow" id="pad1"></div>
+      <div class="srow" id="pad2"></div>
+      <div class="row"><div class="btn b-ghost">🔄 UNDO</div><div class="btn b-gold">💡 HINT</div><div class="btn b-purple">✎ NOTES</div></div>
+      <div class="row"><div class="btn b-ghost">🎯 NEW</div><div class="btn b-emer">✓ CHECK</div></div>
+    </div>
+  </div><div class="cap">Sudoku</div></div>
+
+  <!-- WORD -->
+  <div class="shot"><div class="phone">
+    <div class="status"><span>9:41</span><span>▲ ● ▮</span></div>
+    <div class="col">
+      <div class="card" style="padding:10px"><div class="ttl" style="text-align:center;font-size:15px">🔤 Word Descrambler</div>
+        <div style="display:flex;margin-top:3px"><div class="mut" style="flex:1;font-size:10px">Unscramble the word!</div><div style="color:#F59E0B;font-size:11px">⏱ 0:00</div></div></div>
+      <div class="card" style="padding:18px 10px">
+        <div class="tiles" id="tiles"></div>
+        <div style="text-align:center;color:#F59E0B;font-family:monospace;font-size:14px;letter-spacing:.2em">_ _ _ _ _ _ _ _</div>
+      </div>
+      <div class="card" style="padding:10px">
+        <div class="inp" style="font-family:monospace;font-size:14px">🔑&nbsp; Type the word...</div>
+        <div class="row" style="margin-top:7px"><div class="btn b-emer">✓ CHECK</div><div class="btn b-gold">💡 HINT</div></div>
+        <div class="row" style="margin-top:7px"><div class="btn b-purple">🎯 Medium</div><div class="btn b-cyan">NEXT WORD ▶</div></div>
+      </div>
+    </div>
+  </div><div class="cap">Word Descrambler</div></div>
+
+  <!-- DAILY -->
+  <div class="shot"><div class="phone">
+    <div class="status"><span>9:41</span><span>▲ ● ▮</span></div>
+    <div class="col">
+      <div class="card" style="padding:12px"><div class="ttl" style="text-align:center;font-size:16px">🗓️ Daily Challenge</div>
+        <div class="mut" style="text-align:center;font-size:10px;margin-top:3px">2026-11-02 · The Neon Arcade · Hard</div></div>
+      <div class="card" style="padding:14px;color:#22D3EE;font-family:monospace;text-align:center;font-size:13px;letter-spacing:.03em">
+        UF TUB QSFOUPG<br><span class="mut" style="font-size:10px">Shift each letter back by one…</span></div>
+      <div style="flex:1"></div>
+      <div class="card" style="padding:10px">
+        <div class="inp">🔑&nbsp; Enter your answer…</div>
+        <div class="row" style="margin-top:7px"><div class="btn b-cyan">✓ CHECK</div><div class="btn b-gold">💡 HINT</div></div>
+      </div>
+      <div class="mut" style="text-align:center;font-size:10px">Solve to extend your streak 🔥</div>
+    </div>
+  </div><div class="cap">Daily Challenge</div></div>
+
+</div>
+<script>
+  // sudoku grid
+  var sg = document.getElementById('sudoku');
+  var given = {0:'5',2:'9',6:'3',11:'7',19:'4',22:'8',28:'6',33:'1',40:'5',47:'9',52:'3',58:'8',61:'2',69:'7',73:'6',80:'1'};
+  for (var i=0;i<81;i++){
+    var d=document.createElement('div'); d.className='scell'+(given[i]?' g':'');
+    d.textContent = given[i]||'';
+    var r=Math.floor(i/9), c=i%9;
+    if(c===2||c===5) d.style.borderRight='2px solid #26324a';
+    if(r===2||r===5) d.style.borderBottom='2px solid #26324a';
+    sg.appendChild(d);
+  }
+  var p1=document.getElementById('pad1'), p2=document.getElementById('pad2');
+  for(var n=1;n<=5;n++){var b=document.createElement('div');b.className='sku';b.textContent=n;p1.appendChild(b);}
+  for(var m=6;m<=9;m++){var b2=document.createElement('div');b2.className='sku';b2.textContent=m;p2.appendChild(b2);}
+  var clr=document.createElement('div');clr.className='sku';clr.textContent='⌫';clr.style.background='linear-gradient(90deg,#22D3EE,#3B82F6)';clr.style.color='#06131A';p2.appendChild(clr);
+  // word tiles
+  var w='LABYRINTH', tl=document.getElementById('tiles');
+  for(var k=0;k<w.length;k++){var t=document.createElement('div');t.className='tile';t.textContent=w[k];tl.appendChild(t);}
+</script>
+</body>
+</html>

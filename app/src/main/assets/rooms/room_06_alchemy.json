@@ -1,0 +1,309 @@
+{
+  "room_id": "room_06_alchemy",
+  "room_name": "The Alchemist's Laboratory",
+  "theme": "alchemy",
+  "description": "In a candlelit laboratory, a master alchemist sealed away the secrets of transmutation. Solve ciphers, riddles, and locked mechanisms to complete the Great Work — turning base puzzles into pure gold.",
+  "puzzle_type": "potion_mix",
+  "room_graph": {
+    "room_06_alchemy_01": [
+      "room_06_alchemy_02"
+    ],
+    "room_06_alchemy_02": [
+      "room_06_alchemy_03"
+    ],
+    "room_06_alchemy_03": [
+      "room_06_alchemy_04"
+    ],
+    "room_06_alchemy_04": [
+      "room_06_alchemy_05"
+    ],
+    "room_06_alchemy_05": [
+      "room_06_alchemy_06"
+    ],
+    "room_06_alchemy_06": [
+      "room_06_alchemy_07"
+    ],
+    "room_06_alchemy_07": [
+      "room_06_alchemy_08"
+    ],
+    "room_06_alchemy_08": [
+      "room_06_alchemy_09"
+    ],
+    "room_06_alchemy_09": [
+      "room_06_alchemy_10"
+    ],
+    "room_06_alchemy_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_06_alchemy_01",
+      "title": "First Pour",
+      "difficulty": "Easy",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [5,3], target 4."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 5,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 3,
+            "vol": 0
+          }
+        ],
+        "target": 4
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_02",
+      "title": "Two Beakers",
+      "difficulty": "Easy",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [8,5,3], target 4."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 8,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 5,
+            "vol": 0
+          },
+          {
+            "id": 2,
+            "cap": 3,
+            "vol": 0
+          }
+        ],
+        "target": 4
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_03",
+      "title": "Measure Twice",
+      "difficulty": "Medium",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [5,3], target 2."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 5,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 3,
+            "vol": 0
+          }
+        ],
+        "target": 2
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_04",
+      "title": "The Alembic",
+      "difficulty": "Medium",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [6,4], target 2."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 6,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 4,
+            "vol": 0
+          }
+        ],
+        "target": 2
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_05",
+      "title": "Solvent Split",
+      "difficulty": "Medium",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [10,6], target 8."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 10,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 6,
+            "vol": 0
+          }
+        ],
+        "target": 8
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_06",
+      "title": "Distill",
+      "difficulty": "Hard",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [7,3], target 5."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 7,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 3,
+            "vol": 0
+          }
+        ],
+        "target": 5
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_07",
+      "title": "The Elixir",
+      "difficulty": "Hard",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [6,5], target 3."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 6,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 5,
+            "vol": 0
+          }
+        ],
+        "target": 3
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_08",
+      "title": "Exact Measure",
+      "difficulty": "Hard",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [9,5], target 4."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 9,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 5,
+            "vol": 0
+          }
+        ],
+        "target": 4
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_09",
+      "title": "Transmute",
+      "difficulty": "Expert",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [8,3], target 2."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 8,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 3,
+            "vol": 0
+          }
+        ],
+        "target": 2
+      }
+    },
+    {
+      "level_id": "room_06_alchemy_10",
+      "title": "The Great Work",
+      "difficulty": "Expert",
+      "hints": [
+        "⚗️ Pour between beakers until one holds the target volume.",
+        "⚗️ You can fill, empty, and pour one beaker into another.",
+        "⚗️ Beakers [12,8,5], target 6."
+      ],
+      "mechanic": {
+        "mechanic_type": "potion_mix",
+        "beakers": [
+          {
+            "id": 0,
+            "cap": 12,
+            "vol": 0
+          },
+          {
+            "id": 1,
+            "cap": 8,
+            "vol": 0
+          },
+          {
+            "id": 2,
+            "cap": 5,
+            "vol": 0
+          }
+        ],
+        "target": 6
+      }
+    }
+  ]
+}

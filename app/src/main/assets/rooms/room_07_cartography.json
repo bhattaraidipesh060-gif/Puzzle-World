@@ -1,0 +1,262 @@
+{
+  "room_id": "room_07_cartography",
+  "room_name": "The Cartographer's Vault",
+  "theme": "cartography",
+  "description": "A master cartographer hid the world's lost maps behind layers of nautical riddles, coded coordinates, and locked map cases. Chart the course, decode the legends, and unlock the vault of the mapmaker.",
+  "puzzle_type": "coordinate_maze",
+  "room_graph": {
+    "room_07_cartography_01": [
+      "room_07_cartography_02"
+    ],
+    "room_07_cartography_02": [
+      "room_07_cartography_03"
+    ],
+    "room_07_cartography_03": [
+      "room_07_cartography_04"
+    ],
+    "room_07_cartography_04": [
+      "room_07_cartography_05"
+    ],
+    "room_07_cartography_05": [
+      "room_07_cartography_06"
+    ],
+    "room_07_cartography_06": [
+      "room_07_cartography_07"
+    ],
+    "room_07_cartography_07": [
+      "room_07_cartography_08"
+    ],
+    "room_07_cartography_08": [
+      "room_07_cartography_09"
+    ],
+    "room_07_cartography_09": [
+      "room_07_cartography_10"
+    ],
+    "room_07_cartography_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_07_cartography_01",
+      "title": "Set the Bearing",
+      "difficulty": "Easy",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "#####",
+          "#S..#",
+          "#.#.#",
+          "#..E#",
+          "#####"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_02",
+      "title": "True North",
+      "difficulty": "Easy",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "######",
+          "#S...#",
+          "#.##.#",
+          "#....#",
+          "#.#E##",
+          "######"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_03",
+      "title": "Starboard",
+      "difficulty": "Medium",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "#####",
+          "#S###",
+          "#.##.",
+          "#.#E#",
+          "#...#",
+          "#####"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_04",
+      "title": "Against the Wind",
+      "difficulty": "Medium",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "#######",
+          "#S....#",
+          "#.#####",
+          "#.....#",
+          "###.#.#",
+          "###.#E#",
+          "#######"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_05",
+      "title": "Dead Reckoning",
+      "difficulty": "Medium",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "#######",
+          "#S#...#",
+          "#.#.#.#",
+          "#...#.#",
+          "#####.#",
+          "####E.#",
+          "#######"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_06",
+      "title": "The Overland Route",
+      "difficulty": "Hard",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "#######",
+          "#S....#",
+          "###.##.#",
+          "#..#...#",
+          "#.##.#.#",
+          "#....#E#",
+          "#######"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_07",
+      "title": "Chart the Stones",
+      "difficulty": "Hard",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "########",
+          "#S.....#",
+          "#.####.#",
+          "#.#..#.#",
+          "#.#.##.#",
+          "#......#",
+          "####.##E",
+          "########"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_08",
+      "title": "Compass Rose",
+      "difficulty": "Hard",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "########",
+          "#S#....#",
+          "#.#.##.#",
+          "#.#..#.#",
+          "#.##.#.#",
+          "#....#.#",
+          "###.####",
+          "#####E##",
+          "########"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_09",
+      "title": "Lost Cartographer",
+      "difficulty": "Expert",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "#########",
+          "#S...#.##",
+          "#.#.#.#.#",
+          "#...#...#",
+          "#.###.#.#",
+          "#.#...#.#",
+          "#.#.###.#",
+          "#.....#E#",
+          "#########"
+        ]
+      }
+    },
+    {
+      "level_id": "room_07_cartography_10",
+      "title": "The Final Coordinates",
+      "difficulty": "Expert",
+      "hints": [
+        "🧭 Move from S to E using compass directions.",
+        "🧭 # are walls; . are open ground.",
+        "🧭 Head toward E, avoiding dead ends."
+      ],
+      "mechanic": {
+        "mechanic_type": "coordinate_maze",
+        "grid": [
+          "#########",
+          "#S..####.",
+          "#.##....#",
+          "#.####.#.#",
+          "#....#.#.#",
+          "##.##.#.#",
+          "#.#..#.#.#",
+          "#.##...#E#",
+          "#########"
+        ]
+      }
+    }
+  ]
+}

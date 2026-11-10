@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ps_bg"
+    android:fitsSystemWindows="true"
+    android:fillViewport="true">
+
+    <LinearLayout android:id="@+id/login_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🧩"
+            android:textSize="52sp"
+            android:layout_marginTop="36dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PuzzleWorld"
+            android:textColor="@color/ps_text"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/sora_bold"
+            android:shadowColor="#9922D3EE"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="20"
+            android:letterSpacing="0.02"
+            android:layout_marginTop="8dp" />
+
+        <TextView android:id="@+id/login_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign in to continue"
+            android:textColor="@color/ps_muted"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <LinearLayout
+            android:id="@+id/login_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/ps_card_glow"
+            android:elevation="10dp"
+            android:padding="22dp"
+            android:layout_marginTop="28dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/login_username_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username"
+                app:boxBackgroundColor="@color/ps_surface"
+                app:boxStrokeColor="@color/ps_input_stroke"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintTextColor="@color/ps_input_hint"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/login_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ps_text"
+                    android:textColorHint="@color/ps_dim"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/inter"
+                    android:inputType="text"
+                    android:imeOptions="actionNext"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/login_password_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Password"
+                app:boxBackgroundColor="@color/ps_surface"
+                app:boxStrokeColor="@color/ps_input_stroke"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintTextColor="@color/ps_input_hint"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/ps_muted"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/login_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ps_text"
+                    android:textColorHint="@color/ps_dim"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/inter"
+                    android:inputType="textPassword"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/login_confirm_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Confirm password"
+                android:visibility="gone"
+                app:boxBackgroundColor="@color/ps_surface"
+                app:boxStrokeColor="@color/ps_input_stroke"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:hintTextColor="@color/ps_input_hint"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/ps_muted"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/login_confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ps_text"
+                    android:textColorHint="@color/ps_dim"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/inter"
+                    android:inputType="textPassword"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/login_btn_submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="🔐  SIGN IN"
+                    android:textSize="14sp"
+                    android:textColor="@color/ps_on_accent"
+                    android:background="@drawable/ps_btn_primary"
+                    android:fontFamily="@font/inter" />
+
+                <ProgressBar
+                    android:id="@+id/login_loading"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/ps_on_accent"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/login_btn_guest"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="👤  Play as Guest"
+                android:textSize="14sp"
+                android:textColor="@color/ps_text"
+                android:background="@drawable/ps_btn_ghost"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/inter" />
+
+            <TextView android:id="@+id/login_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New here? Create an account"
+                android:textColor="@color/ps_cyan"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="6dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <CheckBox android:id="@+id/login_terms_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/ps_cyan"
+                    android:text="I agree to the "
+                    android:textColor="@color/ps_muted"
+                    android:textSize="13sp" />
+
+                <TextView android:id="@+id/login_terms_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Terms &amp; Privacy Policy"
+                    android:textColor="@color/ps_cyan"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="4dp" />
+            </LinearLayout>
+
+            <TextView android:id="@+id/login_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ps_muted"
+                android:textSize="13sp"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

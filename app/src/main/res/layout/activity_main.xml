@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_wrapper"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/ps_bg"
+    android:padding="0dp">
+
+    <!-- Header card -->
+    <LinearLayout
+        android:id="@+id/header_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/ps_card"
+        android:layout_margin="12dp"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView android:id="@+id/header_title"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="PuzzleWorld"
+                android:textColor="@color/ps_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/sora_bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="center" />
+
+            <TextView android:id="@+id/btn_help"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="❓"
+                android:textColor="@color/ps_amber"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+        </LinearLayout>
+
+        <TextView android:id="@+id/puzzle_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/ps_muted"
+            android:textSize="13sp"
+            android:layout_marginTop="4dp"
+            android:gravity="center" />
+
+        <TextView android:id="@+id/btn_restart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="↺  Restart"
+            android:textColor="@color/ps_cyan"
+            android:textSize="12sp"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <!-- Puzzle prompt -->
+    <TextView android:id="@+id/puzzle_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ps_card"
+        android:padding="16dp"
+        android:textSize="17sp"
+        android:textColor="@color/ps_cyan"
+        android:gravity="center"
+        android:fontFamily="monospace"
+        android:textIsSelectable="false"
+        android:letterSpacing="0.03"
+        android:lineSpacingExtra="4dp"
+        android:visibility="gone" />
+
+    <!-- Puzzle visual area — hosts WireMaze, PatternLock, ColorSequence -->
+    <FrameLayout android:id="@+id/puzzle_stage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="8dp">
+
+        <com.jeiu.puzzleworld.PuzzleGridView android:id="@+id/puzzle_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ps_card"
+            android:visibility="visible" />
+
+        <com.jeiu.puzzleworld.PatternLockView android:id="@+id/pattern_lock"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ps_card"
+            android:visibility="gone" />
+
+        <com.jeiu.puzzleworld.ColorSequenceView android:id="@+id/color_sequence"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ps_card"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Answer input card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/ps_card"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="8dp"
+        android:padding="12dp">
+
+        <EditText android:id="@+id/answer_input"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="🔑 Enter your answer..."
+            android:textColor="@color/ps_text"
+            android:textColorHint="@color/ps_dim"
+            android:background="@drawable/ps_search"
+            android:paddingHorizontal="16dp"
+            android:textSize="15sp"
+            android:fontFamily="@font/inter"
+            android:inputType="text"
+            android:imeOptions="actionDone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center">
+
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_submit"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="44dp"
+                android:text="▶  SUBMIT"
+                android:textSize="13sp"
+                android:textColor="@color/ps_on_accent"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/ps_btn_primary"
+                android:fontFamily="@font/inter" />
+
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_hint"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="44dp"
+                android:text="💡  HINT"
+                android:textSize="13sp"
+                android:textColor="@color/ps_on_accent"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/ps_btn_gold"
+                android:fontFamily="@font/inter" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Level strip -->
+    <HorizontalScrollView android:id="@+id/strip_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:paddingVertical="10dp"
+        android:background="@color/ps_bg2"
+        android:visibility="gone">
+
+        <LinearLayout android:id="@+id/level_strip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="10dp" />
+    </HorizontalScrollView>
+
+    <!-- Bottom bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="@color/ps_bg2"
+        android:gravity="center">
+
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_rooms"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="44dp"
+            android:text="🏠  ROOMS"
+            android:textSize="13sp"
+            android:textColor="@color/ps_text"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/ps_btn_ghost"
+            android:fontFamily="@font/inter" />
+
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_daily"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="44dp"
+            android:text="🌤  DAILY"
+            android:textSize="13sp"
+            android:textColor="@color/ps_text"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/ps_btn_purple"
+            android:fontFamily="@font/inter" />
+
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_next"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="44dp"
+            android:text="NEXT  ▶"
+            android:textSize="13sp"
+            android:textColor="@color/ps_on_accent"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/ps_btn_emerald"
+            android:fontFamily="@font/inter" />
+    </LinearLayout>
+</LinearLayout>
+
+    <com.jeiu.puzzleworld.CelebrationView android:id="@+id/celebration"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

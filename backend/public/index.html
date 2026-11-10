@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>PuzzleWorld — Play</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20261103b" />
+  <link rel="stylesheet" href="games/games.css?v=20261103" />
+</head>
+<body>
+  <!-- ===================== TOP APP BAR ===================== -->
+  <header class="appbar" id="appbar">
+    <div class="appbar__inner">
+      <div class="appbar__brand">
+        <span class="appbar__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
+            <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="url(#g1)"/>
+            <path d="M14 14h6v6h-6z" fill="url(#g2)" opacity=".6"/>
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#8B5CF6"/>
+              </linearGradient>
+              <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#34D399"/><stop offset="1" stop-color="#10B981"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <div class="appbar__title">
+          <span class="appbar__name">PuzzleWorld</span>
+          <span class="appbar__sub" id="greeting">Welcome back</span>
+        </div>
+      </div>
+
+      <label class="search" aria-label="Search games and rooms">
+        <svg class="search__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input class="search__input" id="searchInput" type="search" placeholder="Search games & rooms…" autocomplete="off" />
+      </label>
+
+      <div class="appbar__actions">
+        <a class="signin-btn" href="auth.html" id="signinLink" hidden>Sign in</a>
+        <button class="icon-btn" id="btnSound" title="Mute / Unmute" aria-label="Toggle sound" aria-pressed="true">
+          <svg class="ico-on" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+          </svg>
+          <svg class="ico-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6M17 9l6 6"/>
+          </svg>
+        </button>
+        <div class="user" id="userWrap">
+          <button class="avatar" id="avatarBtn" title="Account" aria-label="Account" aria-haspopup="true" aria-expanded="false">
+            <span id="avatarInitial">G</span>
+          </button>
+          <div class="dropdown" id="userMenu" hidden>
+            <div class="dropdown__head">
+              <strong id="menuName">Guest</strong>
+              <span id="menuId">guest</span>
+            </div>
+            <button class="dropdown__item" data-act="profile">👤&nbsp; Profile</button>
+            <button class="dropdown__item" data-act="settings">⚙️&nbsp; Settings</button>
+            <button class="dropdown__item" data-act="terms">📜&nbsp; Terms &amp; Privacy</button>
+            <div class="dropdown__divider"></div>
+            <button class="dropdown__item dropdown__item--danger" data-act="logout" id="menuLogout">🚪&nbsp; Log out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== NOTIFICATION BANNER ===================== -->
+  <div class="banner-wrap" id="bannerWrap" aria-live="assertive"></div>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="shell" id="main">
+
+    <!-- Hero welcome header -->
+    <section class="hero" id="hero" aria-live="polite">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__profile">
+        <div class="hero__avatar" id="heroAvatar">G</div>
+        <div class="hero__who">
+          <h1 class="hero__title" id="heroGreeting">Welcome back, Guest</h1>
+          <p class="hero__sub" id="heroSub">Ready for today's challenge?</p>
+        </div>
+      </div>
+      <div class="hero__stats">
+        <div class="stat-pill"><span class="stat-pill__v" id="heroGames">0</span><span class="stat-pill__l">Games Played</span></div>
+        <div class="stat-pill"><span class="stat-pill__v" id="heroScore">0</span><span class="stat-pill__l">High Score</span></div>
+        <div class="stat-pill"><span class="stat-pill__v" id="heroRank">—</span><span class="stat-pill__l">Global Rank</span></div>
+      </div>
+      <div class="hero__cta">
+        <button class="btn btn--primary" id="btnPlayNow"><span class="btn__label">▶&nbsp; Play Now</span></button>
+        <button class="btn btn--ghost" id="btnSurprise"><span class="btn__label">✨&nbsp; Surprise me</span></button>
+        <button class="btn btn--resume" id="btnResume" hidden><span class="btn__label">↩&nbsp; Resume</span><span class="btn__hint" id="resumeHint"></span></button>
+      </div>
+    </section>
+
+    <!-- Dashboard tabs -->
+    <nav class="tabs" id="dashTabs" role="tablist" aria-label="Dashboard sections">
+      <button class="tab is-active" data-tab="games" role="tab" aria-selected="true">🎮 All Games</button>
+      <button class="tab" data-tab="board" role="tab" aria-selected="false">🏆 Leaderboard</button>
+      <button class="tab" data-tab="stats" role="tab" aria-selected="false">📊 My Stats</button>
+      <button class="tab" data-tab="settings" role="tab" aria-selected="false">⚙️ Settings</button>
+    </nav>
+
+    <!-- ============ PANEL: All Games ============ -->
+    <section class="panel is-active" data-panel="games" role="tabpanel">
+      <div class="chips" id="chipRow" role="tablist" aria-label="Categories">
+        <button class="cat-chip is-active" data-cat="all" role="tab" aria-selected="true">All</button>
+        <button class="cat-chip" data-cat="escape" role="tab" aria-selected="false">🚪 Escape</button>
+        <button class="cat-chip" data-cat="puzzle" role="tab" aria-selected="false">🧩 Puzzle</button>
+        <button class="cat-chip" data-cat="word" role="tab" aria-selected="false">🔤 Word</button>
+        <button class="cat-chip" data-cat="daily" role="tab" aria-selected="false">📅 Daily</button>
+      </div>
+
+      <div class="section" style="margin-top:0">
+        <div class="section__head">
+          <h2 class="section__title">Games</h2>
+          <span class="section__hint" id="gamesHint">Tap a card to play</span>
+        </div>
+        <div class="grid" id="gamesGrid"><!-- injected --></div>
+      </div>
+
+      <div class="section" id="roomsSection">
+        <div class="section__head">
+          <h2 class="section__title">Escape Rooms</h2>
+          <span class="section__hint" id="roomsHint">Loading rooms…</span>
+        </div>
+        <div class="grid grid--rooms" id="roomsGrid"><!-- injected --></div>
+      </div>
+
+      <div class="section" id="miniBoardSection">
+        <div class="section__head">
+          <h2 class="section__title">🏆 Top Players</h2>
+          <button class="text-btn" data-act="goto-board">View all →</button>
+        </div>
+        <div class="mini-lb glass" id="miniBoard"><!-- injected --></div>
+      </div>
+    </section>
+
+    <!-- ============ PANEL: Leaderboard ============ -->
+    <section class="panel" data-panel="board" role="tabpanel">
+      <div class="section" style="margin-top:0">
+        <div class="section__head">
+          <h2 class="section__title">Global Leaderboard</h2>
+          <button class="text-btn" id="btnRefreshLb">↻ Refresh</button>
+        </div>
+        <ol class="lb-list" id="leaderboard"><!-- injected --></ol>
+      </div>
+    </section>
+
+    <!-- ============ PANEL: My Stats ============ -->
+    <section class="panel" data-panel="stats" role="tabpanel">
+      <div class="panel-card glass" id="statsDetail"><!-- injected --></div>
+    </section>
+
+    <!-- ============ PANEL: Settings ============ -->
+    <section class="panel" data-panel="settings" role="tabpanel">
+      <div class="panel-card glass" id="settingsPanel"><!-- injected --></div>
+    </section>
+
+    <footer class="footer">
+      <span>PuzzleWorld · v1.0</span>
+      <span class="dot">•</span>
+      <a href="#" id="btnTerms" class="footer__link">Terms &amp; Privacy</a>
+    </footer>
+  </main>
+
+  <!-- ===================== BOTTOM NAV (mobile) ===================== -->
+  <nav class="bottomnav" aria-label="Primary">
+    <button class="bottomnav__item is-active" data-tab="games" aria-label="Games">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
+      <span>Games</span>
+    </button>
+    <button class="bottomnav__item" data-tab="board" aria-label="Leaderboard">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V10M12 20V4M18 20v-6"/></svg>
+      <span>Board</span>
+    </button>
+    <button class="bottomnav__item" data-tab="stats" aria-label="My stats">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+      <span>Stats</span>
+    </button>
+    <button class="bottomnav__item" data-tab="settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- ===================== MODAL ===================== -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" id="modalPanel">
+      <button class="modal__close" id="modalClose" aria-label="Close">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===================== TOASTS ===================== -->
+  <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+  <!-- ===================== LOADER ===================== -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="spinner"></div>
+  </div>
+
+  <script src="games/dispatcher.js?v=20261103"></script>
+  <script src="games/VaultGame.js?v=20261103"></script>
+  <script src="games/CipherGame.js?v=20261103"></script>
+  <script src="games/GearGame.js?v=20261103"></script>
+  <script src="games/SlidingTileGame.js?v=20261103"></script>
+  <script src="games/TerminalHackGame.js?v=20261103"></script>
+  <script src="games/PotionMixGame.js?v=20261103"></script>
+  <script src="games/CoordinateMazeGame.js?v=20261103"></script>
+  <script src="games/LockPinGame.js?v=20261103"></script>
+  <script src="games/NeonSimonGame.js?v=20261103"></script>
+  <script src="app.js?v=20261103"></script>
+</body>
+</html>

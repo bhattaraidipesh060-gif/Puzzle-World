@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Neon glow ring around the primary CTA -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <gradient
+                android:angle="0"
+                android:startColor="#5522D3EE"
+                android:endColor="#553B82F6" />
+        </shape>
+    </item>
+    <!-- Button surface inset to reveal the glow -->
+    <item android:left="3dp" android:top="3dp" android:right="3dp" android:bottom="3dp">
+        <ripple android:color="#33FFFFFF">
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="22dp" />
+                    <gradient
+                        android:angle="0"
+                        android:startColor="@color/ps_cyan"
+                        android:endColor="@color/ps_blue" />
+                </shape>
+            </item>
+        </ripple>
+    </item>
+</layer-list>

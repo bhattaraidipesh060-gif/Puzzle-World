@@ -1,0 +1,241 @@
+{
+  "room_id": "room_08_locksmith",
+  "room_name": "The Locksmith's Forge",
+  "theme": "forge",
+  "description": "A sweltering forge where a master locksmith once crafted unbreakable locks — and the secret patterns that open them. Embers glow in the dark, and every anvil holds a puzzle. Trace the hidden patterns and crack the forged locks to claim the master key.",
+  "puzzle_type": "lock_pin",
+  "room_graph": {
+    "room_08_locksmith_01": [
+      "room_08_locksmith_02"
+    ],
+    "room_08_locksmith_02": [
+      "room_08_locksmith_03"
+    ],
+    "room_08_locksmith_03": [
+      "room_08_locksmith_04"
+    ],
+    "room_08_locksmith_04": [
+      "room_08_locksmith_05"
+    ],
+    "room_08_locksmith_05": [
+      "room_08_locksmith_06"
+    ],
+    "room_08_locksmith_06": [
+      "room_08_locksmith_07"
+    ],
+    "room_08_locksmith_07": [
+      "room_08_locksmith_08"
+    ],
+    "room_08_locksmith_08": [
+      "room_08_locksmith_09"
+    ],
+    "room_08_locksmith_09": [
+      "room_08_locksmith_10"
+    ],
+    "room_08_locksmith_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_08_locksmith_01",
+      "title": "First Tumbler",
+      "difficulty": "Easy",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 3 pins — click them in sequence.",
+        "🔑 Pin depths are [4,3,3]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          4,
+          3,
+          3
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_02",
+      "title": "Two Pins",
+      "difficulty": "Easy",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 3 pins — click them in sequence.",
+        "🔑 Pin depths are [3,1,4]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          3,
+          1,
+          4
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_03",
+      "title": "Light Tension",
+      "difficulty": "Medium",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 3 pins — click them in sequence.",
+        "🔑 Pin depths are [4,4,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          4,
+          4,
+          2
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_04",
+      "title": "Set the Pins",
+      "difficulty": "Medium",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 4 pins — click them in sequence.",
+        "🔑 Pin depths are [1,2,1,1]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          1,
+          2,
+          1,
+          1
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_05",
+      "title": "The Binding Pin",
+      "difficulty": "Medium",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 4 pins — click them in sequence.",
+        "🔑 Pin depths are [2,2,3,3]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          2,
+          2,
+          3,
+          3
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_06",
+      "title": "Rake It",
+      "difficulty": "Hard",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 4 pins — click them in sequence.",
+        "🔑 Pin depths are [1,4,4,3]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          1,
+          4,
+          4,
+          3
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_07",
+      "title": "Shear Line",
+      "difficulty": "Hard",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 5 pins — click them in sequence.",
+        "🔑 Pin depths are [3,3,3,3,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          3,
+          3,
+          3,
+          3,
+          2
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_08",
+      "title": "Half Picked",
+      "difficulty": "Hard",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 5 pins — click them in sequence.",
+        "🔑 Pin depths are [2,1,2,2,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          2,
+          1,
+          2,
+          2,
+          2
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_09",
+      "title": "Master Keyway",
+      "difficulty": "Expert",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 5 pins — click them in sequence.",
+        "🔑 Pin depths are [2,1,2,4,4]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          2,
+          1,
+          2,
+          4,
+          4
+        ],
+        "max_attempts": 5
+      }
+    },
+    {
+      "level_id": "room_08_locksmith_10",
+      "title": "The Final Pin",
+      "difficulty": "Expert",
+      "hints": [
+        "🔑 Set each pin in order, left to right, to the correct depth.",
+        "🔑 6 pins — click them in sequence.",
+        "🔑 Pin depths are [3,2,3,4,1,4]."
+      ],
+      "mechanic": {
+        "mechanic_type": "lock_pin",
+        "pins": [
+          3,
+          2,
+          3,
+          4,
+          1,
+          4
+        ],
+        "max_attempts": 5
+      }
+    }
+  ]
+}

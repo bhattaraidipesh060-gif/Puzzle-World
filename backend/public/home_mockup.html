@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PuzzleWorld — native Home mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #05121c; font-family: Roboto, "Segoe UI", system-ui, sans-serif; }
+  .wrap { display: grid; place-items: center; padding: 18px; }
+  .phone {
+    width: 360px; height: 740px; border-radius: 30px; overflow: hidden;
+    background: #0F172A; position: relative; display: flex; flex-direction: column;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 8px #10141c, 0 0 0 9px #2a3242;
+    background-image:
+      radial-gradient(520px 520px at 88% -2%, rgba(34,211,238,.20), rgba(34,211,238,.08) 40%, transparent 70%),
+      radial-gradient(600px 600px at 8% 100%, rgba(139,92,246,.20), rgba(139,92,246,.08) 40%, transparent 70%),
+      linear-gradient(180deg, #111C31 0%, #0F172A 55%, #0B1120 100%);
+  }
+  /* status bar */
+  .status { display: flex; justify-content: space-between; padding: 8px 18px 0; font-size: 11px; color: #E2E8F0; }
+  /* app bar */
+  .appbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px 12px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .appbar .t1 { font-size: 20px; font-weight: 700; color: #E2E8F0; letter-spacing: .01em; }
+  .appbar .t2 { font-size: 12px; color: #94A3B8; margin-top: 1px; }
+  .avatar { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    font-weight: 700; font-size: 16px; color: #06131A;
+    background: linear-gradient(135deg, #8B5CF6, #22D3EE); }
+  /* scroll area */
+  .scroll { flex: 1; overflow-y: auto; padding: 14px 16px 22px; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+  /* search */
+  .search { height: 46px; border-radius: 22px; background: #1E293B; border: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; gap: 8px; padding: 0 14px; color: #64748B; font-size: 14px; }
+  /* chips */
+  .chips { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; padding: 8px 16px; border-radius: 18px; font-size: 13px; color: #94A3B8;
+    background: #263449; border: 1px solid rgba(255,255,255,.08); }
+  .chip.on { background: linear-gradient(90deg, #22D3EE, #3B82F6); color: #06131A; font-weight: 700; border-color: transparent; }
+  /* hero */
+  .hero { margin-top: 16px; border-radius: 24px; padding: 20px;
+    background: linear-gradient(135deg, rgba(34,211,238,.20), rgba(139,92,246,.20) 50%, rgba(16,185,129,.20));
+    border: 1px solid rgba(255,255,255,.15); }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .14em; color: #F59E0B; }
+  .hero h2 { font-size: 22px; font-weight: 700; color: #E2E8F0; margin-top: 6px; }
+  .hero p { font-size: 13px; color: #94A3B8; margin-top: 6px; line-height: 1.4; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 20px;
+    border-radius: 14px; font-size: 13px; font-weight: 700; color: #06131A;
+    background: linear-gradient(90deg, #22D3EE, #3B82F6); margin-top: 14px; }
+  .btn.wide { width: 100%; height: 48px; margin-top: 16px; font-size: 14px; }
+  /* stats */
+  .stats { display: flex; gap: 10px; margin-top: 14px; }
+  .stat { flex: 1; background: #1E293B; border: 1px solid rgba(255,255,255,.08); border-radius: 20px;
+    padding: 14px; text-align: center; }
+  .stat .n { font-size: 22px; font-weight: 700; }
+  .stat .l { font-size: 10px; color: #94A3B8; margin-top: 2px; }
+  /* section + grid */
+  .section { display: flex; align-items: center; margin-top: 20px; }
+  .section h3 { font-size: 18px; font-weight: 700; color: #E2E8F0; }
+  .section span { margin-left: auto; font-size: 12px; color: #94A3B8; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  .card { background: #1E293B; border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 12px; }
+  .art { height: 84px; border-radius: 18px; display: grid; place-items: center; font-size: 34px; }
+  .art.cyan { background: linear-gradient(135deg, rgba(34,211,238,.33), rgba(59,130,246,.10)); border: 1px solid rgba(34,211,238,.40); }
+  .art.purple { background: linear-gradient(135deg, rgba(139,92,246,.33), rgba(168,85,247,.10)); border: 1px solid rgba(139,92,246,.40); }
+  .art.emerald { background: linear-gradient(135deg, rgba(16,185,129,.33), rgba(52,211,153,.10)); border: 1px solid rgba(16,185,129,.40); }
+  .art.amber { background: linear-gradient(135deg, rgba(245,158,11,.33), rgba(255,215,64,.10)); border: 1px solid rgba(245,158,11,.40); }
+  .card .ct { font-size: 15px; font-weight: 700; color: #E2E8F0; margin-top: 10px; }
+  .card .cm { font-size: 11px; color: #94A3B8; margin-top: 3px; }
+  .card .cp { font-size: 11px; font-weight: 700; margin-top: 8px; }
+  .cp.cyan { color: #22D3EE; } .cp.purple { color: #8B5CF6; }
+  .cp.emerald { color: #34D399; } .cp.amber { color: #FFD740; }
+  .terms { text-align: center; font-size: 11px; color: #64748B; margin-top: 14px; padding: 8px; }
+  /* bottom nav */
+  .nav { display: flex; background: #111C31; border-top: 1px solid rgba(255,255,255,.08); padding: 6px 0; }
+  .nav div { flex: 1; text-align: center; font-size: 10px; color: #94A3B8; padding: 8px 0; line-height: 1.5; }
+  .nav div.on { color: #22D3EE; font-weight: 700; }
+  .nav em { font-style: normal; font-size: 14px; display: block; }
+  .label { color: #6b7688; font-size: 11px; text-align: center; padding-top: 10px; letter-spacing: .08em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>▲ ● ▮</span></div>
+      <div class="appbar">
+        <div>
+          <div class="t1">PuzzleWorld</div>
+          <div class="t2">Welcome, Player 👋</div>
+        </div>
+        <div class="avatar">P</div>
+      </div>
+      <div class="scroll">
+        <div class="search">🔍 <span>Search games…</span></div>
+        <div class="chips">
+          <div class="chip on">All</div>
+          <div class="chip">Escape</div>
+          <div class="chip">Puzzle</div>
+          <div class="chip">Word</div>
+          <div class="chip">Daily</div>
+        </div>
+        <div class="hero">
+          <div class="kicker">DAILY CHALLENGE</div>
+          <h2>Today's Puzzle</h2>
+          <p>Solve today's featured escape room and keep your streak alive.</p>
+          <div class="btn">▶&nbsp; Play today's puzzle</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="n" style="color:#F59E0B">0</div><div class="l">⭐ Total Score</div></div>
+          <div class="stat"><div class="n" style="color:#22D3EE">0</div><div class="l">🧩 Solved</div></div>
+          <div class="stat"><div class="n" style="color:#F43F5E">0/8</div><div class="l">🏅 Achievements</div></div>
+        </div>
+        <div class="section"><h3>Games</h3><span>4 titles</span></div>
+        <div class="grid">
+          <div class="card">
+            <div class="art cyan">🚪</div>
+            <div class="ct">Escape Rooms</div>
+            <div class="cm">9 rooms · 90 puzzles</div>
+            <div class="cp cyan">▶ Play</div>
+          </div>
+          <div class="card">
+            <div class="art purple">🔢</div>
+            <div class="ct">Sudoku</div>
+            <div class="cm">Logic · 4 difficulties</div>
+            <div class="cp purple">▶ Play</div>
+          </div>
+          <div class="card">
+            <div class="art emerald">🔤</div>
+            <div class="ct">Word Descrambler</div>
+            <div class="cm">89 words · 4 tiers</div>
+            <div class="cp emerald">▶ Play</div>
+          </div>
+          <div class="card">
+            <div class="art amber">📅</div>
+            <div class="ct">Daily Challenge</div>
+            <div class="cm">One puzzle a day</div>
+            <div class="cp amber">▶ Play</div>
+          </div>
+        </div>
+        <div class="btn wide">🏆&nbsp; View Leaderboard</div>
+        <div class="terms">📜 Terms &amp; Privacy</div>
+      </div>
+      <div class="nav">
+        <div class="on"><em>🏠</em>Home</div>
+        <div><em>🚪</em>Rooms</div>
+        <div><em>📅</em>Daily</div>
+        <div><em>🏆</em>Board</div>
+      </div>
+    </div>
+    <div class="label">native Home — activity_home.xml (built ✓)</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ps_bg"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/ps_card"
+            android:layout_margin="12dp"
+            android:padding="16dp">
+
+            <TextView android:id="@+id/wd_header_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔤 Word Descrambler"
+                android:textColor="@color/ps_text"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="4dp">
+
+                <TextView android:id="@+id/wd_status"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ps_muted"
+                    android:textSize="13sp"
+                    android:gravity="start"
+                    android:text="Unscramble the word!" />
+
+                <TextView android:id="@+id/wd_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⏱ 0:00"
+                    android:textColor="@color/ps_amber"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Scrambled word tiles -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginHorizontal="12dp"
+            android:paddingVertical="28dp"
+            android:background="@drawable/ps_card">
+
+            <LinearLayout android:id="@+id/wd_tiles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="12dp" />
+
+            <TextView android:id="@+id/wd_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ps_amber"
+                android:textSize="18sp"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Answer card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/ps_card"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
+            android:padding="12dp">
+
+            <EditText android:id="@+id/wd_answer_input"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="🔑 Type the word..."
+                android:textColor="@color/ps_text"
+                android:textColorHint="@color/ps_dim"
+                android:background="@drawable/ps_search"
+                android:paddingHorizontal="16dp"
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:inputType="textCapCharacters|textNoSuggestions"
+                android:imeOptions="actionDone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:gravity="center">
+
+                <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_check"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
+                    android:text="✓  CHECK" android:textSize="13sp" android:textColor="@color/ps_on_accent"
+                    android:layout_marginEnd="6dp" android:background="@drawable/ps_btn_emerald"
+                    android:fontFamily="sans-serif-medium" />
+
+                <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_hint"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
+                    android:text="💡  HINT" android:textSize="13sp" android:textColor="@color/ps_on_accent"
+                    android:layout_marginStart="6dp" android:background="@drawable/ps_btn_gold"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:gravity="center">
+
+                <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_difficulty"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
+                    android:text="🎯  Medium" android:textSize="13sp" android:textColor="@color/ps_text"
+                    android:layout_marginEnd="6dp" android:background="@drawable/ps_btn_purple"
+                    android:fontFamily="sans-serif-medium" />
+
+                <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_next"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
+                    android:text="NEXT WORD  ▶" android:textSize="13sp" android:textColor="@color/ps_on_accent"
+                    android:layout_marginStart="6dp" android:background="@drawable/ps_btn_primary"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.jeiu.puzzleworld.CelebrationView android:id="@+id/wd_celebration"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

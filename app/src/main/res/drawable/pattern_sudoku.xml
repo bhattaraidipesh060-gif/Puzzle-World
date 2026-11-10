@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp" android:height="36dp"
+    android:viewportWidth="36" android:viewportHeight="36">
+    <!-- 3x3 sudoku mini-grid with one filled cell -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="1" android:fillColor="#00000000"
+        android:pathData="M0,12 L36,12 M0,24 L36,24 M12,0 L12,36 M24,0 L24,36" />
+    <path android:fillColor="#FFFFFF" android:fillAlpha="0.5"
+        android:pathData="M18,14 m-3,0 a3,3 0,1,1 6,0 a3,3 0,1,1 -6,0" />
+</vector>

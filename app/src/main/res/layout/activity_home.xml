@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ps_bg">
+
+    <LinearLayout android:id="@+id/home_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- ================= APP BAR ================= -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/ps_appbar"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PuzzleWorld"
+                    android:textColor="@color/ps_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/sora_bold"
+                    android:letterSpacing="0.01" />
+
+                <TextView android:id="@+id/home_welcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome, Player 👋"
+                    android:textColor="@color/ps_muted"
+                    android:textSize="12sp"
+                    android:layout_marginTop="1dp" />
+            </LinearLayout>
+
+            <TextView android:id="@+id/home_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐ 0"
+                android:textColor="@color/ps_amber2"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:background="@drawable/ps_chip"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:layout_marginEnd="10dp" />
+
+            <TextView android:id="@+id/home_sound"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="🔔"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView android:id="@+id/home_logout"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="P"
+                android:textColor="@color/ps_on_accent"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="@drawable/ps_avatar"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- ================= TABS ================= -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/ps_appbar"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="10dp">
+
+            <TextView android:id="@+id/tab_games"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="🎮 All Games"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/ps_on_accent"
+                android:background="@drawable/ps_chip_active"
+                android:layout_marginEnd="4dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView android:id="@+id/tab_board"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="🏆 Leaderboard"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/ps_muted"
+                android:layout_marginHorizontal="4dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView android:id="@+id/tab_stats"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="📊 My Stats"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/ps_muted"
+                android:layout_marginHorizontal="4dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView android:id="@+id/tab_settings"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="⚙️ Settings"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/ps_muted"
+                android:layout_marginStart="4dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- ================= PANEL HOST ================= -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- ============ PANEL 1: ALL GAMES ============ -->
+            <ScrollView android:id="@+id/panel_games"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:clipToPadding="false"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="22dp">
+
+                    <!-- Search -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/ps_search"
+                        android:paddingHorizontal="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔍"
+                            android:textSize="14sp" />
+
+                        <EditText android:id="@+id/home_search"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:background="@null"
+                            android:hint="Search games &amp; rooms…"
+                            android:textColor="@color/ps_text"
+                            android:textColorHint="@color/ps_dim"
+                            android:textSize="14sp"
+                            android:singleLine="true"
+                            android:inputType="text"
+                            android:imeOptions="actionSearch"
+                            android:padding="0dp" />
+                    </LinearLayout>
+
+                    <!-- Category chips -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:scrollbars="none"
+                        android:clipToPadding="false">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView android:id="@+id/chip_all"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="All"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/ps_on_accent"
+                                android:background="@drawable/ps_chip_active"
+                                android:paddingHorizontal="16dp"
+                                android:paddingVertical="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+
+                            <TextView android:id="@+id/chip_escape"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🚪 Escape"
+                                android:textSize="13sp"
+                                android:textColor="@color/ps_muted"
+                                android:background="@drawable/ps_chip"
+                                android:paddingHorizontal="16dp"
+                                android:paddingVertical="8dp"
+                                android:layout_marginStart="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+
+                            <TextView android:id="@+id/chip_puzzle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🧩 Puzzle"
+                                android:textSize="13sp"
+                                android:textColor="@color/ps_muted"
+                                android:background="@drawable/ps_chip"
+                                android:paddingHorizontal="16dp"
+                                android:paddingVertical="8dp"
+                                android:layout_marginStart="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+
+                            <TextView android:id="@+id/chip_word"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔤 Word"
+                                android:textSize="13sp"
+                                android:textColor="@color/ps_muted"
+                                android:background="@drawable/ps_chip"
+                                android:paddingHorizontal="16dp"
+                                android:paddingVertical="8dp"
+                                android:layout_marginStart="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+
+                            <TextView android:id="@+id/chip_daily"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📅 Daily"
+                                android:textSize="13sp"
+                                android:textColor="@color/ps_muted"
+                                android:background="@drawable/ps_chip"
+                                android:paddingHorizontal="16dp"
+                                android:paddingVertical="8dp"
+                                android:layout_marginStart="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <!-- Hero card -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/ps_hero"
+                        android:padding="20dp"
+                        android:layout_marginTop="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DAILY CHALLENGE"
+                            android:textColor="@color/ps_amber"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.14" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Today's Puzzle"
+                            android:textColor="@color/ps_text"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/sora_bold"
+                            android:layout_marginTop="6dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Solve today's featured escape room and keep your streak alive."
+                            android:textColor="@color/ps_muted"
+                            android:textSize="13sp"
+                            android:layout_marginTop="6dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="14dp">
+
+                            <TextView android:id="@+id/hero_daily"
+                                android:layout_width="0dp"
+                                android:layout_height="44dp"
+                                android:layout_weight="1"
+                                android:text="▶  Play Now"
+                                android:textColor="@color/ps_on_accent"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:background="@drawable/ps_btn_primary"
+                                android:layout_marginEnd="6dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+
+                            <TextView android:id="@+id/btn_surprise"
+                                android:layout_width="0dp"
+                                android:layout_height="44dp"
+                                android:layout_weight="1"
+                                android:text="✨ Surprise me"
+                                android:textColor="@color/ps_text"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:background="@drawable/ps_btn_ghost"
+                                android:layout_marginStart="6dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Stats -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false"
+                        android:layout_marginTop="14dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/ps_card"
+                            android:elevation="8dp"
+                            android:padding="14dp"
+                            android:layout_marginEnd="5dp">
+
+                            <TextView android:id="@+id/stat_score"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/ps_amber"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/sora_bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="⭐ Total Score"
+                                android:textColor="@color/ps_muted"
+                                android:textSize="10sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/ps_card"
+                            android:elevation="8dp"
+                            android:padding="14dp"
+                            android:layout_marginHorizontal="5dp">
+
+                            <TextView android:id="@+id/stat_solved"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/ps_cyan"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/sora_bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🧩 Solved"
+                                android:textColor="@color/ps_muted"
+                                android:textSize="10sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <LinearLayout android:id="@+id/stat_achievements_card"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/ps_card"
+                            android:elevation="8dp"
+                            android:padding="14dp"
+                            android:layout_marginStart="5dp"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <TextView android:id="@+id/stat_achievements"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0/8"
+                                android:textColor="@color/ps_rose"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/sora_bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🏅 Achievements"
+                                android:textColor="@color/ps_muted"
+                                android:textSize="10sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Games section header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="20dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Games"
+                            android:textColor="@color/ps_text"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/sora_bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4 titles"
+                            android:textColor="@color/ps_muted"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Games grid -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/games_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="never"
+                        android:clipToPadding="false"
+                        tools:listitem="@layout/item_game_card"
+                        tools:itemCount="4" />
+
+                    <!-- Escape Rooms section header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="24dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Escape Rooms"
+                            android:textColor="@color/ps_text"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/sora_bold" />
+
+                        <TextView android:id="@+id/rooms_hint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="9 rooms · 90 levels"
+                            android:textColor="@color/ps_muted"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Rooms grid -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rooms_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="never"
+                        android:clipToPadding="false"
+                        tools:listitem="@layout/item_game_card"
+                        tools:itemCount="6" />
+
+                    <!-- Mini leaderboard -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="24dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🏆 Top Players"
+                            android:textColor="@color/ps_text"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/sora_bold" />
+
+                        <TextView android:id="@+id/mini_viewall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View all →"
+                            android:textColor="@color/ps_cyan"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:padding="6dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+
+                    <LinearLayout android:id="@+id/mini_board"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/ps_card"
+                        android:padding="14dp"
+                        android:layout_marginTop="10dp" />
+
+                    <!-- Terms link -->
+                    <TextView android:id="@+id/home_terms"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📜 Terms &amp; Privacy"
+                        android:textColor="@color/ps_dim"
+                        android:textSize="11sp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="14dp"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- ============ PANEL 2: LEADERBOARD ============ -->
+            <ScrollView android:id="@+id/panel_board"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:clipToPadding="false"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="22dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Global Leaderboard"
+                            android:textColor="@color/ps_text"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/sora_bold" />
+
+                        <TextView android:id="@+id/lb_refresh"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="↻ Refresh"
+                            android:textColor="@color/ps_cyan"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:background="@drawable/ps_chip"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="8dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+
+                    <TextView android:id="@+id/lb_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Loading…"
+                        android:textColor="@color/ps_muted"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:padding="18dp" />
+
+                    <LinearLayout android:id="@+id/lb_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- ============ PANEL 3: MY STATS ============ -->
+            <ScrollView android:id="@+id/panel_stats"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:clipToPadding="false"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout android:id="@+id/stats_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="22dp" />
+            </ScrollView>
+
+            <!-- ============ PANEL 4: SETTINGS ============ -->
+            <ScrollView android:id="@+id/panel_settings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:clipToPadding="false"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="22dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Settings"
+                        android:textColor="@color/ps_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/sora_bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/ps_card"
+                        android:padding="16dp"
+                        android:layout_marginTop="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="10dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="🔊 Sound effects"
+                                    android:textColor="@color/ps_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Synthesized UI tones"
+                                    android:textColor="@color/ps_muted"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <TextView android:id="@+id/settings_sound"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔔"
+                                android:textSize="18sp"
+                                android:background="@drawable/ps_chip"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="10dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="👤 Account"
+                                    android:textColor="@color/ps_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView android:id="@+id/settings_account"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Player"
+                                    android:textColor="@color/ps_muted"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <TextView android:id="@+id/settings_logout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sign out"
+                                android:textColor="@color/ps_rose"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:background="@drawable/ps_chip"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingVertical="10dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="🗑️ Reset progress"
+                                    android:textColor="@color/ps_text"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Clears score, streaks &amp; solved levels"
+                                    android:textColor="@color/ps_muted"
+                                    android:textSize="11sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <TextView android:id="@+id/settings_reset"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Reset"
+                                android:textColor="@color/ps_rose"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:background="@drawable/ps_chip"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="8dp"
+                                android:clickable="true"
+                                android:focusable="true" />
+                        </LinearLayout>
+
+                        <TextView android:id="@+id/settings_terms"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="📜  Terms &amp; Privacy"
+                            android:textColor="@color/ps_cyan"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:background="@drawable/ps_btn_ghost"
+                            android:paddingVertical="12dp"
+                            android:layout_marginTop="8dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+        </FrameLayout>
+
+        <!-- ================= BOTTOM NAV ================= -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/ps_nav"
+            android:paddingVertical="6dp">
+
+            <TextView android:id="@+id/nav_games"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="🎮&#10;Games"
+                android:textColor="@color/ps_cyan"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:paddingVertical="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView android:id="@+id/nav_board"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="🏆&#10;Board"
+                android:textColor="@color/ps_muted"
+                android:textSize="10sp"
+                android:paddingVertical="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView android:id="@+id/nav_stats"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="📊&#10;Stats"
+                android:textColor="@color/ps_muted"
+                android:textSize="10sp"
+                android:paddingVertical="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView android:id="@+id/nav_settings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="⚙️&#10;Settings"
+                android:textColor="@color/ps_muted"
+                android:textSize="10sp"
+                android:paddingVertical="8dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.jeiu.puzzleworld.CelebrationView android:id="@+id/home_celebration"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

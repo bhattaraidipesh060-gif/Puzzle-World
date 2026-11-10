@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Gradient border (cyan → violet → emerald) revealed as a glowing edge -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="20dp" />
+            <gradient
+                android:angle="0"
+                android:startColor="#9922D3EE"
+                android:centerColor="#998B5CF6"
+                android:endColor="#9910B981" />
+        </shape>
+    </item>
+    <!-- Card surface inset to expose the 2dp gradient border -->
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="18dp" />
+            <solid android:color="@color/ps_surface" />
+        </shape>
+    </item>
+    <!-- Top glass sheen -->
+    <item android:top="3dp" android:left="3dp" android:right="3dp" android:height="1dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="8dp" />
+            <gradient
+                android:angle="0"
+                android:startColor="#40FFFFFF"
+                android:endColor="#08FFFFFF" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="270"
+                android:startColor="#FF0F1A2E" android:centerColor="#FF15243A"
+                android:endColor="#FF080C14" android:type="linear" />
+        </shape>
+    </item>
+    <item>
+        <bitmap android:src="@drawable/pattern_wire"
+            android:tileMode="repeat" android:alpha="0.08" />
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="45"
+                android:startColor="#2200E5FF" android:centerColor="#00000000"
+                android:endColor="#00000000" android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

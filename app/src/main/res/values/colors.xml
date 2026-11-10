@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Play-Store dark palette (slate #0f172a) -->
+    <color name="primary">#FF0F172A</color>
+    <color name="primary_variant">#FF111C31</color>
+    <color name="accent">#FF00E5FF</color>
+    <color name="accent_pink">#FFFF4081</color>
+    <color name="accent_gold">#FFFFD740</color>
+    <color name="accent_green">#FF00E676</color>
+    <color name="background">#FF0F172A</color>
+    <color name="surface">#FF1E293B</color>
+    <color name="surface_light">#FF263449</color>
+    <color name="on_primary">#FFE2E8F0</color>
+    <color name="on_surface">#FF94A3B8</color>
+    <color name="ic_launcher_background">#FF0F172A</color>
+
+    <!-- Play-Store design tokens -->
+    <color name="ps_bg">#FF0F172A</color>
+    <color name="ps_bg2">#FF111C31</color>
+    <color name="ps_surface">#FF1E293B</color>
+    <color name="ps_surface2">#FF263449</color>
+    <color name="ps_surface3">#FF334155</color>
+    <color name="ps_stroke">#14FFFFFF</color>
+    <color name="ps_stroke2">#26FFFFFF</color>
+    <color name="ps_text">#FFE2E8F0</color>
+    <color name="ps_muted">#FF94A3B8</color>
+    <color name="ps_dim">#FF64748B</color>
+    <color name="ps_on_accent">#FF06131A</color>
+    <color name="ps_cyan">#FF22D3EE</color>
+    <color name="ps_blue">#FF3B82F6</color>
+    <color name="ps_purple">#FF8B5CF6</color>
+    <color name="ps_violet">#FFA855F7</color>
+    <color name="ps_emerald">#FF10B981</color>
+    <color name="ps_emerald2">#FF34D399</color>
+    <color name="ps_amber">#FFF59E0B</color>
+    <color name="ps_amber2">#FFFFD740</color>
+    <color name="ps_rose">#FFF43F5E</color>
+    <color name="ps_cyan_a">#3322D3EE</color>
+    <color name="ps_purple_a">#338B5CF6</color>
+    <color name="ps_emerald_a">#3310B981</color>
+    <color name="ps_amber_a">#33F59E0B</color>
+    <color name="ps_rose_a">#33F43F5E</color>
+
+    <!-- Puzzle grid colors -->
+    <color name="grid_line">#FF1E293B</color>
+    <color name="grid_glow">#3300E5FF</color>
+    <color name="cell_start">#FF00E676</color>
+    <color name="cell_start_glow">#4400E676</color>
+    <color name="cell_end">#FFFF4081</color>
+    <color name="cell_end_glow">#44FF4081</color>
+    <color name="cell_wire">#FFFFD740</color>
+    <color name="cell_wire_glow">#44FFD740</color>
+    <color name="cell_node">#FF448AFF</color>
+    <color name="cell_node_glow">#44448AFF</color>
+
+    <!-- Level strip -->
+    <color name="strip_bg">#FF0B1120</color>
+    <color name="level_active">#FFFF4081</color>
+    <color name="level_solved">#FF00E676</color>
+    <color name="level_locked">#FF2A2A2A</color>
+    <color name="level_open">#FF263449</color>
+
+    <!-- Buttons -->
+    <color name="btn_submit">#FF00E5FF</color>
+    <color name="btn_hint">#FFFFD740</color>
+    <color name="btn_rooms">#FF448AFF</color>
+    <color name="btn_next">#FF00E676</color>
+</resources>

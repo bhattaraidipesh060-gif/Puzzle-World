@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0f172a" />
+<title>Sign in — PuzzleWorld</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #0f172a;
+  --surface: rgba(30, 41, 59, .55);
+  --surface-2: rgba(38, 52, 73, .72);
+  --stroke: rgba(255, 255, 255, .1);
+  --stroke-strong: rgba(255, 255, 255, .18);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --dim: #64748b;
+  --cyan: #22d3ee;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --emerald: #34d399;
+  --rose: #f43f5e;
+  --grad: linear-gradient(135deg, #22d3ee, #3b82f6);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --display: 'Sora', var(--font);
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font); color: var(--text); line-height: 1.5;
+  background: var(--bg); -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr;
+  background:
+    radial-gradient(900px 620px at 8% -10%, rgba(34, 211, 238, .14), transparent 60%),
+    radial-gradient(900px 700px at 100% 0%, rgba(139, 92, 246, .16), transparent 55%),
+    radial-gradient(800px 700px at 55% 115%, rgba(16, 185, 129, .12), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* ---------- brand panel ---------- */
+.brand { position: relative; overflow: hidden; display: flex; align-items: center; padding: 48px; }
+.brand__inner { position: relative; z-index: 1; max-width: 460px; }
+.brand__logo { font-size: 52px; filter: drop-shadow(0 8px 24px rgba(34, 211, 238, .4)); animation: floaty 6s ease-in-out infinite; }
+.brand h1 {
+  font-family: var(--display); font-size: clamp(34px, 4vw, 48px); font-weight: 800; letter-spacing: -.02em; margin: 14px 0 10px;
+  background: linear-gradient(92deg, #7ce9fb, #b69bff 55%, #5eeac0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.brand__tag { color: var(--muted); font-size: 16px; max-width: 42ch; }
+.brand__points { list-style: none; margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
+.brand__points li { display: flex; align-items: center; gap: 12px; color: var(--text); font-size: 15px; font-weight: 500; }
+.brand__points li::before {
+  content: '✓'; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; flex: none;
+  background: rgba(52, 211, 153, .16); color: var(--emerald); border: 1px solid rgba(52, 211, 153, .3); font-size: 13px;
+}
+.orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; }
+.orb--1 { width: 340px; height: 340px; top: -80px; right: -60px; background: radial-gradient(circle, rgba(34, 211, 238, .5), transparent 70%); animation: drift 12s ease-in-out infinite; }
+.orb--2 { width: 300px; height: 300px; bottom: -100px; left: -40px; background: radial-gradient(circle, rgba(139, 92, 246, .5), transparent 70%); animation: drift 15s ease-in-out infinite reverse; }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(24px, 18px); } }
+
+/* ---------- form panel ---------- */
+.form-side { display: grid; place-items: center; padding: 32px 20px; }
+.card {
+  width: min(430px, 100%); border-radius: 20px; padding: 34px 30px 26px;
+  background: var(--surface); border: 1px solid var(--stroke-strong);
+  backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .06);
+  animation: fadeUp .5s var(--ease) both;
+}
+.card__head { text-align: center; margin-bottom: 20px; }
+.card__logo { display: none; }
+.card__head h2 { font-family: var(--display); font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+.card__sub { color: var(--muted); font-size: 13.5px; margin-top: 4px; }
+
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; border-radius: 14px;
+  background: rgba(0, 0, 0, .25); border: 1px solid var(--stroke); margin-bottom: 22px;
+}
+.tab {
+  height: 40px; border: 0; border-radius: 10px; background: transparent; color: var(--muted);
+  font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all .2s var(--ease);
+}
+.tab:hover { color: var(--text); }
+.tab.is-active { background: var(--grad); color: #06121a; box-shadow: 0 6px 18px rgba(34, 211, 238, .35); }
+
+/* ---------- floating-label fields ---------- */
+.field { position: relative; margin-bottom: 16px; }
+.field input {
+  width: 100%; height: 54px; padding: 20px 46px 6px 16px; border-radius: 13px;
+  background: rgba(255, 255, 255, .04); border: 1px solid var(--stroke); color: var(--text);
+  font-family: inherit; font-size: 15px; outline: none; transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.field input:focus { border-color: rgba(34, 211, 238, .6); box-shadow: 0 0 0 3px rgba(34, 211, 238, .16); background: rgba(34, 211, 238, .06); }
+.field label {
+  position: absolute; left: 16px; top: 17px; color: var(--muted); font-size: 15px; pointer-events: none;
+  transition: all .18s var(--ease);
+}
+.field input:focus + label, .field input:not(:placeholder-shown) + label {
+  top: 7px; font-size: 11px; font-weight: 600; color: var(--cyan); letter-spacing: .04em;
+}
+.reveal {
+  position: absolute; right: 10px; top: 15px; width: 28px; height: 28px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted); font-size: 15px; cursor: pointer; line-height: 1;
+  display: grid; place-items: center; transition: color .15s, background .15s;
+}
+.reveal:hover { color: var(--text); background: rgba(255, 255, 255, .08); }
+
+.agree { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: var(--muted); margin: 2px 0 18px; line-height: 1.45; }
+.agree input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--cyan); flex: none; }
+.agree a { color: var(--cyan); text-decoration: none; font-weight: 600; }
+.agree a:hover { text-decoration: underline; }
+
+.form-msg { border-radius: 11px; padding: 11px 13px; font-size: 13px; font-weight: 500; margin-bottom: 14px; animation: fadeUp .25s var(--ease) both; }
+.form-msg--error { background: rgba(244, 63, 94, .12); color: #fb7185; border: 1px solid rgba(244, 63, 94, .3); }
+.form-msg--success { background: rgba(52, 211, 153, .12); color: #34d399; border: 1px solid rgba(52, 211, 153, .3); }
+
+.btn {
+  position: relative; width: 100%; height: 50px; border: 0; border-radius: 13px; cursor: pointer;
+  background: var(--grad); color: #06121a; font-family: inherit; font-size: 15px; font-weight: 800;
+  box-shadow: 0 12px 28px rgba(34, 211, 238, .35); transition: transform .12s var(--ease), box-shadow .2s, filter .2s;
+}
+.btn:hover { box-shadow: 0 16px 36px rgba(34, 211, 238, .5); filter: brightness(1.05); }
+.btn:active { transform: scale(.96); }
+.btn.is-loading { pointer-events: none; color: transparent; }
+.btn.is-loading::after {
+  content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%;
+  border: 2.5px solid rgba(6, 18, 26, .25); border-top-color: #06121a; animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.switch { text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
+.switch a { color: var(--cyan); font-weight: 700; text-decoration: none; }
+.switch a:hover { text-decoration: underline; }
+.guest { text-align: center; margin-top: 10px; }
+.guest a { color: var(--dim); font-size: 12.5px; text-decoration: none; font-weight: 600; transition: color .15s; }
+.guest a:hover { color: var(--muted); }
+
+/* ---------- modals ---------- */
+.modal { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; padding: 20px; }
+.modal.is-open { display: grid; }
+.modal__backdrop { position: absolute; inset: 0; background: rgba(2, 6, 17, .72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadeIn .2s ease both; }
+.modal__panel {
+  position: relative; width: min(600px, 100%); max-height: 82vh; overflow-y: auto; border-radius: 18px;
+  background: var(--surface-2); border: 1px solid var(--stroke-strong); padding: 28px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6); animation: modalIn .3s var(--ease) both;
+}
+.modal__close {
+  position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, .05); color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; transition: all .18s;
+}
+.modal__close:hover { color: var(--text); background: rgba(255, 255, 255, .1); }
+.modal h3 { font-family: var(--display); font-size: 21px; margin-bottom: 4px; padding-right: 40px; }
+.modal .muted { color: var(--dim); font-size: 12px; margin-bottom: 14px; }
+.modal__body h4 { font-size: 14px; margin: 16px 0 6px; color: var(--cyan); }
+.modal__body p { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes modalIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 860px) {
+  .stage { grid-template-columns: 1fr; }
+  .brand { display: none; }
+  .card__logo { display: grid; place-items: center; font-size: 40px; margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <aside class="brand" aria-hidden="true">
+    <div class="brand__inner">
+      <div class="brand__logo">🧩</div>
+      <h1>PuzzleWorld</h1>
+      <p class="brand__tag">90 escape-room puzzles, Sudoku &amp; daily challenges — now with cloud sync and a global leaderboard.</p>
+      <ul class="brand__points">
+        <li>🚪 Nine themed escape rooms</li>
+        <li>🔢 Sudoku &amp; 🔤 word descrambler</li>
+        <li>📅 Daily challenge &amp; streaks</li>
+        <li>🏆 Sync progress across devices</li>
+      </ul>
+    </div>
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+  </aside>
+
+  <main class="form-side">
+    <div class="card">
+      <div class="card__head">
+        <div class="card__logo">🧩</div>
+        <h2 id="formTitle">Welcome back</h2>
+        <p class="card__sub" id="formSub">Sign in to continue your progress.</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Authentication mode">
+        <button class="tab is-active" data-mode="login" role="tab" aria-selected="true">Sign In</button>
+        <button class="tab" data-mode="register" role="tab" aria-selected="false">Create Account</button>
+      </div>
+
+      <form id="authForm" novalidate>
+        <div class="field">
+          <input id="username" name="username" type="text" placeholder=" " autocomplete="username" required />
+          <label for="username">Username</label>
+        </div>
+
+        <div class="field">
+          <input id="password" name="password" type="password" placeholder=" " autocomplete="current-password" required />
+          <label for="password">Password</label>
+          <button type="button" class="reveal" data-target="password" aria-label="Toggle password visibility">👁</button>
+        </div>
+
+        <div class="field field--confirm" hidden>
+          <input id="confirm" name="confirm" type="password" placeholder=" " autocomplete="new-password" />
+          <label for="confirm">Confirm password</label>
+          <button type="button" class="reveal" data-target="confirm" aria-label="Toggle password visibility">👁</button>
+        </div>
+
+        <label class="agree" hidden>
+          <input id="agree" type="checkbox" />
+          <span>By creating an account, you agree to our <a href="#" data-modal="terms">Terms of Service</a> and <a href="#" data-modal="privacy">Privacy Policy</a>.</span>
+        </label>
+
+        <div class="form-msg" id="formMsg" hidden></div>
+
+        <button type="submit" class="btn" id="submitBtn"><span id="btnLabel">Sign In</span></button>
+      </form>
+
+      <p class="switch" id="switchText">New here? <a href="#" data-mode="register">Create an account</a></p>
+      <p class="guest"><a href="/">← Continue as guest</a></p>
+    </div>
+  </main>
+</div>
+
+<!-- Terms of Service modal -->
+<div class="modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+  <div class="modal__backdrop" data-close="terms"></div>
+  <div class="modal__panel">
+    <button class="modal__close" data-close="terms" aria-label="Close">×</button>
+    <h3 id="termsTitle">Terms of Service</h3>
+    <p class="muted">Last updated: November 2, 2026</p>
+    <div class="modal__body">
+      <h4>1. Acceptance of Terms</h4>
+      <p>By creating an account or using PuzzleWorld, you agree to these Terms of Service. If you do not agree, please do not use the service.</p>
+      <h4>2. Use of the Service</h4>
+      <p>PuzzleWorld is an offline-first puzzle game with optional cloud sync. You are responsible for the accuracy of your account information and for keeping your password secure.</p>
+      <h4>3. Accounts</h4>
+      <p>You may register a personal account. You must not impersonate others, use offensive usernames, or attempt to access other players' data.</p>
+      <h4>4. Acceptable Use</h4>
+      <p>Do not attempt to disrupt, reverse-engineer, or exploit the service, its leaderboards, or other players' progress.</p>
+      <h4>5. Termination</h4>
+      <p>We may suspend or remove accounts that violate these terms. You may delete your progress at any time from the app.</p>
+      <h4>6. Changes</h4>
+      <p>We may update these terms periodically. Continued use after changes constitutes acceptance of the revised terms.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Privacy Policy modal -->
+<div class="modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+  <div class="modal__backdrop" data-close="privacy"></div>
+  <div class="modal__panel">
+    <button class="modal__close" data-close="privacy" aria-label="Close">×</button>
+    <h3 id="privacyTitle">Privacy Policy</h3>
+    <p class="muted">Last updated: November 2, 2026</p>
+    <div class="modal__body">
+      <h4>1. What We Collect</h4>
+      <p>We store only what is needed to run the game: a unique player ID, your chosen username, and gameplay statistics (score, streaks, solved levels). Passwords are salted and hashed — we never store plaintext passwords.</p>
+      <h4>2. How We Use It</h4>
+      <p>Your data powers progress sync, statistics, achievements, and the global leaderboard. We do not sell, rent, or share your personal data with third parties.</p>
+      <h4>3. Storage &amp; Security</h4>
+      <p>Data is stored in a local SQLite database. Authentication uses salted SHA-256 hashing. Access to raw data is restricted to the service administrator.</p>
+      <h4>4. Your Rights</h4>
+      <p>You may review, export, or delete your data at any time. Deleting your account removes your progress and leaderboard entry.</p>
+      <h4>5. Contact</h4>
+      <p>Questions about this policy can be directed to the app administrator from the in-app help section.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+try { localStorage.getItem('x'); } catch(e) {
+  Object.defineProperty(window,'localStorage',{configurable:true,value:{_d:{},
+    getItem:function(k){return k in this._d?this._d[k]:null;},
+    setItem:function(k,v){this._d[k]=String(v);}, removeItem:function(k){delete this._d[k];}}});
+}
+window.fetch = async function(url, opts){
+  const body = JSON.parse((opts && opts.body) || '{}');
+  const username = body.username || 'player';
+  await new Promise(function(r){ setTimeout(r, 500); });
+  if (String(url).indexOf('/api/auth/') !== -1) {
+    return { ok:true, status:200, json: async function(){ return {user_id:'u_preview', username: username}; } };
+  }
+  return { ok:false, status:404, json: async function(){ return {error:'Not found'}; } };
+};
+</script>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+  let mode = 'login';
+
+  function hideMsg() { $('#formMsg').hidden = true; }
+  function showMsg(text, kind) {
+    const el = $('#formMsg');
+    el.textContent = text;
+    el.className = 'form-msg form-msg--' + kind;
+    el.hidden = false;
+  }
+  function setLoading(on) {
+    $('#submitBtn').classList.toggle('is-loading', on);
+  }
+
+  function setMode(next) {
+    mode = next;
+    const isReg = next === 'register';
+    $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.mode === next));
+    $$('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.mode === next)));
+    $('#formTitle').textContent = isReg ? 'Create your account' : 'Welcome back';
+    $('#formSub').textContent = isReg ? 'Join PuzzleWorld and sync your progress.' : 'Sign in to continue your progress.';
+    $('#btnLabel').textContent = isReg ? 'Create Account' : 'Sign In';
+    $('#switchText').innerHTML = isReg
+      ? 'Already have an account? <a href="#" data-mode="login">Sign in</a>'
+      : 'New here? <a href="#" data-mode="register">Create an account</a>';
+    $$('.field--confirm').forEach((f) => { f.hidden = !isReg; });
+    $$('.agree').forEach((a) => { a.hidden = !isReg; });
+    hideMsg();
+    setLoading(false);
+  }
+
+  // Tab + link switching
+  document.addEventListener('click', (e) => {
+    const modeEl = e.target.closest('[data-mode]');
+    if (modeEl && !e.target.closest('[data-modal]')) { e.preventDefault(); setMode(modeEl.dataset.mode); }
+  });
+
+  // Password visibility toggles
+  $$('.reveal').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.textContent = show ? '🙈' : '👁';
+    });
+  });
+
+  // Modals (terms / privacy)
+  const modals = { terms: '#termsModal', privacy: '#privacyModal' };
+  function openModal(key) { document.querySelector(modals[key]).classList.add('is-open'); }
+  function closeModals() { $$('.modal').forEach((m) => m.classList.remove('is-open')); }
+  document.addEventListener('click', (e) => {
+    const open = e.target.closest('[data-modal]');
+    if (open) { e.preventDefault(); openModal(open.dataset.modal); return; }
+    const close = e.target.closest('[data-close]');
+    if (close) closeModals();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModals(); });
+
+  // Prefill username if already signed in
+  const uname = localStorage.getItem('pw_username');
+  if (uname && uname !== 'Guest') { $('#username').value = uname; }
+
+  // Submit → backend
+  $('#authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMsg();
+    const username = $('#username').value.trim();
+    const password = $('#password').value;
+
+    if (!username) return showMsg('Please enter a username.', 'error');
+    if (!password) return showMsg('Please enter a password.', 'error');
+    if (mode === 'register') {
+      if (password.length < 4) return showMsg('Password must be at least 4 characters.', 'error');
+      if (password !== $('#confirm').value) return showMsg('Passwords do not match.', 'error');
+      if (!$('#agree').checked) return showMsg('Please accept the Terms of Service and Privacy Policy.', 'error');
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/' + mode, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+
+      showMsg(mode === 'register' ? 'Account created — signing you in…' : 'Welcome back, ' + data.username + '!', 'success');
+      localStorage.setItem('pw_user_id', data.user_id);
+      localStorage.setItem('pw_username', data.username);
+      setTimeout(() => { /* sandboxed preview: skip redirect */ }, 900);
+    } catch (err) {
+      showMsg(err.message, 'error');
+      setLoading(false);
+    }
+  });
+})();
+
+</script>
+</body>
+</html>

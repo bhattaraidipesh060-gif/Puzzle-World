@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PuzzleWorld</string>
+    <string name="terms_text">By using PuzzleWorld, you agree to play fair, have fun, and not reverse-engineer our puzzle algorithms. This app is provided for entertainment purposes. All puzzle content is procedurally generated or authored by the PuzzleWorld team. No real-world prizes or monetary value are associated with in-game scores. We reserve the right to update these terms at any time.</string>
+    <string name="privacy_text">PuzzleWorld stores your game progress, scores, and username locally on your device only. No personal data is transmitted to external servers unless you explicitly connect to our optional cloud sync service. We do not collect, sell, or share your information with third parties. This app does not use advertising trackers. Your data stays on your device — you own it.</string>
+    <string name="tutorial_pattern_lock">🔓 PATTERN LOCK\n\nA 3×3 grid of dots. Drag your finger to connect them in the correct sequence. The pattern you draw must match the hidden pattern exactly — order matters!</string>
+    <string name="tutorial_color_sequence">🎨 COLOR SEQUENCE\n\nFour colored panels will flash in a specific order. Watch carefully, then tap them back in the exact same sequence. This tests your memory!</string>
+    <string name="tutorial_wire_maze">🔌 WIRE MAZE\n\nDrag from the green power outlet to the bulb to complete the circuit. Avoid the dark wall tiles — they block your path. Can you match the shortest route (par)?</string>
+    <string name="tutorial_cipher">🔐 CIPHER\n\nDecode the encrypted text to reveal the hidden message. Use pattern recognition and the hints provided. Type your answer and submit!</string>
+    <string name="tutorial_riddle">🤔 RIDDLE\n\nRead the riddle carefully. Think outside the box — the answer is often a single word. Use hints if you\'re stuck!</string>
+    <string name="tutorial_deduction">🧩 DEDUCTION GRID\n\nUse the clues to match items to their categories. Think of it as a logic puzzle. Enter your solution in order (e.g., "RedCoffee BlueDog GreenWater").</string>
+    <string name="tutorial_mechanical_lock">🔒 MECHANICAL LOCK\n\nA 3-digit combination lock. You have limited attempts — guess the combination by trial and error or use clues from earlier puzzles!</string>
+    <string name="tutorial_sudoku">🧩 SUDOKU\n\nFill the 9×9 grid so each row, column, and 3×3 box contains digits 1-9 exactly once. Tap a cell, then tap a number. Use NOTES mode for pencil marks!</string>
+    <string name="tutorial_word_scramble">🔤 WORD DESCRAMBLER\n\nUnscramble the letters to form the correct word. Type your answer — hints reveal letters one at a time. Faster answers earn more points!</string>
+</resources>

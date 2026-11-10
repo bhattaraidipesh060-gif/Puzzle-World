@@ -1,0 +1,284 @@
+{
+  "room_id": "room_09_arcade",
+  "room_name": "The Neon Arcade",
+  "theme": "arcade",
+  "description": "A retro arcade after closing time, where every cabinet flickers with one last challenge. Colored panels light up in secret sequences, and the high-score screen holds a hidden code. Watch the flashes, remember the order, and beat the machine at its own game.",
+  "puzzle_type": "neon_simon",
+  "room_graph": {
+    "room_09_arcade_01": [
+      "room_09_arcade_02"
+    ],
+    "room_09_arcade_02": [
+      "room_09_arcade_03"
+    ],
+    "room_09_arcade_03": [
+      "room_09_arcade_04"
+    ],
+    "room_09_arcade_04": [
+      "room_09_arcade_05"
+    ],
+    "room_09_arcade_05": [
+      "room_09_arcade_06"
+    ],
+    "room_09_arcade_06": [
+      "room_09_arcade_07"
+    ],
+    "room_09_arcade_07": [
+      "room_09_arcade_08"
+    ],
+    "room_09_arcade_08": [
+      "room_09_arcade_09"
+    ],
+    "room_09_arcade_09": [
+      "room_09_arcade_10"
+    ],
+    "room_09_arcade_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_09_arcade_01",
+      "title": "Power On",
+      "difficulty": "Easy",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 3 lights to remember.",
+        "🕹️ The sequence is [3,0,1]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          3,
+          0,
+          1
+        ],
+        "speed_ms": 900
+      }
+    },
+    {
+      "level_id": "room_09_arcade_02",
+      "title": "Two Blinks",
+      "difficulty": "Easy",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 4 lights to remember.",
+        "🕹️ The sequence is [1,2,2,0]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          1,
+          2,
+          2,
+          0
+        ],
+        "speed_ms": 860
+      }
+    },
+    {
+      "level_id": "room_09_arcade_03",
+      "title": "Catch the Flash",
+      "difficulty": "Medium",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 5 lights to remember.",
+        "🕹️ The sequence is [1,0,1,0,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          1,
+          0,
+          1,
+          0,
+          2
+        ],
+        "speed_ms": 820
+      }
+    },
+    {
+      "level_id": "room_09_arcade_04",
+      "title": "Quarter Round",
+      "difficulty": "Medium",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 6 lights to remember.",
+        "🕹️ The sequence is [0,1,0,1,0,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          2
+        ],
+        "speed_ms": 780
+      }
+    },
+    {
+      "level_id": "room_09_arcade_05",
+      "title": "Colour Combo",
+      "difficulty": "Medium",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 7 lights to remember.",
+        "🕹️ The sequence is [0,2,2,0,0,1,0]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          0,
+          2,
+          2,
+          0,
+          0,
+          1,
+          0
+        ],
+        "speed_ms": 740
+      }
+    },
+    {
+      "level_id": "room_09_arcade_06",
+      "title": "Speed Up",
+      "difficulty": "Hard",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 8 lights to remember.",
+        "🕹️ The sequence is [0,2,3,1,0,3,1,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          0,
+          2,
+          3,
+          1,
+          0,
+          3,
+          1,
+          2
+        ],
+        "speed_ms": 700
+      }
+    },
+    {
+      "level_id": "room_09_arcade_07",
+      "title": "The High Score",
+      "difficulty": "Hard",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 9 lights to remember.",
+        "🕹️ The sequence is [0,3,1,1,3,1,1,0,3]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          0,
+          3,
+          1,
+          1,
+          3,
+          1,
+          1,
+          0,
+          3
+        ],
+        "speed_ms": 660
+      }
+    },
+    {
+      "level_id": "room_09_arcade_08",
+      "title": "Blink Chain",
+      "difficulty": "Hard",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 10 lights to remember.",
+        "🕹️ The sequence is [2,0,2,3,2,0,1,0,1,3]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          2,
+          0,
+          2,
+          3,
+          2,
+          0,
+          1,
+          0,
+          1,
+          3
+        ],
+        "speed_ms": 620
+      }
+    },
+    {
+      "level_id": "room_09_arcade_09",
+      "title": "Watch Closely",
+      "difficulty": "Expert",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 11 lights to remember.",
+        "🕹️ The sequence is [1,1,3,1,2,3,0,0,1,1,3]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          1,
+          1,
+          3,
+          1,
+          2,
+          3,
+          0,
+          0,
+          1,
+          1,
+          3
+        ],
+        "speed_ms": 580
+      }
+    },
+    {
+      "level_id": "room_09_arcade_10",
+      "title": "Beat the Machine",
+      "difficulty": "Expert",
+      "hints": [
+        "🕹️ Watch the colours flash, then replay the sequence.",
+        "🕹️ 12 lights to remember.",
+        "🕹️ The sequence is [2,0,2,3,1,0,3,0,1,2,2,2]."
+      ],
+      "mechanic": {
+        "mechanic_type": "neon_simon",
+        "colors": 4,
+        "sequence": [
+          2,
+          0,
+          2,
+          3,
+          1,
+          0,
+          3,
+          0,
+          1,
+          2,
+          2,
+          2
+        ],
+        "speed_ms": 540
+      }
+    }
+  ]
+}

@@ -1,0 +1,321 @@
+{
+  "room_id": "room_03_observatory",
+  "room_name": "The Clockwork Observatory",
+  "theme": "observatory",
+  "description": "High above the city, an astronomer's tower hums with the ticking of a hundred brass gears. Constellations are painted on the domed ceiling. Each puzzle is a mechanism of the great celestial clock — solve them all to stop the countdown and release the observatory's secrets.",
+  "puzzle_type": "gear_alignment",
+  "room_graph": {
+    "room_03_observatory_01": [
+      "room_03_observatory_02"
+    ],
+    "room_03_observatory_02": [
+      "room_03_observatory_03"
+    ],
+    "room_03_observatory_03": [
+      "room_03_observatory_04"
+    ],
+    "room_03_observatory_04": [
+      "room_03_observatory_05"
+    ],
+    "room_03_observatory_05": [
+      "room_03_observatory_06"
+    ],
+    "room_03_observatory_06": [
+      "room_03_observatory_07"
+    ],
+    "room_03_observatory_07": [
+      "room_03_observatory_08"
+    ],
+    "room_03_observatory_08": [
+      "room_03_observatory_09"
+    ],
+    "room_03_observatory_09": [
+      "room_03_observatory_10"
+    ],
+    "room_03_observatory_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_03_observatory_01",
+      "title": "First Cog",
+      "difficulty": "Easy",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 2 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 98,
+            "target": 0
+          },
+          {
+            "angle": 35,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_02",
+      "title": "Two-Tooth",
+      "difficulty": "Easy",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 3 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 38,
+            "target": 0
+          },
+          {
+            "angle": 324,
+            "target": 0
+          },
+          {
+            "angle": 335,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_03",
+      "title": "Spin Chain",
+      "difficulty": "Medium",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 4 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 71,
+            "target": 0
+          },
+          {
+            "angle": 96,
+            "target": 0
+          },
+          {
+            "angle": 49,
+            "target": 0
+          },
+          {
+            "angle": 280,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_04",
+      "title": "Gear Train",
+      "difficulty": "Medium",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 5 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 271,
+            "target": 0
+          },
+          {
+            "angle": 344,
+            "target": 0
+          },
+          {
+            "angle": 55,
+            "target": 0
+          },
+          {
+            "angle": 91,
+            "target": 0
+          },
+          {
+            "angle": 156,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_05",
+      "title": "Tight Meshing",
+      "difficulty": "Medium",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 2 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 31,
+            "target": 0
+          },
+          {
+            "angle": 65,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_06",
+      "title": "The Escapement",
+      "difficulty": "Hard",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 3 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 123,
+            "target": 0
+          },
+          {
+            "angle": 357,
+            "target": 0
+          },
+          {
+            "angle": 295,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_07",
+      "title": "Torque Test",
+      "difficulty": "Hard",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 4 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 70,
+            "target": 0
+          },
+          {
+            "angle": 232,
+            "target": 0
+          },
+          {
+            "angle": 325,
+            "target": 0
+          },
+          {
+            "angle": 313,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_08",
+      "title": "Clockwork Core",
+      "difficulty": "Hard",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 5 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 244,
+            "target": 0
+          },
+          {
+            "angle": 276,
+            "target": 0
+          },
+          {
+            "angle": 207,
+            "target": 0
+          },
+          {
+            "angle": 315,
+            "target": 0
+          },
+          {
+            "angle": 301,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_09",
+      "title": "Perfect Timing",
+      "difficulty": "Expert",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 2 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 66,
+            "target": 0
+          },
+          {
+            "angle": 229,
+            "target": 0
+          }
+        ]
+      }
+    },
+    {
+      "level_id": "room_03_observatory_10",
+      "title": "The Mechanism",
+      "difficulty": "Expert",
+      "hints": [
+        "⚙️ Rotate the gears until every tooth reads \"aligned\".",
+        "⚙️ 3 gears to line up — tap each gear to rotate it.",
+        "⚙️ All target angles are 0 (pointing straight up)."
+      ],
+      "mechanic": {
+        "mechanic_type": "gear_alignment",
+        "gears": [
+          {
+            "angle": 289,
+            "target": 0
+          },
+          {
+            "angle": 198,
+            "target": 0
+          },
+          {
+            "angle": 93,
+            "target": 0
+          }
+        ]
+      }
+    }
+  ]
+}

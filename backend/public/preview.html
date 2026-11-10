@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>PuzzleWorld — Play</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+/* =========================================================
+   PuzzleWorld — glassmorphic dashboard (pixel-matched)
+   ========================================================= */
+:root {
+  --bg: #0f172a;
+  --bg-2: #111c31;
+  --glass: rgba(30, 41, 59, 0.7);
+  --glass-2: rgba(38, 52, 73, 0.7);
+  --glass-strong: rgba(30, 41, 59, 0.78);
+  --stroke: rgba(255, 255, 255, .09);
+  --stroke-strong: rgba(255, 255, 255, .16);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --dim: #64748b;
+
+  --cyan: #22d3ee;
+  --cyan-2: #00e5ff;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --violet: #a855f7;
+  --emerald: #34d399;
+  --emerald2: #10b981;
+  --amber: #f59e0b;
+  --amber2: #fbbf24;
+  --rose: #f43f5e;
+
+  --grad-cyan: linear-gradient(135deg, #22d3ee, #3b82f6);
+  --grad-purple: linear-gradient(135deg, #8b5cf6, #a855f7);
+  --grad-emerald: linear-gradient(135deg, #34d399, #10b981);
+  --grad-amber: linear-gradient(135deg, #fbbf24, #f59e0b);
+  --grad-rose: linear-gradient(135deg, #fb7185, #f43f5e);
+
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-sm: 12px;
+  --radius-pill: 24px;
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Sora', var(--font);
+  --nav-h: 68px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100vh;
+  font-family: var(--font); color: var(--text); line-height: 1.45;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(34, 211, 238, .12), transparent 60%),
+    radial-gradient(1000px 640px at 92% 4%, rgba(139, 92, 246, .14), transparent 60%),
+    radial-gradient(900px 700px at 60% 110%, rgba(16, 185, 129, .10), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: -.01em; }
+p { margin: 0; }
+button { font-family: inherit; }
+a { color: inherit; }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+/* glassmorphic surface */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid var(--stroke-strong);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+/* ===================== APP BAR ===================== */
+.appbar {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(15, 23, 42, .72);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--stroke);
+}
+.appbar__inner {
+  max-width: 1180px; margin: 0 auto;
+  display: flex; align-items: center; gap: 14px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+}
+.appbar__brand { display: flex; align-items: center; gap: 11px; flex: none; }
+.appbar__logo {
+  display: grid; place-items: center; width: 42px; height: 42px;
+  border-radius: 13px; background: var(--glass-2);
+  border: 1px solid var(--stroke); box-shadow: var(--shadow);
+}
+.appbar__title { display: flex; flex-direction: column; line-height: 1.15; }
+.appbar__name {
+  font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.02em;
+  background: linear-gradient(92deg, #7ce9fb, #b69bff 55%, #5eeac0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.appbar__sub { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+.search {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px;
+  height: 42px; padding: 0 14px; border-radius: 999px;
+  background: var(--glass); border: 1px solid var(--stroke);
+  color: var(--muted); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease), background .2s;
+}
+.search:focus-within {
+  border-color: rgba(34, 211, 238, .55);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, .14);
+  background: var(--glass-2);
+}
+.search__icon { flex: none; opacity: .8; }
+.search__input {
+  flex: 1; min-width: 0; height: 100%; border: 0; outline: 0;
+  background: transparent; color: var(--text); font-size: 14px; font-family: inherit;
+}
+.search__input::placeholder { color: var(--dim); }
+
+.appbar__actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.icon-btn {
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border-radius: 12px; border: 1px solid var(--stroke);
+  background: var(--glass); color: var(--text); cursor: pointer;
+  transition: transform .12s var(--ease), background .2s, border-color .2s;
+}
+.icon-btn:hover { background: var(--glass-2); border-color: var(--stroke-strong); }
+.icon-btn:active { transform: scale(.98); }
+.icon-btn .ico-off { display: none; }
+.icon-btn.is-muted .ico-on { display: none; }
+.icon-btn.is-muted .ico-off { display: block; }
+.icon-btn.is-muted { color: var(--rose); border-color: rgba(244, 63, 94, .42); background: rgba(244, 63, 94, .1); }
+.icon-btn.pulse { animation: iconPulse .42s var(--ease); }
+@keyframes iconPulse { 0% { transform: scale(1); } 35% { transform: scale(.84); } 100% { transform: scale(1); } }
+
+.signin-btn {
+  display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: var(--radius-pill);
+  border: 1px solid transparent; background: var(--grad-cyan); color: #06121a;
+  font-size: 13px; font-weight: 800; text-decoration: none; white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(34, 211, 238, .3);
+  transition: transform .12s var(--ease), box-shadow .2s, filter .2s;
+}
+.signin-btn:hover { box-shadow: 0 8px 22px rgba(34, 211, 238, .45); transform: translateY(-1px); }
+.signin-btn:active { transform: scale(.98); }
+
+/* user dropdown */
+.user { position: relative; }
+.avatar {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  border: 0; cursor: pointer; color: #06121a; font-weight: 800; font-size: 15px;
+  background: var(--grad-cyan); box-shadow: 0 4px 16px rgba(34, 211, 238, .4);
+  transition: transform .12s var(--ease), box-shadow .2s;
+}
+.avatar:hover { box-shadow: 0 6px 22px rgba(34, 211, 238, .55); }
+.avatar:active { transform: scale(.98); }
+.dropdown {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 80;
+  width: 240px; border-radius: 16px; padding: 8px;
+  background: var(--glass-strong);
+  backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid var(--stroke-strong); box-shadow: var(--shadow-lg);
+  animation: dropIn .18s var(--ease) both;
+}
+.dropdown__head { padding: 10px 12px 12px; border-bottom: 1px solid var(--stroke); margin-bottom: 6px; }
+.dropdown__head strong { display: block; font-size: 14px; }
+.dropdown__head span { display: block; font-size: 11px; color: var(--muted); font-family: monospace; margin-top: 2px; word-break: break-all; }
+.dropdown__item {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px;
+  border: 0; border-radius: 10px; background: transparent; color: var(--text);
+  font-size: 13.5px; font-weight: 600; cursor: pointer; text-align: left;
+  transition: background .15s, transform .1s;
+}
+.dropdown__item:hover { background: rgba(255, 255, 255, .07); }
+.dropdown__item:active { transform: scale(.98); }
+.dropdown__divider { height: 1px; background: var(--stroke); margin: 6px 0; }
+.dropdown__item--danger { color: var(--rose); }
+.dropdown__item--danger:hover { background: rgba(244, 63, 94, .12); }
+@keyframes dropIn { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* ===================== SHELL ===================== */
+.shell { max-width: 1180px; margin: 0 auto; padding: 20px 16px 42px; }
+
+/* ===================== HERO (welcome header) ===================== */
+.hero {
+  position: relative; display: grid; grid-template-columns: 1.3fr auto; gap: 20px; align-items: center;
+  padding: 28px; border-radius: var(--radius-lg); overflow: hidden; isolation: isolate;
+  background: linear-gradient(135deg, rgba(34, 211, 238, .14), rgba(139, 92, 246, .14) 55%, rgba(52, 211, 153, .12));
+  border: 1px solid var(--stroke-strong); box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+.hero__glow {
+  position: absolute; inset: -40%; z-index: -1;
+  background: conic-gradient(from 120deg, rgba(34, 211, 238, .22), rgba(139, 92, 246, .22), rgba(52, 211, 153, .22), rgba(34, 211, 238, .22));
+  filter: blur(70px); opacity: .55; animation: spin 22s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.hero__profile { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.hero__avatar {
+  flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 22px;
+  font-size: 30px; font-weight: 800; color: #06121a;
+  background: var(--grad-cyan); box-shadow: 0 10px 30px rgba(34, 211, 238, .45), inset 0 1px 0 rgba(255, 255, 255, .4);
+  border: 1px solid rgba(255, 255, 255, .25);
+}
+.hero__who { min-width: 0; }
+.hero__title { font-size: clamp(20px, 2.6vw, 30px); font-weight: 800; line-height: 1.1; }
+.hero__sub { color: var(--muted); font-size: 14px; margin-top: 5px; }
+.hero__stats { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.stat-pill {
+  display: flex; flex-direction: column; align-items: center; min-width: 96px; padding: 12px 16px;
+  border-radius: 14px; background: rgba(15, 23, 42, .4); border: 1px solid var(--stroke);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.stat-pill__v { font-family: var(--font-display); font-size: 20px; font-weight: 800; line-height: 1.1;
+  background: linear-gradient(92deg, #7ce9fb, #b69bff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stat-pill__l { font-size: 10.5px; color: var(--muted); font-weight: 600; margin-top: 3px; }
+.hero__cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 46px; padding: 0 22px; border-radius: var(--radius-pill); border: 1px solid transparent;
+  font-size: 14px; font-weight: 700; cursor: pointer; color: var(--text);
+  transition: transform .12s var(--ease), box-shadow .2s var(--ease), background .2s, border-color .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(.98); }
+.btn__label { pointer-events: none; }
+.btn--primary { background: var(--grad-cyan); color: #06121a; box-shadow: 0 10px 26px rgba(34, 211, 238, .4); }
+.btn--primary:hover { box-shadow: 0 14px 34px rgba(34, 211, 238, .55); transform: translateY(-1px); }
+.btn--ghost { background: rgba(255, 255, 255, .06); border-color: var(--stroke-strong); color: var(--text); }
+.btn--ghost:hover { background: rgba(255, 255, 255, .11); }
+.btn--danger { background: var(--grad-rose); color: #fff; box-shadow: 0 10px 26px rgba(244, 63, 94, .35); }
+.btn[disabled] { opacity: .55; pointer-events: none; }
+.btn.is-loading { pointer-events: none; color: transparent; }
+.btn.is-loading::after {
+  content: ''; position: absolute; width: 19px; height: 19px; border-radius: 50%;
+  border: 2.5px solid rgba(6, 18, 26, .25); border-top-color: #06121a; animation: spin .7s linear infinite;
+}
+.text-btn {
+  border: 0; background: transparent; color: var(--cyan); font-size: 13px; font-weight: 700;
+  cursor: pointer; padding: 6px 10px; border-radius: 999px; transition: background .18s, transform .1s;
+}
+.text-btn:hover { background: rgba(34, 211, 238, .1); }
+.text-btn:active { transform: scale(.98); }
+
+/* ===================== DASHBOARD TABS ===================== */
+.tabs {
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  padding: 4px; border-radius: 16px; margin: 18px 0 20px;
+  background: rgba(15, 23, 42, .4); border: 1px solid var(--stroke);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1; min-width: max-content; height: 42px; padding: 0 20px; border: 0; border-radius: 12px;
+  background: transparent; color: var(--muted); font-size: 13.5px; font-weight: 700; cursor: pointer;
+  white-space: nowrap; transition: all .2s var(--ease);
+}
+.tab:hover { color: var(--text); }
+.tab:active { transform: scale(.98); }
+.tab.is-active { background: var(--grad-cyan); color: #06121a; box-shadow: 0 6px 18px rgba(34, 211, 238, .35); }
+
+/* tab panels with animated transition */
+.panel { display: none; }
+.panel.is-active { display: block; animation: panelIn .32s var(--ease) both; }
+@keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ===================== CATEGORY CHIPS ===================== */
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 14px; }
+.chips::-webkit-scrollbar { display: none; }
+.cat-chip {
+  flex: none; height: 34px; padding: 0 15px; border-radius: 999px;
+  border: 1px solid var(--stroke); background: var(--glass);
+  color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; transition: all .18s var(--ease);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.cat-chip:hover { color: var(--text); border-color: var(--stroke-strong); background: var(--glass-2); }
+.cat-chip:active { transform: scale(.98); }
+.cat-chip.is-active {
+  color: #06121a; border-color: transparent;
+  background: var(--grad-cyan); box-shadow: 0 4px 16px rgba(34, 211, 238, .32);
+}
+
+/* ===================== SECTIONS ===================== */
+.section { margin-top: 26px; }
+.section__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.section__title { font-size: clamp(17px, 2vw, 21px); font-weight: 800; }
+.section__hint { font-size: 12.5px; color: var(--muted); font-weight: 500; }
+
+/* ===================== GAME GRID ===================== */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.grid--rooms { grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); }
+
+.card {
+  position: relative; display: flex; flex-direction: column; overflow: hidden;
+  padding: 0; border-radius: var(--radius); border: 1px solid var(--stroke);
+  background: var(--glass); color: var(--text); text-align: left; cursor: pointer;
+  backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .10);
+  transition: transform .18s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--stroke-strong); }
+.card:active { transform: scale(.98); }
+.card--blue:hover { border-color: rgba(34, 211, 238, .5); box-shadow: 0 18px 46px rgba(34, 211, 238, .28); }
+.card--purple:hover { border-color: rgba(139, 92, 246, .5); box-shadow: 0 18px 46px rgba(139, 92, 246, .3); }
+.card--emerald:hover { border-color: rgba(52, 211, 153, .5); box-shadow: 0 18px 46px rgba(16, 185, 129, .28); }
+.card--amber:hover { border-color: rgba(245, 158, 11, .5); box-shadow: 0 18px 46px rgba(245, 158, 11, .28); }
+.card--rose:hover { border-color: rgba(244, 63, 94, .5); box-shadow: 0 18px 46px rgba(244, 63, 94, .28); }
+
+.card__art {
+  position: relative; height: 112px; display: grid; place-items: center; font-size: 44px;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .16), transparent 62%);
+  overflow: hidden;
+}
+.card__art::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(120px 80px at 80% 120%, rgba(255, 255, 255, .14), transparent 70%);
+}
+.card--blue .card__art { background-image: linear-gradient(135deg, rgba(34, 211, 238, .42), rgba(59, 130, 246, .42)); }
+.card--purple .card__art { background-image: linear-gradient(135deg, rgba(139, 92, 246, .46), rgba(168, 85, 247, .42)); }
+.card--emerald .card__art { background-image: linear-gradient(135deg, rgba(52, 211, 153, .44), rgba(16, 185, 129, .42)); }
+.card--amber .card__art { background-image: linear-gradient(135deg, rgba(251, 191, 36, .44), rgba(245, 158, 11, .42)); }
+.card--rose .card__art { background-image: linear-gradient(135deg, rgba(251, 113, 133, .44), rgba(244, 63, 94, .42)); }
+.card__body { display: flex; flex-direction: column; gap: 7px; padding: 14px 15px 15px; }
+.card__title { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.card__desc { font-size: 12.5px; color: var(--muted); line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card__meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+
+.chip {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: 999px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .02em;
+  background: rgba(34, 211, 238, .13); color: var(--cyan); border: 1px solid rgba(34, 211, 238, .22);
+}
+.chip--purple { background: rgba(139, 92, 246, .14); color: #b794ff; border-color: rgba(139, 92, 246, .24); }
+.chip--emerald { background: rgba(52, 211, 153, .14); color: var(--emerald); border-color: rgba(52, 211, 153, .24); }
+.chip--amber { background: rgba(245, 158, 11, .15); color: var(--amber2); border-color: rgba(245, 158, 11, .26); }
+.chip--rose { background: rgba(244, 63, 94, .14); color: #fb7185; border-color: rgba(244, 63, 94, .24); }
+.chip--blue { background: rgba(59, 130, 246, .14); color: #93c5fd; border-color: rgba(59, 130, 246, .26); }
+
+/* difficulty badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 9px; border-radius: 999px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+}
+.badge--easy { background: rgba(52, 211, 153, .15); color: var(--emerald); border: 1px solid rgba(52, 211, 153, .3); }
+.badge--medium { background: rgba(245, 158, 11, .15); color: var(--amber2); border: 1px solid rgba(245, 158, 11, .3); }
+.badge--hard { background: rgba(244, 63, 94, .15); color: #fb7185; border: 1px solid rgba(244, 63, 94, .3); }
+.badge--expert { background: rgba(139, 92, 246, .16); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, .34); }
+
+.card__footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+.card__rating { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.card__stars { color: var(--amber2); letter-spacing: -.5px; }
+.card__play {
+  display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 16px;
+  border-radius: var(--radius-pill); border: 0; cursor: pointer; font-size: 13px; font-weight: 800;
+  color: #06121a; background: var(--grad-cyan); box-shadow: 0 6px 16px rgba(34, 211, 238, .3);
+  transition: transform .12s var(--ease), box-shadow .2s;
+}
+.card__play:hover { box-shadow: 0 8px 22px rgba(34, 211, 238, .45); }
+.card__play:active { transform: scale(.98); }
+.card--purple .card__play { background: var(--grad-purple); box-shadow: 0 6px 16px rgba(139, 92, 246, .32); }
+.card--emerald .card__play { background: var(--grad-emerald); box-shadow: 0 6px 16px rgba(16, 185, 129, .3); }
+.card--amber .card__play { background: var(--grad-amber); box-shadow: 0 6px 16px rgba(245, 158, 11, .3); }
+.card--rose .card__play { background: var(--grad-rose); box-shadow: 0 6px 16px rgba(244, 63, 94, .3); }
+
+/* ===================== EMPTY ===================== */
+.empty {
+  grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 42px 20px; border: 1px dashed var(--stroke-strong); border-radius: var(--radius);
+  color: var(--muted); text-align: center;
+}
+.empty__icon { font-size: 34px; opacity: .8; }
+.empty__title { font-weight: 700; color: var(--text); }
+
+/* ===================== LEADERBOARD ===================== */
+.lb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lb-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+  background: var(--glass); border: 1px solid var(--stroke); border-radius: 14px;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: transform .16s var(--ease), border-color .2s, background .2s;
+}
+.lb-row:hover { transform: translateX(3px); border-color: var(--stroke-strong); background: var(--glass-2); }
+.lb-rank {
+  display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px;
+  font-weight: 800; font-size: 13px; background: rgba(255, 255, 255, .07); color: var(--muted); flex: none;
+}
+.lb-row:nth-child(1) .lb-rank { background: var(--grad-amber); color: #201300; box-shadow: 0 4px 14px rgba(245, 158, 11, .4); }
+.lb-row:nth-child(2) .lb-rank { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #0c1420; }
+.lb-row:nth-child(3) .lb-rank { background: linear-gradient(135deg, #f59e0b, #b45309); color: #1a0d00; }
+.trophy { font-size: 18px; }
+.lb-name { flex: 1; min-width: 0; font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-name.is-me { color: var(--cyan); }
+.lb-solved { font-size: 12px; color: var(--muted); flex: none; }
+.lb-score { font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--cyan); flex: none; min-width: 58px; text-align: right; }
+
+/* mini leaderboard card */
+.mini-lb { border-radius: var(--radius); padding: 18px; }
+.mini-lb__row { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+.mini-lb__row + .mini-lb__row { border-top: 1px solid var(--stroke); }
+.mini-lb__rank { width: 34px; flex: none; text-align: center; font-size: 18px; }
+.mini-lb__rank.num { font-family: var(--font-display); font-weight: 800; color: var(--muted); font-size: 14px; }
+.mini-lb__name { flex: 1; min-width: 0; font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini-lb__name.is-me { color: var(--cyan); }
+.mini-lb__solved { flex: none; font-size: 11.5px; color: var(--muted); }
+
+/* progress bars */
+.progress { height: 8px; border-radius: 999px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.progress > i {
+  display: block; height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  transition: width .8s var(--ease);
+}
+.progress--gold > i { background: linear-gradient(90deg, var(--amber2), var(--amber)); }
+.progress--silver > i { background: linear-gradient(90deg, #e2e8f0, #94a3b8); }
+.progress--bronze > i { background: linear-gradient(90deg, #f59e0b, #b45309); }
+
+/* ===================== STATS DETAIL + SETTINGS ===================== */
+.panel-card { border-radius: var(--radius); padding: 22px; margin-bottom: 16px; }
+.stat-block { margin-bottom: 18px; }
+.stat-block:last-child { margin-bottom: 0; }
+.stat-block__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.stat-block__row span { color: var(--muted); font-size: 13px; }
+.stat-block__row strong { font-family: var(--font-display); font-size: 18px; font-weight: 800; }
+.stat-block__row strong.grad { background: linear-gradient(92deg, #7ce9fb, #b69bff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.account-box { display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 12px; background: rgba(255, 255, 255, .04); border: 1px solid var(--stroke); }
+.account-box code { color: var(--muted); font-size: 12px; word-break: break-all; }
+
+.settings__row {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px 4px; border-bottom: 1px solid var(--stroke);
+}
+.settings__row:last-child { border-bottom: 0; }
+.settings__row .lbl { font-size: 14px; font-weight: 600; }
+.settings__row .sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.settings__links { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px 0; }
+
+/* toggle switch */
+.switch { position: relative; width: 48px; height: 27px; border-radius: 999px; border: 1px solid var(--stroke-strong); background: rgba(255, 255, 255, .08); cursor: pointer; transition: background .2s; }
+.switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 19px; height: 19px; border-radius: 50%; background: #fff; transition: transform .2s var(--ease); }
+.switch.on { background: var(--grad-cyan); }
+.switch.on::after { transform: translateX(21px); }
+
+/* ===================== MODAL / TOAST / BANNER / LOADER ===================== */
+.modal { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; padding: 20px; }
+.modal.is-open { display: grid; }
+.modal__backdrop { position: absolute; inset: 0; background: rgba(2, 6, 17, .72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadeIn .2s ease both; }
+.modal__panel {
+  position: relative; width: min(560px, calc(100vw - 32px)); max-height: 82vh; overflow-y: auto;
+  background: var(--glass-strong); border: 1px solid var(--stroke-strong); border-radius: var(--radius-lg);
+  padding: 24px; box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+  transform: translateY(12px) scale(.98); opacity: 0; animation: modalIn .28s var(--ease) forwards;
+}
+@keyframes modalIn { to { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal__close {
+  position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 10px;
+  border: 1px solid var(--stroke); background: var(--glass-2); color: var(--muted);
+  font-size: 20px; line-height: 1; cursor: pointer; transition: all .18s;
+}
+.modal__close:hover { color: var(--text); background: var(--glass-strong); }
+.modal h3 { font-size: 21px; margin-bottom: 6px; padding-right: 40px; }
+.modal .sub { color: var(--muted); font-size: 13px; line-height: 1.55; margin-top: 6px; }
+.modal__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+.level-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.level-row {
+  display: flex; align-items: center; gap: 12px; padding: 11px 13px; width: 100%;
+  background: var(--glass); border: 1px solid var(--stroke); border-radius: 13px;
+  color: var(--text); text-align: left; cursor: pointer;
+  transition: transform .14s var(--ease), border-color .2s, background .2s;
+}
+.level-row:hover { transform: translateX(3px); border-color: rgba(34, 211, 238, .4); background: var(--glass-2); }
+.level-row:active { transform: scale(.98); }
+.level-row__num { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; flex: none;
+  background: var(--grad-cyan); color: #06121a; font-weight: 800; font-size: 13px; }
+.level-row__body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.level-row__title { font-weight: 600; font-size: 14px; }
+.level-row__mech { font-size: 11.5px; color: var(--muted); text-transform: capitalize; }
+.level-row__state { flex: none; color: var(--dim); font-weight: 700; }
+
+.banner-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 90; display: flex; flex-direction: column; gap: 8px;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 0; pointer-events: none; }
+.banner { pointer-events: auto; display: flex; align-items: center; gap: 11px; max-width: 720px; width: 100%; margin: 0 auto;
+  padding: 12px 14px; border-radius: 14px; background: var(--glass-strong); border: 1px solid var(--stroke-strong);
+  box-shadow: var(--shadow); color: var(--text); font-size: 13.5px; font-weight: 500;
+  transform: translateY(-16px); opacity: 0; animation: bannerIn .32s var(--ease) forwards;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.banner.is-out { animation: bannerOut .3s var(--ease) forwards; }
+.banner__icon { font-size: 17px; flex: none; }
+.banner__text { flex: 1; min-width: 0; }
+.banner__close { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 0; background: rgba(255, 255, 255, .06); color: var(--muted); font-size: 16px; cursor: pointer; line-height: 1; }
+.banner__close:hover { color: var(--text); background: rgba(255, 255, 255, .12); }
+.banner--success { border-left: 3px solid var(--emerald); }
+.banner--error { border-left: 3px solid var(--rose); }
+.banner--info { border-left: 3px solid var(--cyan); }
+@keyframes bannerIn { to { transform: translateY(0); opacity: 1; } }
+@keyframes bannerOut { to { transform: translateY(-16px); opacity: 0; } }
+
+.toast-wrap { position: fixed; right: 16px; bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px)); z-index: 110;
+  display: flex; flex-direction: column; gap: 9px; align-items: flex-end; pointer-events: none; }
+.toast { pointer-events: auto; display: flex; align-items: center; gap: 9px; max-width: min(360px, calc(100vw - 32px));
+  padding: 11px 14px; border-radius: 13px; background: var(--glass-strong); border: 1px solid var(--stroke-strong);
+  color: var(--text); font-size: 13px; font-weight: 500; box-shadow: var(--shadow);
+  transform: translateX(24px); opacity: 0; animation: toastIn .26s var(--ease) forwards;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.toast.is-out { animation: toastOut .24s var(--ease) forwards; }
+.toast__icon { font-size: 15px; flex: none; }
+.toast--success { border-left: 3px solid var(--emerald); }
+.toast--error { border-left: 3px solid var(--rose); }
+.toast--info { border-left: 3px solid var(--cyan); }
+@keyframes toastIn { to { transform: translateX(0); opacity: 1; } }
+@keyframes toastOut { to { transform: translateX(24px); opacity: 0; } }
+
+.loader { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center;
+  background: rgba(8, 11, 20, .6); backdrop-filter: blur(4px); opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s; }
+.loader.is-active { opacity: 1; visibility: visible; }
+.spinner { width: 46px; height: 46px; border-radius: 50%; border: 3.5px solid rgba(255, 255, 255, .12); border-top-color: var(--cyan); border-right-color: var(--purple); animation: spin .8s linear infinite; }
+
+.skeleton { position: relative; overflow: hidden; border-radius: var(--radius); min-height: 200px; background: var(--glass); border: 1px solid var(--stroke); }
+.skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .06), transparent); animation: shimmer 1.3s infinite; }
+@keyframes shimmer { to { transform: translateX(100%); } }
+
+/* ===================== FOOTER ===================== */
+.footer { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--stroke); color: var(--dim); font-size: 12px; }
+.footer__link { color: var(--muted); text-decoration: none; font-weight: 600; }
+.footer__link:hover { color: var(--cyan); }
+.dot { opacity: .6; }
+
+/* ===================== BOTTOM NAV (mobile) ===================== */
+.bottomnav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; display: grid; grid-template-columns: repeat(4, 1fr);
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(15, 23, 42, .84); backdrop-filter: saturate(160%) blur(12px); -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border-top: 1px solid var(--stroke); }
+.bottomnav__item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  border: 0; background: transparent; color: var(--muted); font-size: 10.5px; font-weight: 600; cursor: pointer; transition: color .18s, transform .12s; }
+.bottomnav__item span { line-height: 1; }
+.bottomnav__item:active { transform: scale(.98); }
+.bottomnav__item:hover { color: var(--text); }
+.bottomnav__item.is-active { color: var(--cyan); }
+.bottomnav__item.is-active svg { filter: drop-shadow(0 0 8px rgba(34, 211, 238, .6)); }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero__stats { justify-content: flex-start; }
+  .hero__cta { grid-column: 1; }
+}
+@media (max-width: 620px) {
+  .shell { padding: 16px 16px 36px; }
+  .appbar__inner { padding-left: 16px; padding-right: 16px; gap: 10px; }
+  .appbar__sub { display: none; }
+  .search { height: 40px; }
+  .appbar__name { font-size: 17px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .grid--rooms { grid-template-columns: 1fr 1fr; }
+  .card__art { height: 96px; font-size: 36px; }
+  .hero { padding: 22px; }
+  .hero__avatar { width: 60px; height: 60px; font-size: 24px; border-radius: 18px; }
+  .stat-pill { min-width: 0; flex: 1; }
+  .toast-wrap { right: 12px; left: 12px; align-items: stretch; }
+}
+@media (max-width: 400px) {
+  .grid, .grid--rooms { grid-template-columns: 1fr; }
+}
+
+/* ===================== A11Y / MOTION ===================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  .hero__glow { animation: none; }
+}
+
+</style>
+</head>
+<body>
+  <!-- ===================== TOP APP BAR ===================== -->
+  <header class="appbar" id="appbar">
+    <div class="appbar__inner">
+      <div class="appbar__brand">
+        <span class="appbar__logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
+            <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="url(#g1)"/>
+            <path d="M14 14h6v6h-6z" fill="url(#g2)" opacity=".6"/>
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#8B5CF6"/>
+              </linearGradient>
+              <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#34D399"/><stop offset="1" stop-color="#10B981"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <div class="appbar__title">
+          <span class="appbar__name">PuzzleWorld</span>
+          <span class="appbar__sub" id="greeting">Welcome back</span>
+        </div>
+      </div>
+
+      <label class="search" aria-label="Search games and rooms">
+        <svg class="search__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input class="search__input" id="searchInput" type="search" placeholder="Search games & rooms…" autocomplete="off" />
+      </label>
+
+      <div class="appbar__actions">
+        <a class="signin-btn" href="auth.html" id="signinLink" hidden>Sign in</a>
+        <button class="icon-btn" id="btnSound" title="Mute / Unmute" aria-label="Toggle sound" aria-pressed="true">
+          <svg class="ico-on" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+          </svg>
+          <svg class="ico-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m23 9-6 6M17 9l6 6"/>
+          </svg>
+        </button>
+        <div class="user" id="userWrap">
+          <button class="avatar" id="avatarBtn" title="Account" aria-label="Account" aria-haspopup="true" aria-expanded="false">
+            <span id="avatarInitial">G</span>
+          </button>
+          <div class="dropdown" id="userMenu" hidden>
+            <div class="dropdown__head">
+              <strong id="menuName">Guest</strong>
+              <span id="menuId">guest</span>
+            </div>
+            <button class="dropdown__item" data-act="profile">👤&nbsp; Profile</button>
+            <button class="dropdown__item" data-act="settings">⚙️&nbsp; Settings</button>
+            <button class="dropdown__item" data-act="terms">📜&nbsp; Terms &amp; Privacy</button>
+            <div class="dropdown__divider"></div>
+            <button class="dropdown__item dropdown__item--danger" data-act="logout" id="menuLogout">🚪&nbsp; Log out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== NOTIFICATION BANNER ===================== -->
+  <div class="banner-wrap" id="bannerWrap" aria-live="assertive"></div>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="shell" id="main">
+
+    <!-- Hero welcome header -->
+    <section class="hero" id="hero" aria-live="polite">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__profile">
+        <div class="hero__avatar" id="heroAvatar">G</div>
+        <div class="hero__who">
+          <h1 class="hero__title" id="heroGreeting">Welcome back, Guest</h1>
+          <p class="hero__sub" id="heroSub">Ready for today's challenge?</p>
+        </div>
+      </div>
+      <div class="hero__stats">
+        <div class="stat-pill"><span class="stat-pill__v" id="heroGames">0</span><span class="stat-pill__l">Games Played</span></div>
+        <div class="stat-pill"><span class="stat-pill__v" id="heroScore">0</span><span class="stat-pill__l">High Score</span></div>
+        <div class="stat-pill"><span class="stat-pill__v" id="heroRank">—</span><span class="stat-pill__l">Global Rank</span></div>
+      </div>
+      <div class="hero__cta">
+        <button class="btn btn--primary" id="btnPlayNow"><span class="btn__label">▶&nbsp; Play Now</span></button>
+        <button class="btn btn--ghost" id="btnSurprise"><span class="btn__label">✨&nbsp; Surprise me</span></button>
+      </div>
+    </section>
+
+    <!-- Dashboard tabs -->
+    <nav class="tabs" id="dashTabs" role="tablist" aria-label="Dashboard sections">
+      <button class="tab is-active" data-tab="games" role="tab" aria-selected="true">🎮 All Games</button>
+      <button class="tab" data-tab="board" role="tab" aria-selected="false">🏆 Leaderboard</button>
+      <button class="tab" data-tab="stats" role="tab" aria-selected="false">📊 My Stats</button>
+      <button class="tab" data-tab="settings" role="tab" aria-selected="false">⚙️ Settings</button>
+    </nav>
+
+    <!-- ============ PANEL: All Games ============ -->
+    <section class="panel is-active" data-panel="games" role="tabpanel">
+      <div class="chips" id="chipRow" role="tablist" aria-label="Categories">
+        <button class="cat-chip is-active" data-cat="all" role="tab" aria-selected="true">All</button>
+        <button class="cat-chip" data-cat="escape" role="tab" aria-selected="false">🚪 Escape</button>
+        <button class="cat-chip" data-cat="puzzle" role="tab" aria-selected="false">🧩 Puzzle</button>
+        <button class="cat-chip" data-cat="word" role="tab" aria-selected="false">🔤 Word</button>
+        <button class="cat-chip" data-cat="daily" role="tab" aria-selected="false">📅 Daily</button>
+      </div>
+
+      <div class="section" style="margin-top:0">
+        <div class="section__head">
+          <h2 class="section__title">Games</h2>
+          <span class="section__hint" id="gamesHint">Tap a card to play</span>
+        </div>
+        <div class="grid" id="gamesGrid"><!-- injected --></div>
+      </div>
+
+      <div class="section" id="roomsSection">
+        <div class="section__head">
+          <h2 class="section__title">Escape Rooms</h2>
+          <span class="section__hint" id="roomsHint">Loading rooms…</span>
+        </div>
+        <div class="grid grid--rooms" id="roomsGrid"><!-- injected --></div>
+      </div>
+
+      <div class="section" id="miniBoardSection">
+        <div class="section__head">
+          <h2 class="section__title">🏆 Top Players</h2>
+          <button class="text-btn" data-act="goto-board">View all →</button>
+        </div>
+        <div class="mini-lb glass" id="miniBoard"><!-- injected --></div>
+      </div>
+    </section>
+
+    <!-- ============ PANEL: Leaderboard ============ -->
+    <section class="panel" data-panel="board" role="tabpanel">
+      <div class="section" style="margin-top:0">
+        <div class="section__head">
+          <h2 class="section__title">Global Leaderboard</h2>
+          <button class="text-btn" id="btnRefreshLb">↻ Refresh</button>
+        </div>
+        <ol class="lb-list" id="leaderboard"><!-- injected --></ol>
+      </div>
+    </section>
+
+    <!-- ============ PANEL: My Stats ============ -->
+    <section class="panel" data-panel="stats" role="tabpanel">
+      <div class="panel-card glass" id="statsDetail"><!-- injected --></div>
+    </section>
+
+    <!-- ============ PANEL: Settings ============ -->
+    <section class="panel" data-panel="settings" role="tabpanel">
+      <div class="panel-card glass" id="settingsPanel"><!-- injected --></div>
+    </section>
+
+    <footer class="footer">
+      <span>PuzzleWorld · v1.0</span>
+      <span class="dot">•</span>
+      <a href="#" id="btnTerms" class="footer__link">Terms &amp; Privacy</a>
+    </footer>
+  </main>
+
+  <!-- ===================== BOTTOM NAV (mobile) ===================== -->
+  <nav class="bottomnav" aria-label="Primary">
+    <button class="bottomnav__item is-active" data-tab="games" aria-label="Games">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
+      <span>Games</span>
+    </button>
+    <button class="bottomnav__item" data-tab="board" aria-label="Leaderboard">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V10M12 20V4M18 20v-6"/></svg>
+      <span>Board</span>
+    </button>
+    <button class="bottomnav__item" data-tab="stats" aria-label="My stats">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+      <span>Stats</span>
+    </button>
+    <button class="bottomnav__item" data-tab="settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- ===================== MODAL ===================== -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" id="modalPanel">
+      <button class="modal__close" id="modalClose" aria-label="Close">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===================== TOASTS ===================== -->
+  <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+  <!-- ===================== LOADER ===================== -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+try { localStorage.getItem('__t'); } catch(e) {
+  Object.defineProperty(window,'localStorage',{configurable:true,value:{_d:{pw_user_id:'u_demo',pw_username:'dipesh'},
+    getItem:function(k){return k in this._d?this._d[k]:null;},
+    setItem:function(k,v){this._d[k]=String(v);}, removeItem:function(k){delete this._d[k];}}});
+}
+(function(){
+  const rooms=[{"room_id": "room_01_vault", "room_name": "The First Vault", "theme": "industrial", "description": "An abandoned underground vault. Rusted pipes line the walls.", "level_count": 10}, {"room_id": "room_02_cipher_lab", "room_name": "The Cipher Laboratory", "theme": "laboratory", "description": "A sterile lab littered with half-solved ciphers.", "level_count": 10}, {"room_id": "room_03_observatory", "room_name": "The Clockwork Observatory", "theme": "observatory", "description": "Brass gears mesh beneath a cracked dome.", "level_count": 10}, {"room_id": "room_04_study", "room_name": "The Puzzle Master's Study", "theme": "study", "description": "Leather-bound books and a mahogany desk.", "level_count": 10}, {"room_id": "room_05_crypto", "room_name": "The Cryptographer's Cache", "theme": "vault", "description": "A vault sealed by layered encryption.", "level_count": 10}, {"room_id": "room_06_alchemy", "room_name": "The Alchemist's Laboratory", "theme": "alchemy", "description": "Bubbling flasks and glowing runes.", "level_count": 10}, {"room_id": "room_07_cartography", "room_name": "The Cartographer's Vault", "theme": "cartography", "description": "Maps of places that don't exist.", "level_count": 10}, {"room_id": "room_08_locksmith", "room_name": "The Locksmith's Forge", "theme": "forge", "description": "A sweltering forge where every anvil hides a lock.", "level_count": 10}, {"room_id": "room_09_arcade", "room_name": "The Neon Arcade", "theme": "arcade", "description": "A retro arcade after closing time.", "level_count": 10}], levels=[{"level_id": "room_01_vault_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_01_vault_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_01_vault_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_02_cipher_lab_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_02_cipher_lab_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_02_cipher_lab_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_03_observatory_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_03_observatory_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_03_observatory_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_04_study_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_04_study_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_04_study_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_05_crypto_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_05_crypto_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_05_crypto_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_06_alchemy_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_06_alchemy_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_06_alchemy_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_07_cartography_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_07_cartography_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_07_cartography_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_08_locksmith_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_08_locksmith_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_08_locksmith_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}, {"level_id": "room_09_arcade_1", "title": "Level 1", "difficulty": "Easy", "mechanic": {"mechanic_type": "cipher"}}, {"level_id": "room_09_arcade_2", "title": "Level 2", "difficulty": "Medium", "mechanic": {"mechanic_type": "riddle"}}, {"level_id": "room_09_arcade_3", "title": "Level 3", "difficulty": "Hard", "mechanic": {"mechanic_type": "mechanical_lock"}}], leaders=[{"user_id": "u_demo", "username": "dipesh", "solved_count": 42, "score": 5200}, {"user_id": "u_2", "username": "Neo", "solved_count": 39, "score": 4880}, {"user_id": "u_3", "username": "Trinity", "solved_count": 31, "score": 3990}, {"user_id": "u_4", "username": "Morpheus", "solved_count": 27, "score": 3410}, {"user_id": "u_5", "username": "Ada", "solved_count": 22, "score": 2980}, {"user_id": "u_6", "username": "Cipher", "solved_count": 18, "score": 2440}], stats={"user_id": "u_demo", "solved_count": 42, "total_score": 5200, "best_streak": 9, "hints_used": 12, "total_attempts": 57}, daily={"challenge_date": "20261102", "seed": 7, "level": {"title": "The Alchemist's Trial", "room_name": "The Alchemist's Laboratory", "difficulty": "Hard", "mechanic": {"mechanic_type": "cipher"}}};
+  const json=(x)=>({ok:true,status:200,json:async()=>x});
+  window.fetch=async function(url,opts){
+    const u=String(url), m=(opts&&opts.method)||'GET';
+    if(u.indexOf('/api/rooms/')>-1){ const id=u.split('/api/rooms/')[1]; const r=rooms.find(x=>x.room_id===id)||rooms[0];
+      return json({room_name:r.room_name, description:r.description, levels:levels.filter(l=>l.level_id.indexOf(id)===0)}); }
+    if(u.indexOf('/api/rooms')>-1) return json({rooms:rooms});
+    if(u.indexOf('/api/stats/')>-1) return json(stats);
+    if(u.indexOf('/api/daily-challenge/complete')>-1) return json({challenge_date:daily.challenge_date,solved:true,solved_count:42,total_score:5200,best_streak:9});
+    if(u.indexOf('/api/daily-challenge')>-1) return json(daily);
+    if(u.indexOf('/api/progress')>-1){ if(m==='DELETE') return json({deleted:true}); return json({leaderboard:leaders}); }
+    return json({});
+  };
+})();
+</script>
+
+<script>
+/* =========================================================
+   PuzzleWorld web portal — glassmorphic dashboard
+   ========================================================= */
+(() => {
+  'use strict';
+
+  const API = '/api';
+
+  // ---------- DOM helpers ----------
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const el = (tag, cls, html) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  };
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
+  ));
+  const debounce = (fn, ms) => {
+    let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+  };
+
+  // =========================================================
+  //  AUDIO MANAGER — synthesized effects, autoplay-safe
+  // =========================================================
+  const Audio = (() => {
+    let ctx = null, master = null;
+    let muted = localStorage.getItem('pw_muted') === '1';
+    let armed = false;
+
+    function ensure() {
+      if (ctx) return ctx;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = muted ? 0 : 0.55;
+      master.connect(ctx.destination);
+      return ctx;
+    }
+    function arm() {
+      const c = ensure();
+      if (!c) return;
+      if (c.state === 'suspended') { const p = c.resume(); if (p && p.catch) p.catch(() => {}); }
+      if (!armed) {
+        armed = true;
+        try {
+          const o = c.createOscillator(), g = c.createGain();
+          g.gain.value = 0.0001;
+          o.connect(g).connect(master);
+          o.start(); o.stop(c.currentTime + 0.02);
+        } catch (_) {}
+      }
+    }
+    ['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+      document.addEventListener(ev, arm, { passive: true }));
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && ctx && ctx.state === 'suspended') arm();
+    });
+
+    function tone(freq, dur, type = 'sine', gain = 0.25, when = 0) {
+      const c = ensure(); if (!c || muted) return;
+      if (c.state === 'suspended') c.resume();
+      const t = c.currentTime + when;
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(master);
+      o.start(t); o.stop(t + dur + 0.02);
+    }
+    function sweep(f1, f2, dur, type = 'sine', gain = 0.22) {
+      const c = ensure(); if (!c || muted) return;
+      if (c.state === 'suspended') c.resume();
+      const t = c.currentTime;
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(f1, t);
+      o.frequency.exponentialRampToValueAtTime(Math.max(f2, 1), t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(master);
+      o.start(t); o.stop(t + dur + 0.03);
+    }
+    const sfx = {
+      click:   () => tone(520, 0.06, 'triangle', 0.18),
+      nav:     () => { tone(440, 0.05, 'sine', 0.16); tone(660, 0.07, 'sine', 0.12, 0.05); },
+      move:    () => tone(360, 0.04, 'square', 0.12),
+      open:    () => sweep(300, 720, 0.16, 'sine', 0.2),
+      close:   () => sweep(620, 300, 0.14, 'sine', 0.16),
+      win:     () => [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.22, 'sine', 0.24, i * 0.09)),
+      loss:    () => { sweep(380, 120, 0.45, 'sawtooth', 0.18); tone(140, 0.3, 'sine', 0.12, 0.05); },
+      error:   () => { tone(200, 0.12, 'sawtooth', 0.18); tone(160, 0.16, 'sawtooth', 0.16, 0.1); },
+      success: () => { tone(660, 0.1, 'triangle', 0.2); tone(990, 0.16, 'triangle', 0.16, 0.08); },
+      toggle:  () => tone(720, 0.07, 'sine', 0.16),
+      tick:    () => tone(880, 0.025, 'square', 0.06),
+    };
+    function setMuted(v) {
+      muted = v; localStorage.setItem('pw_muted', v ? '1' : '0');
+      if (master) master.gain.value = v ? 0 : 0.55;
+      if (!v) arm();
+    }
+    return { sfx, setMuted, isMuted: () => muted, unlock: arm };
+  })();
+
+  // =========================================================
+  //  UI: toasts, banners, loader, modal, button spinner
+  // =========================================================
+  const toastWrap = $('#toastWrap');
+  function toast(msg, type = 'info', ttl = 3200) {
+    const icons = { success: '✅', error: '⚠️', info: 'ℹ️' };
+    const t = el('div', `toast toast--${type}`,
+      `<span class="toast__icon">${icons[type] || 'ℹ️'}</span><span>${esc(msg)}</span>`);
+    toastWrap.appendChild(t);
+    setTimeout(() => { t.classList.add('is-out'); setTimeout(() => t.remove(), 240); }, ttl);
+  }
+
+  const bannerWrap = $('#bannerWrap');
+  function showBanner(type, msg, ttl = 5000) {
+    const icons = { success: '✅', error: '⚠️', info: 'ℹ️' };
+    const b = el('div', `banner banner--${type}`, `
+      <span class="banner__icon">${icons[type] || 'ℹ️'}</span>
+      <span class="banner__text">${esc(msg)}</span>
+      <button class="banner__close" aria-label="Dismiss">×</button>`);
+    bannerWrap.appendChild(b);
+    const remove = () => { b.classList.add('is-out'); setTimeout(() => b.remove(), 300); };
+    b.querySelector('.banner__close').addEventListener('click', remove);
+    if (ttl) setTimeout(remove, ttl);
+  }
+
+  const loader = $('#loader');
+  const showLoader = () => loader.classList.add('is-active');
+  const hideLoader = () => loader.classList.remove('is-active');
+
+  async function withButtonSpinner(btn, fn) {
+    if (!btn) return fn();
+    btn.classList.add('is-loading'); btn.disabled = true;
+    try { return await fn(); }
+    finally { btn.classList.remove('is-loading'); btn.disabled = false; }
+  }
+
+  const modal = $('#modal');
+  const modalBody = $('#modalBody');
+  function openModal(html) {
+    modalBody.innerHTML = html;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    Audio.sfx.open();
+  }
+  function closeModal() {
+    if (!modal.classList.contains('is-open')) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    Audio.sfx.close();
+  }
+  $('#modalClose')?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => { if (e.target.dataset.close !== undefined) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); } });
+
+  // =========================================================
+  //  Networking + identity
+  // =========================================================
+  async function api(path, opts) {
+    const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+    if (!res.ok) {
+      let msg = `HTTP ${res.status}`;
+      try { const j = await res.json(); if (j.error) msg = j.error; } catch (_) {}
+      throw new Error(msg);
+    }
+    return res.json();
+  }
+
+  const uid = (() => {
+    let id = localStorage.getItem('pw_user_id');
+    if (!id) { id = 'web_' + Math.random().toString(36).slice(2, 10); localStorage.setItem('pw_user_id', id); }
+    return id;
+  })();
+  const uname = localStorage.getItem('pw_username') || 'Guest';
+  const isSignedIn = uname !== 'Guest';
+
+  // =========================================================
+  //  Data: games catalogue + room styles
+  // =========================================================
+  const GAMES = [
+    { id: 'rooms', cls: 'blue', emoji: '🚪', title: 'Escape Rooms', cat: 'escape', rating: '4.9',
+      difficulty: 'easy', desc: '9 themed rooms · 90 brain-melting levels across 7 mechanics.',
+      chips: [['9 Rooms', 'chip'], ['90 Levels', 'chip--purple']] },
+    { id: 'sudoku', cls: 'purple', emoji: '🔢', title: 'Sudoku', cat: 'puzzle', rating: '4.7',
+      difficulty: 'medium', desc: 'Classic 9×9 logic with notes, undo, hints and a live timer.',
+      chips: [['Logic', 'chip--purple'], ['4 Difficulties', 'chip--emerald']] },
+    { id: 'word', cls: 'emerald', emoji: '🔤', title: 'Word Descrambler', cat: 'word', rating: '4.6',
+      difficulty: 'medium', desc: 'Unscramble words against the clock. Streaks multiply your score.',
+      chips: [['Word Game', 'chip--emerald'], ['Streaks', 'chip--rose']] },
+    { id: 'daily', cls: 'amber', emoji: '📅', title: 'Daily Challenge', cat: 'daily', rating: '4.8',
+      difficulty: 'hard', desc: 'One fresh puzzle every day. Compete on the global leaderboard.',
+      chips: [['Daily', 'chip--amber'], ['Global', 'chip']] },
+  ];
+  const DIFF_BADGE = { easy: 'badge--easy', medium: 'badge--medium', hard: 'badge--hard', expert: 'badge--expert' };
+  const ROOM_STYLES = ['blue', 'purple', 'emerald', 'rose', 'amber'];
+  const ROOM_EMOJI  = ['🏦', '🔬', '🔭', '📚', '🔐', '⚗️', '🗺️', '🔑', '🕹️'];
+  const ROOM_DIFF    = ['easy', 'medium', 'hard', 'expert'];
+
+  let ROOMS = [];
+  let activeCat = 'all';
+  let searchQuery = '';
+  let STATS = {};
+  let RANK = null;
+
+  // =========================================================
+  //  Render: games grid
+  // =========================================================
+  function renderGames() {
+    const grid = $('#gamesGrid');
+    grid.innerHTML = '';
+    GAMES.forEach((g, i) => {
+      const badge = DIFF_BADGE[g.difficulty] || 'badge--medium';
+      const card = el('button', `card card--${g.cls}`, `
+        <div class="card__art">${g.emoji}</div>
+        <div class="card__body">
+          <h3 class="card__title">${esc(g.title)}</h3>
+          <p class="card__desc">${esc(g.desc)}</p>
+          <div class="card__meta">
+            <span class="badge ${badge}">${esc(g.difficulty)}</span>
+            ${g.chips.map(([t, c]) => `<span class="chip ${c}">${esc(t)}</span>`).join('')}
+          </div>
+          <div class="card__footer">
+            <span class="card__rating"><span class="card__stars">★★★★★</span> ${g.rating}</span>
+            <span class="card__play">▶ Play</span>
+          </div>
+        </div>`);
+      card.dataset.title = g.title.toLowerCase();
+      card.dataset.cat = g.cat;
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(14px)';
+      card.style.transition = 'opacity .35s var(--ease), transform .35s var(--ease)';
+      card.style.transitionDelay = `${i * 55}ms`;
+      card.addEventListener('click', () => { Audio.sfx.click(); onGameClick(g.id); });
+      grid.appendChild(card);
+      requestAnimationFrame(() => setTimeout(() => {
+        card.style.opacity = '1'; card.style.transform = 'translateY(0)';
+      }, 30));
+    });
+  }
+
+  function onGameClick(id) {
+    if (id === 'rooms') {
+      $('#roomsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      Audio.sfx.nav();
+    } else if (id === 'daily') {
+      loadDaily(true);
+    } else {
+      showBanner('info', `${id === 'sudoku' ? 'Sudoku' : 'Word Descrambler'} — full play is in the PuzzleWorld mobile app. This portal previews the catalogue.`);
+      Audio.sfx.click();
+    }
+  }
+
+  // =========================================================
+  //  Render: escape rooms
+  // =========================================================
+  async function loadRooms() {
+    const grid = $('#roomsGrid');
+    grid.innerHTML = '<div class="skeleton"></div>'.repeat(6);
+    try {
+      const data = await api('/rooms');
+      ROOMS = data.rooms || [];
+      renderRooms();
+    } catch (e) {
+      grid.innerHTML = '<div class="empty"><span class="empty__icon">📡</span><span class="empty__title">Rooms offline</span><span>Start the backend to load rooms.</span></div>';
+      showBanner('error', `Couldn't load rooms: ${e.message}`);
+      Audio.sfx.error();
+    }
+  }
+
+  function renderRooms() {
+    const grid = $('#roomsGrid');
+    grid.innerHTML = '';
+    ROOMS.forEach((r, i) => {
+      const cls = ROOM_STYLES[i % ROOM_STYLES.length];
+      const emoji = ROOM_EMOJI[i % ROOM_EMOJI.length];
+      const stars = (4.5 + (i % 5) * 0.1).toFixed(1);
+      const diff = ROOM_DIFF[i % ROOM_DIFF.length];
+      const card = el('button', `card card--${cls}`, `
+        <div class="card__art">${emoji}</div>
+        <div class="card__body">
+          <h3 class="card__title">${esc(r.room_name)}</h3>
+          <p class="card__desc">${esc(r.description || 'A themed escape room.')}</p>
+          <div class="card__meta">
+            <span class="chip">${r.level_count || 10} Levels</span>
+            <span class="chip chip--purple">${esc(r.theme || 'Mystery')}</span>
+            <span class="badge ${DIFF_BADGE[diff] || 'badge--medium'}">${esc(diff)}</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__rating"><span class="card__stars">★★★★★</span> ${stars}</span>
+            <span class="card__play">▶ Enter</span>
+          </div>
+        </div>`);
+      card.dataset.search = `${r.room_name || ''} ${r.theme || ''} ${r.description || ''}`.toLowerCase();
+      card.addEventListener('click', () => { Audio.sfx.click(); openRoom(r); });
+      grid.appendChild(card);
+    });
+    const totalLevels = ROOMS.reduce((n, r) => n + (r.level_count || 0), 0);
+    $('#roomsHint').textContent = `${ROOMS.length} rooms · ${totalLevels} levels`;
+    applyFilters();
+  }
+
+  async function openRoom(room) {
+    openModal(`<h3>${esc(room.room_name)}</h3><p class="sub">Loading levels…</p>`);
+    try {
+      const data = await api(`/rooms/${encodeURIComponent(room.room_id)}`);
+      const levels = data.levels || [];
+      const rows = levels.map((l, i) => `
+        <button class="level-row" data-level="${esc(l.level_id)}">
+          <span class="level-row__num">${i + 1}</span>
+          <span class="level-row__body">
+            <span class="level-row__title">${esc(l.title || 'Level ' + (i + 1))}</span>
+            <span class="level-row__mech">${esc((l.mechanic?.mechanic_type || 'puzzle').replace(/_/g, ' '))} · ${esc(l.difficulty || '')}</span>
+          </span>
+          <span class="level-row__state">▶</span>
+        </button>`).join('');
+      modalBody.innerHTML = `
+        <h3>${esc(data.room_name || room.room_name)}</h3>
+        <p class="sub">${esc(data.description || '')} · ${levels.length} levels</p>
+        <div class="level-list">${rows || '<p class="sub">No levels yet.</p>'}</div>`;
+      $$('.level-row', modalBody).forEach(btn => {
+        btn.addEventListener('click', () => {
+          Audio.sfx.move();
+          showBanner('info', 'Level preview — full interactive play is in the PuzzleWorld mobile app.', 3600);
+        });
+      });
+    } catch (e) {
+      modalBody.innerHTML = `<h3>${esc(room.room_name)}</h3><p class="sub">Couldn't load levels: ${esc(e.message)}</p>`;
+      showBanner('error', 'Failed to load levels');
+      Audio.sfx.error();
+    }
+  }
+
+  // =========================================================
+  //  Leaderboard + mini-leaderboard + rank
+  // =========================================================
+  function computeRank(rows) {
+    const idx = rows.findIndex(r => r.user_id === uid);
+    return idx >= 0 ? idx + 1 : null;
+  }
+
+  function renderMini(rows) {
+    const box = $('#miniBoard');
+    const top = rows.slice(0, 5);
+    if (!top.length) {
+      box.innerHTML = '<p style="color:var(--muted);font-size:13px">No scores yet — be the first!</p>';
+      return;
+    }
+    const max = Math.max(1, ...top.map(r => r.solved_count || 0));
+    const medals = ['🥇', '🥈', '🥉'];
+    box.innerHTML = top.map((r, i) => {
+      const pct = Math.round(((r.solved_count || 0) / max) * 100);
+      const medal = i < 3
+        ? `<span class="mini-lb__rank">${medals[i]}</span>`
+        : `<span class="mini-lb__rank num">#${i + 1}</span>`;
+      const barCls = i === 0 ? 'progress--gold' : i === 1 ? 'progress--silver' : i === 2 ? 'progress--bronze' : '';
+      const me = r.user_id === uid ? ' is-me' : '';
+      return `<div style="${i ? 'border-top:1px solid var(--stroke);padding-top:8px;margin-top:8px' : ''}">
+        <div class="mini-lb__row">
+          ${medal}
+          <span class="mini-lb__name${me}">${esc(r.username || 'Player')}</span>
+          <span class="mini-lb__solved">${r.solved_count || 0} solved</span>
+        </div>
+        <div class="progress ${barCls}" style="margin-left:46px"><i style="width:${pct}%"></i></div>
+      </div>`;
+    }).join('');
+  }
+
+  async function loadLeaderboard(showSpin) {
+    const list = $('#leaderboard');
+    if (showSpin) { list.innerHTML = '<li class="skeleton" style="min-height:56px"></li>'.repeat(3); }
+    try {
+      const data = await api('/progress');
+      const rows = (data.leaderboard || []).slice(0, 10);
+      RANK = computeRank(rows);
+      refreshHero();
+      renderMini(rows);
+      if (!rows.length) {
+        list.innerHTML = '<li class="lb-row"><span class="lb-name">No scores yet — be the first!</span></li>';
+        return;
+      }
+      const medals = ['🥇', '🥈', '🥉'];
+      list.innerHTML = rows.map((r, i) => `
+        <li class="lb-row">
+          <span class="lb-rank">${i < 3 ? medals[i] : i + 1}</span>
+          <span class="lb-name${r.user_id === uid ? ' is-me' : ''}">${esc(r.username || 'Player')}${r.user_id === uid ? ' (you)' : ''}</span>
+          <span class="lb-solved">${r.solved_count || 0} solved</span>
+          <span class="lb-score">${(r.score || 0).toLocaleString()}</span>
+        </li>`).join('');
+      if (showSpin) Audio.sfx.success();
+    } catch (e) {
+      list.innerHTML = '<li class="lb-row"><span class="lb-name">Leaderboard unavailable (offline)</span></li>';
+      showBanner('error', `Leaderboard: ${e.message}`);
+      Audio.sfx.error();
+    }
+  }
+
+  // =========================================================
+  //  Stats: hero + detail panel
+  // =========================================================
+  function refreshHero() {
+    $('#heroGames').textContent = (STATS.total_attempts || 0).toLocaleString();
+    $('#heroScore').textContent = (STATS.total_score || 0).toLocaleString();
+    $('#heroRank').textContent = RANK ? '#' + RANK : '—';
+  }
+
+  function renderStatsDetail() {
+    const solved = STATS.solved_count || 0;
+    const streak = STATS.best_streak || 0;
+    const solvedPct = Math.min(100, Math.round(solved / 90 * 100));
+    const streakPct = Math.min(100, Math.round(streak / 10 * 100));
+    $('#statsDetail').innerHTML = `
+      <div class="stat-block">
+        <div class="stat-block__row"><span>🧩 Puzzles solved</span><strong class="grad">${solved}<small style="font-size:12px;color:var(--muted)"> / 90</small></strong></div>
+        <div class="progress"><i style="width:${solvedPct}%"></i></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block__row"><span>⭐ Total score</span><strong class="grad">${(STATS.total_score || 0).toLocaleString()}</strong></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block__row"><span>🔥 Best streak</span><strong>${streak}</strong></div>
+        <div class="progress progress--gold"><i style="width:${streakPct}%"></i></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block__row"><span>🎮 Games played</span><strong>${(STATS.total_attempts || 0).toLocaleString()}</strong></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block__row"><span>💡 Hints used</span><strong>${STATS.hints_used || 0}</strong></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block__row"><span>🏆 Global rank</span><strong>${RANK ? '#' + RANK : '—'}</strong></div>
+      </div>
+      <div class="account-box">
+        <span style="color:var(--muted);font-size:12px">Signed in as</span>
+        <strong>${esc(uname)}</strong>
+        <code>${esc(uid)}</code>
+      </div>`;
+  }
+
+  async function loadStats() {
+    try {
+      STATS = await api(`/stats/${encodeURIComponent(uid)}`);
+    } catch (_) {
+      STATS = {};
+    }
+    refreshHero();
+    renderStatsDetail();
+  }
+
+  // =========================================================
+  //  Hero / daily challenge
+  // =========================================================
+  async function loadDaily(announce) {
+    try {
+      const d = await api('/daily-challenge');
+      if (!announce) return;
+      Audio.sfx.nav();
+      openModal(`
+        <h3>🔥 ${esc(d.level?.title || 'Daily Challenge')}</h3>
+        <p class="sub">${esc(d.level?.room_name || '')} · ${esc(d.level?.difficulty || '')} · ${esc((d.level?.mechanic?.mechanic_type || 'puzzle').replace(/_/g, ' '))}</p>
+        <p class="sub">Play the full daily puzzle in the PuzzleWorld mobile app, or mark it solved here to claim your points.</p>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" id="mDailyOk"><span class="btn__label">Got it</span></button>
+          <button class="btn btn--primary" id="mDailyDone"><span class="btn__label">✅ Mark solved</span></button>
+        </div>`);
+      $('#mDailyOk')?.addEventListener('click', () => { Audio.sfx.click(); closeModal(); });
+      $('#mDailyDone')?.addEventListener('click', (e) => withButtonSpinner(e.currentTarget, async () => {
+        try {
+          await api('/daily-challenge/complete', {
+            method: 'POST',
+            body: JSON.stringify({ user_id: uid, challenge_date: d.challenge_date }),
+          });
+          Audio.sfx.win();
+          showBanner('success', '🎉 Daily challenge solved! Points added.');
+          loadStats(); loadLeaderboard(false);
+          closeModal();
+        } catch (err) {
+          Audio.sfx.loss();
+          showBanner('error', `Couldn't complete challenge: ${err.message}`);
+        }
+      }));
+    } catch (e) {
+      if (announce) { showBanner('error', `Daily challenge: ${e.message}`); Audio.sfx.error(); }
+    }
+  }
+
+  // =========================================================
+  //  Search + category filters
+  // =========================================================
+  function applyFilters() {
+    const games = $$('.card', $('#gamesGrid'));
+    let visible = 0;
+    games.forEach(card => {
+      const matchCat = activeCat === 'all' || card.dataset.cat === activeCat;
+      const matchSearch = !searchQuery || (card.dataset.title || '').includes(searchQuery);
+      const show = matchCat && matchSearch;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    const gamesGrid = $('#gamesGrid');
+    let empty = gamesGrid.querySelector('.empty');
+    if (!visible) {
+      if (!empty) gamesGrid.appendChild(el('div', 'empty',
+        '<span class="empty__icon">🔍</span><span class="empty__title">No games match</span><span>Try a different search or category.</span>'));
+    } else if (empty) empty.remove();
+
+    $$('.card', $('#roomsGrid')).forEach(card => {
+      const ok = !searchQuery || (card.dataset.search || '').includes(searchQuery);
+      card.style.display = ok ? '' : 'none';
+    });
+  }
+
+  function bindFilters() {
+    $$('.cat-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        Audio.sfx.click();
+        $$('.cat-chip').forEach(c => { c.classList.remove('is-active'); c.setAttribute('aria-selected', 'false'); });
+        chip.classList.add('is-active'); chip.setAttribute('aria-selected', 'true');
+        activeCat = chip.dataset.cat;
+        applyFilters();
+      });
+    });
+    const input = $('#searchInput');
+    input?.addEventListener('input', debounce(() => {
+      searchQuery = input.value.trim().toLowerCase();
+      if (searchQuery) Audio.sfx.tick();
+      applyFilters();
+    }, 140));
+  }
+
+  // =========================================================
+  //  Dashboard tabs
+  // =========================================================
+  function switchTab(name) {
+    $$('.tab').forEach(t => { const on = t.dataset.tab === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
+    $$('.bottomnav__item').forEach(b => b.classList.toggle('is-active', b.dataset.tab === name));
+    $$('.panel').forEach(p => p.classList.toggle('is-active', p.dataset.panel === name));
+    Audio.sfx.nav();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function bindTabs() {
+    $$('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+    $$('.bottomnav__item').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+    $$('[data-act="goto-board"]').forEach(b => b.addEventListener('click', () => switchTab('board')));
+  }
+
+  // =========================================================
+  //  Sound toggle
+  // =========================================================
+  function syncSound() {
+    const btn = $('#btnSound');
+    if (!btn) return;
+    const m = Audio.isMuted();
+    btn.classList.toggle('is-muted', m);
+    btn.setAttribute('aria-pressed', String(!m));
+    btn.setAttribute('aria-label', m ? 'Unmute sound' : 'Mute sound');
+    btn.title = m ? 'Unmute sound' : 'Mute sound';
+  }
+  function bindSound() {
+    syncSound();
+    $('#btnSound').addEventListener('click', () => {
+      Audio.unlock();
+      const next = !Audio.isMuted();
+      Audio.setMuted(next);
+      syncSound();
+      if (!next) Audio.sfx.toggle();
+      const btn = $('#btnSound');
+      btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse');
+      renderSettings();
+      toast(next ? '🔇 Sound muted' : '🔊 Sound on', 'info', 1400);
+    });
+  }
+
+  // =========================================================
+  //  User dropdown
+  // =========================================================
+  function refreshIdentity() {
+    const initial = (isSignedIn ? uname.trim().charAt(0) : 'G').toUpperCase();
+    $('#avatarInitial').textContent = initial;
+    $('#heroAvatar').textContent = initial;
+    $('#greeting').textContent = `Welcome, ${uname}`;
+    $('#heroGreeting').textContent = `Welcome back, ${uname}`;
+    $('#menuName').textContent = uname;
+    $('#menuId').textContent = isSignedIn ? uid : 'guest';
+    $('#menuLogout').innerHTML = isSignedIn ? '🚪&nbsp; Log out' : '🔑&nbsp; Sign in';
+    $('#menuLogout').dataset.act = isSignedIn ? 'logout' : 'login';
+    $('#signinLink').hidden = isSignedIn;
+  }
+
+  function bindDropdown() {
+    const btn = $('#avatarBtn'), menu = $('#userMenu');
+    refreshIdentity();
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      Audio.sfx.click();
+      const open = menu.hidden;
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.hidden && !e.target.closest('#userWrap')) { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    });
+    menu.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-act]');
+      if (!item) return;
+      menu.hidden = true; btn.setAttribute('aria-expanded', 'false');
+      const act = item.dataset.act;
+      if (act === 'profile') { Audio.sfx.click(); openProfile(); }
+      else if (act === 'settings') { switchTab('settings'); }
+      else if (act === 'terms') { Audio.sfx.click(); openTerms(); }
+      else if (act === 'logout') { signout(); }
+      else if (act === 'login') { location.href = 'auth.html'; }
+    });
+  }
+
+  function signout() {
+    localStorage.removeItem('pw_user_id');
+    localStorage.removeItem('pw_username');
+    Audio.sfx.close();
+    location.reload();
+  }
+
+  // =========================================================
+  //  Profile / reset / terms modals
+  // =========================================================
+  async function resetProgress() {
+    try {
+      await api(`/progress/${encodeURIComponent(uid)}`, { method: 'DELETE' });
+      showBanner('success', 'Progress reset — starting fresh!');
+      Audio.sfx.success();
+      loadStats(); loadLeaderboard(false);
+      closeModal();
+    } catch (err) {
+      showBanner('error', `Reset failed: ${err.message}`);
+      Audio.sfx.error();
+    }
+  }
+
+  function openProfile() {
+    openModal(`
+      <h3>👤 Profile</h3>
+      <p class="sub">Signed in as <strong>${esc(uname)}</strong></p>
+      <p class="sub">Player ID · <code>${esc(uid)}</code></p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" id="mProfileClose">Close</button>
+        <button class="btn btn--primary" id="mProfileReset">Reset progress</button>
+      </div>`);
+    $('#mProfileClose')?.addEventListener('click', () => { Audio.sfx.click(); closeModal(); });
+    $('#mProfileReset')?.addEventListener('click', (e) => withButtonSpinner(e.currentTarget, resetProgress));
+  }
+
+  function openTerms() {
+    openModal(`
+      <h3>Terms &amp; Privacy Policy</h3>
+      <p class="sub">PuzzleWorld · effective 2026</p>
+      <p class="sub"><strong>Terms of Service.</strong> By using PuzzleWorld you agree to play fairly. Scores and progress may be stored locally and, if you connect, synced to our servers. Don't attempt to exploit or disrupt the service.</p>
+      <p class="sub"><strong>Privacy Policy.</strong> We store only what's needed to run the game: a player ID, your chosen username, and gameplay stats (score, streaks, solved levels). Passwords are salted and hashed — never stored in plaintext. We never sell your data.</p>
+      <div class="modal__actions">
+        <button class="btn btn--primary" id="mTermsOk"><span class="btn__label">Accept &amp; Close</span></button>
+      </div>`);
+    $('#mTermsOk')?.addEventListener('click', () => { Audio.sfx.success(); closeModal(); });
+  }
+
+  // =========================================================
+  //  Settings panel
+  // =========================================================
+  function renderSettings() {
+    $('#settingsPanel').innerHTML = `
+      <div class="settings__row">
+        <div><div class="lbl">🔊 Sound effects</div><div class="sub">Synthesized UI tones</div></div>
+        <button class="switch ${Audio.isMuted() ? '' : 'on'}" id="setSound" aria-label="Toggle sound"></button>
+      </div>
+      <div class="settings__row">
+        <div><div class="lbl">👤 Account</div><div class="sub">${esc(uname)}</div></div>
+        <button class="text-btn" id="setAccountAct">${isSignedIn ? 'Profile' : 'Sign in'}</button>
+      </div>
+      <div class="settings__row">
+        <div><div class="lbl">🗑️ Reset progress</div><div class="sub">Clears score, streaks &amp; solved levels</div></div>
+        <button class="btn btn--ghost" id="setReset" style="height:38px;padding:0 16px">Reset</button>
+      </div>
+      <div class="settings__links">
+        <button class="text-btn" id="setTerms">📜 Terms &amp; Privacy</button>
+        ${isSignedIn ? '<button class="btn btn--danger" id="setLogout" style="height:40px;padding:0 18px">Log out</button>' : '<a class="text-btn" href="auth.html">Create account</a>'}
+      </div>`;
+  }
+
+  function bindSettings() {
+    $('#settingsPanel').addEventListener('click', (e) => {
+      const t = e.target.closest('[id]');
+      if (!t) return;
+      if (t.id === 'setSound') {
+        Audio.unlock();
+        const next = !Audio.isMuted();
+        Audio.setMuted(next);
+        syncSound();
+        if (!next) Audio.sfx.toggle();
+        renderSettings();
+        toast(next ? '🔇 Sound muted' : '🔊 Sound on', 'info', 1400);
+      } else if (t.id === 'setReset') {
+        Audio.sfx.click();
+        withButtonSpinner(t, resetProgress);
+      } else if (t.id === 'setTerms') {
+        Audio.sfx.click(); openTerms();
+      } else if (t.id === 'setLogout') {
+        signout();
+      } else if (t.id === 'setAccountAct') {
+        Audio.sfx.click();
+        if (isSignedIn) openProfile(); else location.href = 'auth.html';
+      }
+    });
+  }
+
+  // =========================================================
+  //  Boot
+  // =========================================================
+  function boot() {
+    bindDropdown();
+    renderGames();
+    renderSettings();
+    bindTabs();
+    bindFilters();
+    bindSound();
+    bindSettings();
+
+    $('#btnRefreshLb')?.addEventListener('click', (e) => withButtonSpinner(e.currentTarget, async () => {
+      Audio.sfx.click();
+      await loadLeaderboard(true);
+      showBanner('success', 'Leaderboard refreshed');
+    }));
+    $('#btnPlayNow')?.addEventListener('click', () => { Audio.sfx.click(); loadDaily(true); });
+    $('#btnSurprise')?.addEventListener('click', async (e) => withButtonSpinner(e.currentTarget, async () => {
+      Audio.sfx.nav();
+      if (!ROOMS.length) await loadRooms();
+      const pick = ROOMS.length ? ROOMS[Math.floor(Math.random() * ROOMS.length)] : null;
+      if (pick) openRoom(pick); else showBanner('error', 'No rooms available yet.');
+    }));
+    $('#btnTerms')?.addEventListener('click', (e) => { e.preventDefault(); Audio.sfx.click(); openTerms(); });
+
+    loadRooms();
+    loadLeaderboard(false);
+    loadStats();
+
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) loadLeaderboard(false); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+
+</script>
+</body>
+</html>
