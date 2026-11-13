@@ -5,8 +5,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
-// Backend base URL — override for release builds with: -PPW_API_URL=https://...
-val apiBaseUrl = (project.findProperty("PW_API_URL") as? String) ?: "http://10.0.2.2:3000/"
+// Backend base URL — live hosted backend by default. To point at a local dev
+// server during development, override with: -PPW_API_URL=http://10.0.2.2:3000/
+val apiBaseUrl = (project.findProperty("PW_API_URL") as? String)
+    ?: "https://puzzleworld-backend.onrender.com/"
 
 android {
     namespace = "com.jeiu.puzzleworld"
