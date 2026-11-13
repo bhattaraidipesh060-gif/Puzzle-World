@@ -102,7 +102,7 @@ class HomeActivity : AppCompatActivity() {
 
         username = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getString(KEY_USERNAME, "Player") ?: "Player"
-        world = HttpWorldService("http://10.0.2.2:3000", SessionManager.userId() ?: username)
+        world = HttpWorldService(ApiClient.BASE_URL, SessionManager.userId() ?: username)
 
         val welcome = findViewById<TextView>(R.id.home_welcome)
         val avatar = findViewById<TextView>(R.id.home_logout)

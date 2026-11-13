@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         val username = getSharedPreferences("puzzleworld_account", MODE_PRIVATE)
             .getString("username", "android_player") ?: "android_player"
         val backendUserId = SessionManager.userId() ?: username
-        world     = HttpWorldService("http://10.0.2.2:3000", backendUserId)
+        world     = HttpWorldService(ApiClient.BASE_URL, backendUserId)
         storage   = LocalStorage(applicationContext)
         generator = PuzzleGenerator()
 

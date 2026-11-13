@@ -11,8 +11,9 @@ import java.net.URL
 /**
  * Real HTTP client for the PuzzleWorld backend (Node + Express + SQLite).
  *
- * Base URL is http://10.0.2.2:3000 from the Android emulator (10.0.2.2 = host
- * loopback). The app remains offline-first: LocalStorage keeps bundled rooms and
+ * Base URL is the configured ApiClient.BASE_URL (BuildConfig.API_BASE_URL) — the
+ * hosted backend in release builds, emulator loopback (10.0.2.2) in debug. The
+ * app remains offline-first: LocalStorage keeps bundled rooms and
  * player state; this service only augments with cloud sync / remote rooms.
  */
 class HttpWorldService(
@@ -22,7 +23,7 @@ class HttpWorldService(
 
     companion object {
         private const val TAG = "PUZZLE_WORLD"
-        private const val TIMEOUT_MS = 5000
+        private const val TIMEOUT_MS = 15000
 
         /**
          * Mirrors the backend's dailySeed(): Java String.hashCode over the

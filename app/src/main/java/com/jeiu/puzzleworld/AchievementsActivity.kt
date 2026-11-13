@@ -56,7 +56,7 @@ class AchievementsActivity : AppCompatActivity() {
 
         val username = getSharedPreferences("puzzleworld_account", MODE_PRIVATE)
             .getString("username", "Player") ?: "Player"
-        world = HttpWorldService("http://10.0.2.2:3000", SessionManager.userId() ?: username)
+        world = HttpWorldService(ApiClient.BASE_URL, SessionManager.userId() ?: username)
 
         listContainer.addView(TextView(this).apply {
             text = "Loading badges…"

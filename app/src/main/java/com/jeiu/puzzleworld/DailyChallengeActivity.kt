@@ -41,8 +41,8 @@ class DailyChallengeActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "PUZZLE_WORLD"
-        private const val BASE_URL = "http://10.0.2.2:3000"
-        private const val TIMEOUT_MS = 5000
+        private const val BASE_URL = ApiClient.BASE_URL
+        private const val TIMEOUT_MS = 15000
 
         // palette (mirrors res/values/colors.xml — no new resources needed)
         private const val COLOR_SUCCESS = "#00E676"

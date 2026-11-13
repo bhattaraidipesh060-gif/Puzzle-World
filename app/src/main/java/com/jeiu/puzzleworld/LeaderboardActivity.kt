@@ -22,8 +22,8 @@ import java.net.URL
 class LeaderboardActivity : AppCompatActivity() {
 
     companion object {
-        private const val BASE_URL = "http://10.0.2.2:3000"
-        private const val TIMEOUT_MS = 5000
+        private const val BASE_URL = ApiClient.BASE_URL
+        private const val TIMEOUT_MS = 15000
 
         private val MEDALS = listOf("🥇", "🥈", "🥉")
     }
@@ -52,7 +52,7 @@ class LeaderboardActivity : AppCompatActivity() {
     }
 
     private fun fetchLeaderboard(): Result<List<Row>> = try {
-        val conn = (URL("$BASE_URL/api/progress").openConnection() as HttpURLConnection).apply {
+        val conn = (URL(BASE_URL.trimEnd('/') + "/api/progress").openConnection() as HttpURLConnection).apply {
             requestMethod = "GET"
             connectTimeout = TIMEOUT_MS
             readTimeout = TIMEOUT_MS
