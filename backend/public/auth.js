@@ -96,7 +96,8 @@
       showMsg(mode === 'register' ? 'Account created — signing you in…' : 'Welcome back, ' + profile.username + '!', 'success');
       localStorage.setItem('pw_user_id', profile.user_id);
       localStorage.setItem('pw_username', profile.username);
-      if (data.token) localStorage.setItem('pw_token', data.token);
+      // The JWT is delivered via an httpOnly cookie set by the server — it is
+      // intentionally NOT stored in localStorage, so XSS cannot exfiltrate it.
       setTimeout(() => { location.href = '/'; }, 900);
     } catch (err) {
       showMsg(err.message, 'error');

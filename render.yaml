@@ -13,3 +13,7 @@ services:
     envVars:
       - key: PW_JWT_SECRET
         generateValue: true
+      - key: PW_DEMO_USERNAME
+        value: Dipesh
+      - key: PW_DEMO_PASSWORD
+        sync: false

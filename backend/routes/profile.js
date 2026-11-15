@@ -1,24 +1,24 @@
+'use strict';
 const express = require('express');
 const router = express.Router();
 const wrap = require('./wrap');
 const { evaluate } = require('../badges');
+const { requireAuth, requireSelf } = require('../middleware/auth');
 
-// GET /api/user/profile?user_id=xxx  (query param)
-// GET /api/user/profile/:userId    (path param)
-// Returns the user's stats plus the full badge list with per-badge unlock status
-// and progress, so clients can render locked vs unlocked badges.
+// GET /api/user/profile?user_id=xxx  (query param)  — auth + self only
+// GET /api/user/profile/:userId    (path param)     — auth + self only
+// Returns the user's stats plus the full badge list with per-badge unlock status.
 function respond(req, res, userId) {
-  const profile = evaluate(userId);
-  res.json(profile);
+  res.json(evaluate(userId));
 }
 
-router.get('/profile', wrap((req, res) => {
+router.get('/profile', requireAuth, requireSelf((req) => req.query.user_id), wrap((req, res) => {
   const userId = String(req.query.user_id || '').trim();
   if (!userId) return res.status(400).json({ error: 'user_id required' });
   respond(req, res, userId);
 }));
 
-router.get('/profile/:userId', wrap((req, res) => {
+router.get('/profile/:userId', requireAuth, requireSelf((req) => req.params.userId), wrap((req, res) => {
   respond(req, res, String(req.params.userId).trim());
 }));
 

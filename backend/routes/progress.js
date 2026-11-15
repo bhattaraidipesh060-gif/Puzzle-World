@@ -1,17 +1,19 @@
+'use strict';
 const express = require('express');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
+const { requireAuth, requireSelf } = require('../middleware/auth');
 
-// POST /api/progress — sync player progress + stats
-router.post('/', wrap((req, res) => {
+// POST /api/progress — sync player progress + stats (auth + self only).
+router.post('/', requireAuth, requireSelf((req) => req.body && req.body.user_id), wrap((req, res) => {
   const db = getDb();
-  const { user_id, username, solved_levels, score, streak, hints_used, total_attempts, current_room } = req.body;
-  if (!user_id) return res.status(400).json({ error: 'user_id required' });
+  const user_id = req.user.user_id;
+  const { username, solved_levels, score, streak, hints_used, total_attempts, current_room } = req.body;
 
   // 1. Ensure the player row exists (fresh insert defaults username)
   db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)')
-    .run(user_id, username || 'Player');
+    .run(user_id, username || req.user.username || 'Player');
 
   // 2. Apply only the fields that were actually sent (preserve others)
   const sets = ['last_sync = datetime(\'now\')'];
@@ -46,8 +48,8 @@ router.post('/', wrap((req, res) => {
   });
 }));
 
-// GET /api/progress/:userId
-router.get('/:userId', wrap((req, res) => {
+// GET /api/progress/:userId (auth + self only)
+router.get('/:userId', requireAuth, requireSelf((req) => req.params.userId), wrap((req, res) => {
   const db = getDb();
   const p = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.params.userId);
   if (!p) return res.status(404).json({ error: 'Player not found' });
@@ -61,7 +63,7 @@ router.get('/:userId', wrap((req, res) => {
   });
 }));
 
-// GET /api/progress (leaderboard)
+// GET /api/progress (leaderboard) — public aggregate (usernames already public).
 router.get('/', wrap((req, res) => {
   const db = getDb();
   const lb = db.prepare(`SELECT p.user_id, p.username, COUNT(pp.level_id) AS solved_count, p.score, p.last_sync
@@ -70,8 +72,8 @@ router.get('/', wrap((req, res) => {
   res.json({ leaderboard: lb });
 }));
 
-// DELETE /api/progress/:userId — reset a player (remove progress + player row)
-router.delete('/:userId', wrap((req, res) => {
+// DELETE /api/progress/:userId — reset a player (auth + self only).
+router.delete('/:userId', requireAuth, requireSelf((req) => req.params.userId), wrap((req, res) => {
   const db = getDb();
   const p = db.prepare('SELECT user_id FROM players WHERE user_id = ?').get(req.params.userId);
   if (!p) return res.status(404).json({ error: 'Player not found' });

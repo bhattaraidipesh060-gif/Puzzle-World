@@ -66,19 +66,25 @@ function seedIfEmpty() {
 
 // Idempotent: guarantee a known demo login exists on every startup. Render's free
 // tier uses ephemeral SQLite, so this account would otherwise vanish on redeploy.
-const DEMO_USERNAME = 'Dipesh';
-const DEMO_PASSWORD = '12345678';
+// Credentials come from the environment (NOT hardcoded) so no default password is
+// baked into the image. Set PW_DEMO_USERNAME + PW_DEMO_PASSWORD to enable it.
+const { hashPassword } = require('./lib/security');
+const DEMO_USERNAME = process.env.PW_DEMO_USERNAME || '';
+const DEMO_PASSWORD = process.env.PW_DEMO_PASSWORD || '';
 
 function seedDemoAccount() {
+  if (!DEMO_USERNAME || !DEMO_PASSWORD) {
+    console.warn('[seed] Demo account disabled — set PW_DEMO_USERNAME and PW_DEMO_PASSWORD to enable it.');
+    return false;
+  }
   const db = getDb();
   const exists = db.prepare('SELECT user_id FROM users WHERE username = ?').get(DEMO_USERNAME);
   if (exists) return false;
-  const salt = crypto.randomBytes(16).toString('hex');
-  const passwordHash = crypto.createHash('sha256').update(`${salt}:${DEMO_PASSWORD}`).digest('hex');
-  const userId = 'u_demo_dipesh';
+  const passwordHash = hashPassword(DEMO_PASSWORD); // scrypt (salt embedded)
+  const userId = 'u_demo_' + crypto.randomBytes(6).toString('hex');
   db.transaction(() => {
     db.prepare('INSERT INTO users (user_id, username, password_hash, salt) VALUES (?, ?, ?, ?)')
-      .run(userId, DEMO_USERNAME, passwordHash, salt);
+      .run(userId, DEMO_USERNAME, passwordHash, '');
     db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)')
       .run(userId, DEMO_USERNAME);
   })();

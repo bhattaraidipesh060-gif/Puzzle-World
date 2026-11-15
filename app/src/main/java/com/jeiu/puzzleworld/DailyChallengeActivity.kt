@@ -48,6 +48,12 @@ class DailyChallengeActivity : AppCompatActivity() {
         private const val COLOR_SUCCESS = "#00E676"
         private const val COLOR_ERROR   = "#FF4081"
         private const val COLOR_MUTED   = "#B0B8C4"
+
+        // submitAnswer() outcomes
+        private const val SUBMIT_CORRECT   = 0
+        private const val SUBMIT_INCORRECT = 1
+        private const val SUBMIT_UNAUTH    = 2
+        private const val SUBMIT_ERROR     = 3
     }
 
     private lateinit var headerTitle: TextView
@@ -61,7 +67,6 @@ class DailyChallengeActivity : AppCompatActivity() {
 
     // parsed challenge state
     private var mechanicType: String = ""
-    private var expectedAnswer: String = ""
     private var hints: List<String> = emptyList()
     private var hintIndex = 0
     private var solved = false
@@ -151,8 +156,7 @@ class DailyChallengeActivity : AppCompatActivity() {
         hintsView.visibility = android.view.View.GONE
         btnHint.isEnabled = hints.isNotEmpty()
 
-        // grading
-        expectedAnswer = computeExpectedAnswer(mechanic)
+        // grading (server-side — the answer is never shipped to the client)
         solved = false
 
         // For wire_maze there is no text answer — disable input and explain.
@@ -234,24 +238,7 @@ class DailyChallengeActivity : AppCompatActivity() {
         return (0 until arr.length()).map { arr.optString(it) }.filter { it.isNotBlank() }
     }
 
-    private fun computeExpectedAnswer(m: JSONObject): String = when (mechanicType) {
-        "cipher"  -> m.optString("answer", "")
-        "riddle"  -> m.optString("answer", "")
-        "cipher_wheel"  -> m.optString("answer", "")
-        "terminal_hack" -> m.optString("answer", "")
-        "mechanical_lock" -> {
-            val combo = m.optJSONArray("combination")
-            if (combo == null) "" else (0 until combo.length()).joinToString("") { combo.get(it).toString() }
-        }
-        "deduction_grid" -> {
-            val sol = m.optJSONObject("solution")
-            if (sol == null) ""
-            else sol.keys().asSequence().joinToString("") { sol.optString(it) }
-        }
-        else -> ""
-    }
-
-    // ── Grading ──────────────────────────────────────────────────────────────
+    // ── Grading (server-side — the answer never ships to the client) ─────────
 
     private fun checkAnswer() {
         if (solved || mechanicType.isEmpty()) return
@@ -264,69 +251,77 @@ class DailyChallengeActivity : AppCompatActivity() {
         }
 
         attempts++
-        val correct = grade(input)
-        if (correct) {
-            solved = true
-            answerInput.isEnabled = false
-            btnCheck.isEnabled = false
-            statusText.setTextColor(Color.parseColor(COLOR_SUCCESS))
-            statusText.text = "✅ Correct! Challenge complete."
-            answerInput.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-            answerInput.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pop))
-            SoundFx.win()
-            submitCompletion()
-        } else {
-            statusText.setTextColor(Color.parseColor(COLOR_ERROR))
-            statusText.text = "❌ Not quite — try again"
-            answerInput.performHapticFeedback(HapticFeedbackConstants.REJECT)
-            answerInput.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake_x))
-            SoundFx.error()
+        statusText.setTextColor(Color.parseColor(COLOR_MUTED))
+        statusText.text = "Checking…"
+        lifecycleScope.launch {
+            val outcome = withContext(Dispatchers.IO) { submitAnswer(input) }
+            when (outcome) {
+                SUBMIT_CORRECT -> {
+                    solved = true
+                    answerInput.isEnabled = false
+                    btnCheck.isEnabled = false
+                    statusText.setTextColor(Color.parseColor(COLOR_SUCCESS))
+                    statusText.text = "✅ Correct! Challenge complete."
+                    answerInput.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    answerInput.startAnimation(AnimationUtils.loadAnimation(this@DailyChallengeActivity, R.anim.pop))
+                    SoundFx.win()
+                }
+                SUBMIT_INCORRECT -> {
+                    statusText.setTextColor(Color.parseColor(COLOR_ERROR))
+                    statusText.text = "❌ Not quite — try again"
+                    answerInput.performHapticFeedback(HapticFeedbackConstants.REJECT)
+                    answerInput.startAnimation(AnimationUtils.loadAnimation(this@DailyChallengeActivity, R.anim.shake_x))
+                    SoundFx.error()
+                }
+                SUBMIT_UNAUTH -> {
+                    statusText.setTextColor(Color.parseColor(COLOR_ERROR))
+                    statusText.text = "Sign in to submit the daily challenge"
+                    SoundFx.error()
+                }
+                else -> {
+                    statusText.setTextColor(Color.parseColor(COLOR_ERROR))
+                    statusText.text = "⚠️ Couldn't reach the backend — try again"
+                    SoundFx.error()
+                }
+            }
         }
     }
 
-    private fun grade(input: String): Boolean = when (mechanicType) {
-        "cipher"  -> input.equals(expectedAnswer, ignoreCase = true)
-        "riddle"  -> input.equals(expectedAnswer, ignoreCase = true)
-        "cipher_wheel"  -> input.equals(expectedAnswer, ignoreCase = true)
-        "terminal_hack" -> input.equals(expectedAnswer, ignoreCase = true)
-        "mechanical_lock" -> input == expectedAnswer
-        "deduction_grid"  -> input.replace(" ", "").equals(expectedAnswer, ignoreCase = true)
-        else -> false
-    }
-
-    // ── Sync ────────────────────────────────────────────────────────────────
-
-    /** Report a completed daily challenge to the backend so it counts toward the leaderboard. */
-    private fun submitCompletion() {
-        val user = getSharedPreferences("puzzleworld_account", MODE_PRIVATE)
-            .getString("username", "android_player") ?: "android_player"
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val payload = JSONObject().apply {
-                        put("user_id", user)
-                        if (challengeDate.isNotBlank()) put("challenge_date", challengeDate)
-                        put("hints_used", hintIndex)
-                        put("total_attempts", attempts)
-                    }
-                    val conn = (URL(BASE_URL.trimEnd('/') + "/api/daily-challenge/complete").openConnection()
-                            as HttpURLConnection).apply {
-                        requestMethod = "POST"
-                        connectTimeout = TIMEOUT_MS
-                        readTimeout = TIMEOUT_MS
-                        setRequestProperty("Content-Type", "application/json")
-                        setRequestProperty("Accept", "application/json")
-                        doOutput = true
-                    }
-                    conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
-                    val code = conn.responseCode
-                    conn.disconnect()
-                    if (code in 200..299) Log.d(TAG, "Daily challenge completion synced")
-                    else Log.w(TAG, "Daily challenge completion failed: HTTP $code")
-                } catch (e: Exception) {
-                    Log.w(TAG, "Daily challenge completion error: ${e.message}")
-                }
+    /** Submit the answer for server-side grading; returns an outcome constant. */
+    private fun submitAnswer(input: String): Int {
+        val userId = SessionManager.userId()
+        val token = SessionManager.token()
+        if (userId == null || token == null) return SUBMIT_UNAUTH
+        return try {
+            val payload = JSONObject().apply {
+                put("user_id", userId)
+                put("answer", input)
+                if (challengeDate.isNotBlank()) put("challenge_date", challengeDate)
+                put("hints_used", hintIndex)
+                put("total_attempts", attempts)
             }
+            val conn = (URL(BASE_URL.trimEnd('/') + "/api/daily-challenge/complete").openConnection()
+                    as HttpURLConnection).apply {
+                requestMethod = "POST"
+                connectTimeout = TIMEOUT_MS
+                readTimeout = TIMEOUT_MS
+                setRequestProperty("Content-Type", "application/json")
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("Authorization", "Bearer $token")
+                doOutput = true
+            }
+            conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
+            val code = conn.responseCode
+            conn.disconnect()
+            when (code) {
+                in 200..299 -> SUBMIT_CORRECT
+                400 -> SUBMIT_INCORRECT
+                401, 403 -> SUBMIT_UNAUTH
+                else -> SUBMIT_ERROR
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Daily challenge submit error: ${e.message}")
+            SUBMIT_ERROR
         }
     }
 

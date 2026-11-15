@@ -51,6 +51,8 @@ function initSchema() {
       username TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       salt TEXT NOT NULL,
+      mfa_secret TEXT,
+      mfa_enabled INTEGER DEFAULT 0,
       created_at TEXT DEFAULT (datetime('now'))
     );
   `);
@@ -80,6 +82,8 @@ function initSchema() {
   ensureColumn('players', 'hints_used',     'INTEGER DEFAULT 0');
   ensureColumn('players', 'total_attempts', 'INTEGER DEFAULT 0');
   ensureColumn('players', 'current_room',   'TEXT');
+  ensureColumn('users',   'mfa_secret',     'TEXT');
+  ensureColumn('users',   'mfa_enabled',    'INTEGER DEFAULT 0');
 
   // Performance indexes: per-room level lookups (routes/rooms.js) and leaderboard/progress
   // retrieval (routes/progress.js, routes/stats.js) filter on these columns on every query.

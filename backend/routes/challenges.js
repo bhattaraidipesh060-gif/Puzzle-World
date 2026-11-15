@@ -1,11 +1,27 @@
+'use strict';
 const express = require('express');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
+const { requireAuth, requireSelf } = require('../middleware/auth');
 
-function dailySeed(dateStr) { let h=0; for(let i=0;i<dateStr.length;i++)h=((h<<5)-h+dateStr.charCodeAt(i))|0; return Math.abs(h); }
+function dailySeed(dateStr) { let h = 0; for (let i = 0; i < dateStr.length; i++) h = ((h << 5) - h + dateStr.charCodeAt(i)) | 0; return Math.abs(h); }
 
-function todayStr() { return new Date().toISOString().slice(0,10).replace(/-/g,''); }
+function todayStr() { return new Date().toISOString().slice(0, 10).replace(/-/g, ''); }
+
+// Normalize a submitted/expected answer for lenient, case-insensitive comparison.
+function normAnswer(s) {
+  return String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
+}
+
+// Strip solution fields from the mechanic before it leaves the server, so the
+// answer is never shipped to the client (grading happens server-side).
+function sanitizeMechanic(mechanic) {
+  const m = Object.assign({}, mechanic);
+  delete m.answer;
+  delete m.solution;
+  return m;
+}
 
 // Resolve the challenge for a date, generating + persisting it on first use.
 function getOrCreateChallenge(db, date) {
@@ -29,7 +45,8 @@ function getOrCreateChallenge(db, date) {
 function challengeResponse(db, c, date) {
   const l = db.prepare('SELECT l.*, r.room_name, r.theme FROM levels l JOIN rooms r ON r.room_id = l.room_id WHERE l.level_id = ?').get(c.level_id);
   if (!l) return null;
-  return { challenge_date: date, seed: c.seed, level: { level_id: l.level_id, room_id: l.room_id, room_name: l.room_name, theme: l.theme, title: l.title, difficulty: l.difficulty, mechanic: JSON.parse(l.mechanic), hints: JSON.parse(l.hints || '[]') } };
+  const mechanic = sanitizeMechanic(JSON.parse(l.mechanic));
+  return { challenge_date: date, seed: c.seed, level: { level_id: l.level_id, room_id: l.room_id, room_name: l.room_name, theme: l.theme, title: l.title, difficulty: l.difficulty, mechanic, hints: JSON.parse(l.hints || '[]') } };
 }
 
 // GET /api/daily-challenge
@@ -53,15 +70,24 @@ router.get('/:date', wrap((req, res) => {
   res.json(out);
 }));
 
-// POST /api/daily-challenge/complete — submit a solved daily challenge
-router.post('/complete', wrap((req, res) => {
+// POST /api/daily-challenge/complete — verify the answer server-side, then record.
+router.post('/complete', requireAuth, requireSelf((req) => req.body && req.body.user_id), wrap((req, res) => {
   const db = getDb();
-  const { user_id, challenge_date, score, streak, hints_used, total_attempts } = req.body;
-  if (!user_id) return res.status(400).json({ error: 'user_id required' });
+  const { challenge_date, score, streak, hints_used, total_attempts } = req.body;
+  const user_id = req.user.user_id;
 
   const date = challenge_date || todayStr();
   const c = getOrCreateChallenge(db, date);
   if (c.error) return res.status(404).json({ error: c.error });
+
+  // Server-side grading: the client never receives the answer.
+  const level = db.prepare('SELECT mechanic FROM levels WHERE level_id = ?').get(c.level_id);
+  if (!level) return res.status(404).json({ error: 'Level not found' });
+  const expected = normAnswer(JSON.parse(level.mechanic).answer);
+  const got = normAnswer(req.body.answer);
+  if (!got || got !== expected) {
+    return res.status(400).json({ error: 'Incorrect answer.' });
+  }
 
   // Atomic: ensure player, mark solved, and apply stats in one transaction.
   const sets = ['last_sync = datetime(\'now\')'];
@@ -72,7 +98,7 @@ router.post('/complete', wrap((req, res) => {
   if (total_attempts !== undefined && total_attempts !== null) { sets.push('total_attempts = ?'); args.push(total_attempts); }
   args.push(user_id);
   db.transaction(() => {
-    db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)').run(user_id, 'Player');
+    db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)').run(user_id, req.user.username || 'Player');
     db.prepare(`INSERT INTO player_progress (user_id, level_id, is_solved, solved_at)
       VALUES (?, ?, 1, datetime('now'))
       ON CONFLICT(user_id, level_id) DO UPDATE SET is_solved = 1, solved_at = COALESCE(excluded.solved_at, solved_at)`)
@@ -80,7 +106,6 @@ router.post('/complete', wrap((req, res) => {
     db.prepare(`UPDATE players SET ${sets.join(', ')} WHERE user_id = ?`).run(...args);
   })();
 
-  // Build response: challenge + updated stats
   const p = db.prepare('SELECT * FROM players WHERE user_id = ?').get(user_id);
   const solved = db.prepare('SELECT COUNT(*) AS n FROM player_progress WHERE user_id = ? AND is_solved = 1').get(user_id);
 

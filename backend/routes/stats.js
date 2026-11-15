@@ -1,10 +1,12 @@
+'use strict';
 const express = require('express');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
+const { requireAuth, requireSelf } = require('../middleware/auth');
 
-// GET /api/stats/:userId
-router.get('/:userId', wrap((req, res) => {
+// GET /api/stats/:userId (auth + self only)
+router.get('/:userId', requireAuth, requireSelf((req) => req.params.userId), wrap((req, res) => {
   const db = getDb();
   const p = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.params.userId);
   if (!p) return res.status(404).json({ error: 'Player not found' });

@@ -1,63 +1,33 @@
+'use strict';
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
+const {
+  TOKEN_TTL_SECONDS, signToken, hashPassword, verifyPassword,
+  legacySha256, isLegacyHash, generateTotpSecret, verifyTotp, otpauthUrl,
+} = require('../lib/security');
+const { requireAuth } = require('../middleware/auth');
 
-// JWT secret — supplied via PW_JWT_SECRET (see backend/.env.example). Never hardcoded.
-const JWT_SECRET = process.env.PW_JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('PW_JWT_SECRET is not set — copy backend/.env.example to backend/.env and set it.');
-}
-const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
-
-// Salted SHA-256 (no plaintext passwords are ever stored or logged).
-function hash(password, salt) {
-  return crypto.createHash('sha256').update(`${salt}:${password}`).digest('hex');
-}
-
-// base64url encode/decode (Node-version agnostic — no reliance on 'base64url').
-function b64url(buf) {
-  return Buffer.from(buf).toString('base64')
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-function b64urlDecode(str) {
-  return Buffer.from(str.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
-}
-
-// HS256 JWT: header.payload.signature (dependency-free).
-function signToken(user) {
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const now = Math.floor(Date.now() / 1000);
-  const payload = { sub: user.user_id, username: user.username, iat: now, exp: now + TOKEN_TTL_SECONDS };
-  const enc = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(payload))}`;
-  const sig = b64url(crypto.createHmac('sha256', JWT_SECRET).update(enc).digest());
-  return `${enc}.${sig}`;
+// Issue a session: sign the JWT and, for the web portal, drop it into an
+// httpOnly cookie so the token never touches client-side localStorage.
+function issueSession(req, res, user) {
+  const token = signToken(user);
+  const secure = req.secure || String(req.headers['x-forwarded-proto']).toLowerCase() === 'https';
+  res.cookie('token', token, {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure,
+    maxAge: TOKEN_TTL_SECONDS * 1000,
+    path: '/',
+  });
+  return token;
 }
 
-// Returns the decoded payload on success, or null on invalid/expired signature.
-function verifyToken(token) {
-  if (!token) return null;
-  const parts = String(token).split('.');
-  if (parts.length !== 3) return null;
-  const enc = `${parts[0]}.${parts[1]}`;
-  const expect = b64url(crypto.createHmac('sha256', JWT_SECRET).update(enc).digest());
-  const got = Buffer.from(parts[2]);
-  const want = Buffer.from(expect);
-  if (got.length !== want.length || !crypto.timingSafeEqual(got, want)) return null;
-  try {
-    const payload = JSON.parse(b64urlDecode(parts[1]).toString('utf8'));
-    if (!payload.sub) return null;
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-function authResponse(row) {
+function authResponse(req, res, row) {
   const user = { user_id: row.user_id, username: row.username };
-  return { token: signToken(user), user };
+  return { token: issueSession(req, res, user), user, mfa_enabled: !!row.mfa_enabled };
 }
 
 // POST /api/auth/register
@@ -79,20 +49,16 @@ router.post('/register', wrap((req, res) => {
   const existing = db.prepare('SELECT user_id FROM users WHERE username = ?').get(username);
   if (existing) return res.status(409).json({ error: 'That username is already taken.' });
 
-  const salt = crypto.randomBytes(16).toString('hex');
-  const password_hash = hash(password, salt);
+  const password_hash = hashPassword(password); // scrypt; salt is embedded
   const user_id = 'u_' + crypto.randomBytes(9).toString('hex');
 
   try {
     db.transaction(() => {
       db.prepare('INSERT INTO users (user_id, username, password_hash, salt) VALUES (?, ?, ?, ?)')
-        .run(user_id, username, password_hash, salt);
-      // Mirror into `players` so progress / stats / leaderboard work immediately.
+        .run(user_id, username, password_hash, '');
       db.prepare('INSERT INTO players (user_id, username) VALUES (?, ?)').run(user_id, username);
     })();
   } catch (e) {
-    // Concurrent registration of the same username slips past the SELECT check above
-    // but is caught by the UNIQUE constraint — surface a 409 instead of a 500.
     if (e && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
       return res.status(409).json({ error: 'That username is already taken.' });
     }
@@ -100,39 +66,98 @@ router.post('/register', wrap((req, res) => {
   }
 
   const row = db.prepare('SELECT * FROM users WHERE user_id = ?').get(user_id);
-  res.status(201).json(authResponse(row));
+  res.status(201).json(authResponse(req, res, row));
 }));
 
-// POST /api/auth/login
+// POST /api/auth/login  (optional mfa_code when MFA is enabled)
 router.post('/login', wrap((req, res) => {
   const db = getDb();
   const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
+  const mfaCode = String(req.body.mfa_code || '').trim();
 
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  if (!user) return res.status(401).json({ error: 'No account found with that username.' });
+  if (!user) {
+    // Burn a hash to reduce username-enumeration timing differences.
+    legacySha256(password, crypto.randomBytes(16).toString('hex'));
+    return res.status(401).json({ error: 'Invalid username or password.' });
+  }
 
-  if (hash(password, user.salt) !== user.password_hash) {
-    return res.status(401).json({ error: 'Incorrect password.' });
+  let ok = false;
+  if (isLegacyHash(user.password_hash)) {
+    ok = legacySha256(password, user.salt) === user.password_hash;
+    if (ok) {
+      // Opportunistic migration to scrypt.
+      const upgraded = hashPassword(password);
+      db.prepare('UPDATE users SET password_hash = ?, salt = ? WHERE user_id = ?')
+        .run(upgraded, '', user.user_id);
+      user.password_hash = upgraded;
+    }
+  } else {
+    ok = verifyPassword(password, user.password_hash);
+  }
+
+  if (!ok) return res.status(401).json({ error: 'Invalid username or password.' });
+
+  if (user.mfa_enabled) {
+    if (!verifyTotp(user.mfa_secret, mfaCode)) {
+      return res.status(401).json({ error: 'Invalid or missing MFA code.', mfa_required: true });
+    }
   }
 
   db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)')
     .run(user.user_id, user.username);
 
-  res.json(authResponse(user));
+  res.json(authResponse(req, res, user));
 }));
 
-// GET /api/auth/me — validates the Bearer token (auto-login / session check).
-router.get('/me', wrap((req, res) => {
-  const h = String(req.headers.authorization || '');
-  const token = h.startsWith('Bearer ') ? h.slice(7) : h;
-  const payload = verifyToken(token);
-  if (!payload) return res.status(401).json({ error: 'Invalid or expired token.' });
+// POST /api/auth/logout — clear the httpOnly cookie (client also drops its token).
+router.post('/logout', wrap((req, res) => {
+  res.clearCookie('token', { path: '/' });
+  res.json({ ok: true });
+}));
 
-  const user = getDb().prepare('SELECT user_id, username FROM users WHERE user_id = ?').get(payload.sub);
+// GET /api/auth/me — validates the Bearer/cookie token (auto-login / session check).
+router.get('/me', requireAuth, wrap((req, res) => {
+  const user = getDb().prepare('SELECT user_id, username, mfa_enabled FROM users WHERE user_id = ?').get(req.user.user_id);
   if (!user) return res.status(401).json({ error: 'Account not found.' });
+  res.json({ user: { user_id: user.user_id, username: user.username, mfa_enabled: !!user.mfa_enabled } });
+}));
 
-  res.json({ user: { user_id: user.user_id, username: user.username } });
+// ── MFA (TOTP) ────────────────────────────────────────────────────────────
+// POST /api/auth/mfa/enable — begin enrollment: generate a secret, return the
+// otpauth URL for an authenticator app (mfa stays disabled until /verify).
+router.post('/mfa/enable', requireAuth, wrap((req, res) => {
+  const db = getDb();
+  const user = db.prepare('SELECT user_id, username FROM users WHERE user_id = ?').get(req.user.user_id);
+  if (!user) return res.status(404).json({ error: 'Account not found.' });
+  const secret = generateTotpSecret();
+  db.prepare('UPDATE users SET mfa_secret = ? WHERE user_id = ?').run(secret, user.user_id);
+  res.json({ secret, otpauth_url: otpauthUrl(secret, user.username) });
+}));
+
+// POST /api/auth/mfa/verify — confirm a code and activate MFA.
+router.post('/mfa/verify', requireAuth, wrap((req, res) => {
+  const db = getDb();
+  const user = db.prepare('SELECT mfa_secret FROM users WHERE user_id = ?').get(req.user.user_id);
+  if (!user || !user.mfa_secret) return res.status(400).json({ error: 'MFA enrollment has not been started.' });
+  if (!verifyTotp(user.mfa_secret, req.body.code)) {
+    return res.status(400).json({ error: 'Invalid code.' });
+  }
+  db.prepare('UPDATE users SET mfa_enabled = 1 WHERE user_id = ?').run(req.user.user_id);
+  res.json({ ok: true, mfa_enabled: true });
+}));
+
+// POST /api/auth/mfa/disable — require a valid code before turning MFA off.
+router.post('/mfa/disable', requireAuth, wrap((req, res) => {
+  const db = getDb();
+  const user = db.prepare('SELECT mfa_secret FROM users WHERE user_id = ?').get(req.user.user_id);
+  if (!user || !user.mfa_enabled) return res.status(400).json({ error: 'MFA is not enabled.' });
+  if (!verifyTotp(user.mfa_secret, req.body.code)) {
+    return res.status(400).json({ error: 'Invalid code.' });
+  }
+  db.prepare('UPDATE users SET mfa_enabled = 0, mfa_secret = NULL WHERE user_id = ?').run(req.user.user_id);
+  res.json({ ok: true, mfa_enabled: false });
 }));
 
 module.exports = router;

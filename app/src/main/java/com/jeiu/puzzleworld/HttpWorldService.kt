@@ -18,7 +18,8 @@ import java.net.URL
  */
 class HttpWorldService(
     private val baseUrl: String,
-    private val userId: String = "android_player"
+    private val userId: String = "android_player",
+    private val token: String? = null
 ) : WorldRepository {
 
     companion object {
@@ -99,6 +100,7 @@ class HttpWorldService(
             readTimeout = TIMEOUT_MS
             setRequestProperty("Content-Type", "application/json")
             setRequestProperty("Accept", "application/json")
+            if (token != null) setRequestProperty("Authorization", "Bearer $token")
             if (body != null) doOutput = true
         }
     }

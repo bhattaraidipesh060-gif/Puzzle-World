@@ -785,8 +785,11 @@
   }
 
   function signout() {
+    // Clear the httpOnly auth cookie on the server, then wipe local identifiers.
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
     localStorage.removeItem('pw_user_id');
     localStorage.removeItem('pw_username');
+    localStorage.removeItem('pw_token'); // legacy — no longer used
     localStorage.removeItem('pw_last_room_id');
     localStorage.removeItem('pw_last_room_name');
     Audio.sfx.close();
