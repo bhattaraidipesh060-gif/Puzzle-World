@@ -68,12 +68,12 @@ function seedIfEmpty() {
 // tier uses ephemeral SQLite, so this account would otherwise vanish on redeploy.
 //
 // The demo account is an intentional EXCEPTION to the "no hardcoded credentials"
-// rule: it seeds with a known email/username/password (dipesh@example.com / Dipesh /
+// rule: it seeds with a known email/username/password (dipesh@gmail.com / Dipesh /
 // 12345678) so the demo login works out of the box for grading/demo. All three are
 // overridable via PW_DEMO_EMAIL / PW_DEMO_USERNAME / PW_DEMO_PASSWORD. Every OTHER
 // credential stays env-driven.
 const { hashPassword } = require('./lib/security');
-const DEMO_EMAIL = process.env.PW_DEMO_EMAIL || 'dipesh@example.com';
+const DEMO_EMAIL = process.env.PW_DEMO_EMAIL || 'dipesh@gmail.com';
 const DEMO_USERNAME = process.env.PW_DEMO_USERNAME || 'Dipesh';
 const DEMO_PASSWORD = process.env.PW_DEMO_PASSWORD || '12345678';
 

@@ -115,20 +115,26 @@ class LoginActivity : AppCompatActivity() {
 
     private fun attemptSubmit() {
         if (!termsAccepted()) return
-        val email = emailInput.text?.toString()?.trim().orEmpty()
+        val ident = emailInput.text?.toString()?.trim().orEmpty()
         val pass = passwordInput.text?.toString().orEmpty()
-        if (!validate(email, pass, registerMode)) return
+        if (!validate(ident, pass, registerMode)) return
 
         setLoading(true)
         statusView.text = if (registerMode) "Creating account…" else "Signing in…"
         statusView.setTextColor(Color.parseColor("#94A3B8"))
 
+        val request = if (registerMode || ident.contains("@")) {
+            AuthRequest(email = ident, password = pass)
+        } else {
+            AuthRequest(username = ident, password = pass)
+        }
+
         lifecycleScope.launch {
             try {
                 val response = if (registerMode) {
-                    ApiClient.authApi.register(AuthRequest(email, pass))
+                    ApiClient.authApi.register(request)
                 } else {
-                    ApiClient.authApi.login(AuthRequest(email, pass))
+                    ApiClient.authApi.login(request)
                 }
                 onAuthSuccess(response)
             } catch (e: HttpException) {
@@ -136,17 +142,17 @@ class LoginActivity : AppCompatActivity() {
                 showError(
                     when (e.code()) {
                         409 -> "An account with that email already exists"
-                        401 -> "Incorrect email or password"
-                        400 -> "Please check your email and password"
+                        401 -> "Incorrect email, username or password"
+                        400 -> "Please check your email/username and password"
                         else -> "Sign-in failed (${e.code()})"
                     }
                 )
             } catch (e: IOException) {
                 setLoading(false)
-                offlineAuth(email, pass)
+                offlineAuth(ident, pass)
             } catch (e: Exception) {
                 setLoading(false)
-                offlineAuth(email, pass)
+                offlineAuth(ident, pass)
             }
         }
     }
@@ -290,9 +296,22 @@ class LoginActivity : AppCompatActivity() {
         confirmInput.isEnabled = !loading
     }
 
-    private fun validate(email: String, pass: String, register: Boolean): Boolean {
-        if (email.isEmpty()) { showError("Enter your email"); return false }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) { showError("Enter a valid email address"); return false }
+    private fun validate(ident: String, pass: String, register: Boolean): Boolean {
+        if (ident.isEmpty()) {
+            showError(if (register) "Enter your Gmail address" else "Enter your email or username")
+            return false
+        }
+        val isEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(ident).matches()
+        if (register) {
+            if (!isEmail) { showError("Enter a valid email address"); return false }
+            if (!ident.endsWith("@gmail.com", ignoreCase = true) && !ident.endsWith("@googlemail.com", ignoreCase = true)) {
+                showError("Please use a Gmail address (…@gmail.com)")
+                return false
+            }
+        } else {
+            // login: email or username
+            if (ident.contains("@") && !isEmail) { showError("Enter a valid email address"); return false }
+        }
         if (pass.isEmpty()) { showError("Enter a password"); return false }
         if (register) {
             if (pass.length < 8) { showError("Password must be at least 8 characters"); return false }

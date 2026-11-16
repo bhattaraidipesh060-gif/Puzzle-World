@@ -2,9 +2,13 @@ package com.jeiu.puzzleworld
 
 import kotlinx.serialization.Serializable
 
-/** Request body for register/login — identified by email address. */
+/** Request body for register (email) / login (email or username). */
 @Serializable
-data class AuthRequest(val email: String, val password: String)
+data class AuthRequest(
+    val email: String? = null,
+    val username: String? = null,
+    val password: String
+)
 
 /** User profile returned by the backend (username is null until the user picks one). */
 @Serializable

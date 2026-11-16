@@ -15,6 +15,11 @@ function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
+// Registration requires a real Google (Gmail) address.
+function isGoogleEmail(v) {
+  return /^[^\s@]+@(gmail\.com|googlemail\.com)$/i.test(v);
+}
+
 // Issue a session: sign the JWT and, for the web portal, drop it into an
 // httpOnly cookie so the token never touches client-side localStorage.
 function issueSession(req, res, user) {
@@ -54,6 +59,9 @@ router.post('/register', wrap((req, res) => {
 
   if (!isValidEmail(email)) {
     return res.status(400).json({ error: 'A valid email address is required.' });
+  }
+  if (!isGoogleEmail(email)) {
+    return res.status(400).json({ error: 'Please use a Gmail address (…@gmail.com).' });
   }
   if (password.length < 8) {
     return res.status(400).json({ error: 'Password must be at least 8 characters.' });

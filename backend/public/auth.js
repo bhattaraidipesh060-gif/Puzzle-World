@@ -43,6 +43,7 @@
     $('#formTitle').textContent = isReg ? 'Create your account' : 'Welcome back';
     $('#formSub').textContent = isReg ? 'Join PuzzleWorld and sync your progress.' : 'Sign in to continue your progress.';
     $('#btnLabel').textContent = isReg ? 'Create Account' : 'Sign In';
+    $('#emailLabel').textContent = isReg ? 'Gmail address' : 'Email or username';
     $('#switchText').innerHTML = isReg
       ? 'Already have an account? <a href="#" data-mode="login">Sign in</a>'
       : 'New here? <a href="#" data-mode="register">Create an account</a>';
@@ -137,12 +138,18 @@
       return;
     }
 
-    // Step 1: email + password
-    const emailVal = $('#email').value.trim().toLowerCase();
+    // Step 1: email/username + password
+    const ident = $('#email').value.trim();
     const password = $('#password').value;
 
-    if (!emailVal) return showMsg('Please enter your email.', 'error');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) return showMsg('Please enter a valid email address.', 'error');
+    if (!ident) return showMsg('Please enter your email or username.', 'error');
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ident);
+    if (mode === 'register') {
+      if (!isEmail) return showMsg('Please enter a valid email address.', 'error');
+      if (!/^[^\s@]+@(gmail\.com|googlemail\.com)$/i.test(ident)) return showMsg('Please use a Gmail address (…@gmail.com).', 'error');
+    } else if (ident.includes('@') && !isEmail) {
+      return showMsg('Please enter a valid email address.', 'error');
+    }
     if (!password) return showMsg('Please enter a password.', 'error');
     if (mode === 'register') {
       if (password.length < 8) return showMsg('Password must be at least 8 characters.', 'error');
@@ -152,12 +159,16 @@
       if (!$('#agree').checked) return showMsg('Please accept the Terms of Service and Privacy Policy.', 'error');
     }
 
+    const body = mode === 'register' || isEmail
+      ? { email: ident.toLowerCase(), password }
+      : { username: ident, password };
+
     setLoading(true);
     try {
       const res = await fetch('/api/auth/' + mode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailVal, password })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
