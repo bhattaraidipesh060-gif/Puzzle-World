@@ -29,8 +29,6 @@ function publicUser(row) {
   return {
     user_id: row.user_id,
     username: row.username,
-    email: row.email || null,
-    has_username: !!row.username,
   };
 }
 
@@ -67,8 +65,8 @@ router.post('/register', wrap((req, res) => {
 
   try {
     db.transaction(() => {
-      db.prepare('INSERT INTO users (user_id, username, email, password_hash, salt) VALUES (?, ?, ?, ?, ?)')
-        .run(user_id, username, username + '@puzzleworld.local', password_hash, '');
+      db.prepare('INSERT INTO users (user_id, username, password_hash, salt) VALUES (?, ?, ?, ?)')
+        .run(user_id, username, password_hash, '');
       db.prepare('INSERT INTO players (user_id, username) VALUES (?, ?)')
         .run(user_id, username);
     })();
@@ -87,21 +85,14 @@ router.post('/register', wrap((req, res) => {
 //  LOGIN
 // ═══════════════════════════════════════════════════════════════════════════
 
-// POST /api/auth/login — username + password (email fallback for legacy accounts).
+// POST /api/auth/login — username + password.
 router.post('/login', wrap((req, res) => {
   const db = getDb();
   const username = String(req.body.username || '').trim();
-  const email = String(req.body.email || '').trim().toLowerCase();
   const password = String(req.body.password || '');
   const mfaCode = String(req.body.mfa_code || '').trim();
 
-  let user;
-  if (username) {
-    user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  } else if (email) {
-    // Legacy fallback: email lookup for accounts registered during the email-auth period.
-    user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
-  }
+  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 
   if (!user) {
     // Burn a hash to reduce identifier-enumeration timing differences.
@@ -145,7 +136,7 @@ router.post('/logout', wrap((req, res) => {
 
 // GET /api/auth/me — validates the Bearer/cookie token (auto-login / session check).
 router.get('/me', requireAuth, wrap((req, res) => {
-  const user = getDb().prepare('SELECT user_id, username, email, mfa_enabled FROM users WHERE user_id = ?').get(req.user.user_id);
+  const user = getDb().prepare('SELECT user_id, username, mfa_enabled FROM users WHERE user_id = ?').get(req.user.user_id);
   if (!user) return res.status(401).json({ error: 'Account not found.' });
   res.json({ user: { ...publicUser(user), mfa_enabled: !!user.mfa_enabled } });
 }));

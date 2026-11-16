@@ -120,6 +120,29 @@ function initSchema() {
   ensureColumn('users',   'verification_otp',  'TEXT');
   ensureColumn('users',   'otp_expires_at',    'TEXT');
 
+  // Migration: remove email NOT-NULL and UNIQUE constraints (username-only auth).
+  const emailInfo = uCols.find(c => c.name === 'email');
+  if (emailInfo && emailInfo.notnull) {
+    db.exec(`
+      ALTER TABLE users RENAME TO users_old;
+      CREATE TABLE users (
+        user_id TEXT PRIMARY KEY,
+        email TEXT,
+        username TEXT UNIQUE,
+        password_hash TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        mfa_secret TEXT,
+        mfa_enabled INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT (datetime('now')),
+        is_verified INTEGER DEFAULT 0,
+        verification_otp TEXT,
+        otp_expires_at TEXT
+      );
+      INSERT INTO users SELECT user_id, email, username, password_hash, salt, mfa_secret, mfa_enabled, created_at, is_verified, verification_otp, otp_expires_at FROM users_old;
+      DROP TABLE users_old;
+    `);
+  }
+
   // Performance indexes: per-room level lookups (routes/rooms.js) and leaderboard/progress
   // retrieval (routes/progress.js, routes/stats.js) filter on these columns on every query.
   db.exec(`
