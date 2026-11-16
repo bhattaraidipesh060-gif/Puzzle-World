@@ -19,6 +19,7 @@ object SessionManager {
     private const val FILE = "puzzleworld_secure_session"
     private const val KEY_TOKEN = "token"
     private const val KEY_USER_ID = "user_id"
+    private const val KEY_EMAIL = "email"
     private const val KEY_USERNAME = "username"
     private const val KEY_EXP = "exp"
 
@@ -47,7 +48,8 @@ object SessionManager {
         prefs.edit()
             .putString(KEY_TOKEN, token)
             .putString(KEY_USER_ID, user.user_id)
-            .putString(KEY_USERNAME, user.username)
+            .putString(KEY_EMAIL, user.email)
+            .putString(KEY_USERNAME, user.username ?: "")
             .putLong(KEY_EXP, decodeExp(token))
             .apply()
     }
@@ -60,6 +62,9 @@ object SessionManager {
 
     fun username(): String? =
         if (::prefs.isInitialized) prefs.getString(KEY_USERNAME, null) else null
+
+    fun email(): String? =
+        if (::prefs.isInitialized) prefs.getString(KEY_EMAIL, null) else null
 
     /** True when a non-expired token is stored (used for auto-login). */
     fun isLoggedIn(): Boolean {

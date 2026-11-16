@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
@@ -25,6 +26,9 @@ import java.io.IOException
  * in an encrypted session store. Falls back to local SQLite credentials when the
  * backend is unreachable (offline-first). Auto-logins on launch when a valid
  * session exists.
+ *
+ * Two-step setup: accounts are identified by email; a brand-new user is prompted
+ * to pick a unique username (POST /api/auth/set-username) before entering the app.
  */
 class LoginActivity : AppCompatActivity() {
 
@@ -33,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
         private const val KEY_USERNAME = "username"
     }
 
-    private lateinit var usernameInput: TextInputEditText
+    private lateinit var emailInput: TextInputEditText
     private lateinit var passwordInput: TextInputEditText
     private lateinit var confirmInput: TextInputEditText
     private lateinit var confirmLayout: TextInputLayout
@@ -59,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        usernameInput = findViewById(R.id.login_username)
+        emailInput = findViewById(R.id.login_username)
         passwordInput = findViewById(R.id.login_password)
         confirmInput = findViewById(R.id.login_confirm)
         confirmLayout = findViewById(R.id.login_confirm_layout)
@@ -111,9 +115,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun attemptSubmit() {
         if (!termsAccepted()) return
-        val user = usernameInput.text?.toString()?.trim().orEmpty()
+        val email = emailInput.text?.toString()?.trim().orEmpty()
         val pass = passwordInput.text?.toString().orEmpty()
-        if (!validate(user, pass, registerMode)) return
+        if (!validate(email, pass, registerMode)) return
 
         setLoading(true)
         statusView.text = if (registerMode) "Creating account…" else "Signing in…"
@@ -122,43 +126,108 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val response = if (registerMode) {
-                    ApiClient.authApi.register(AuthRequest(user, pass))
+                    ApiClient.authApi.register(AuthRequest(email, pass))
                 } else {
-                    ApiClient.authApi.login(AuthRequest(user, pass))
+                    ApiClient.authApi.login(AuthRequest(email, pass))
                 }
                 onAuthSuccess(response)
             } catch (e: HttpException) {
                 setLoading(false)
                 showError(
                     when (e.code()) {
-                        409 -> "That username is already taken"
-                        401 -> "Incorrect username or password"
-                        400 -> "Please check your username and password"
+                        409 -> "An account with that email already exists"
+                        401 -> "Incorrect email or password"
+                        400 -> "Please check your email and password"
                         else -> "Sign-in failed (${e.code()})"
                     }
                 )
             } catch (e: IOException) {
                 setLoading(false)
-                offlineAuth(user, pass)
+                offlineAuth(email, pass)
             } catch (e: Exception) {
                 setLoading(false)
-                offlineAuth(user, pass)
+                offlineAuth(email, pass)
             }
         }
     }
 
     private fun onAuthSuccess(response: AuthResponse) {
         SessionManager.save(response.token, response.user)
-        persistUsername(response.user.username)
         setLoading(false)
         SoundFx.success()
-        val msg = if (registerMode) {
-            "Account created — welcome, ${response.user.username}! 🎉"
+        val name = response.user.username
+        if (name.isNullOrBlank()) {
+            // Two-step setup: account identified by email; username not chosen yet.
+            promptForUsername(response)
         } else {
-            "Welcome back, ${response.user.username}! 🎉"
+            persistUsername(name)
+            Toast.makeText(this, "Welcome back, $name! 🎉", Toast.LENGTH_SHORT).show()
+            goHome()
         }
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        goHome()
+    }
+
+    /** Step 2: ask for a unique username after an email-based sign-up/sign-in. */
+    private fun promptForUsername(response: AuthResponse) {
+        val input = TextInputEditText(this).apply {
+            hint = "Username (3–32 characters)"
+            setTextColor(Color.parseColor("#E2E8F0"))
+            setHintTextColor(Color.parseColor("#64748B"))
+            setSingleLine()
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Choose your username")
+            .setMessage("Pick a unique name for the leaderboard.")
+            .setView(input)
+            .setCancelable(false)
+            .setPositiveButton("Save") { _, _ ->
+                val name = input.text?.toString()?.trim().orEmpty()
+                if (name.length !in 3..32) {
+                    Toast.makeText(this, "Username must be 3–32 characters", Toast.LENGTH_SHORT).show()
+                    promptForUsername(response)
+                } else {
+                    saveUsername(name, response)
+                }
+            }
+            .setNegativeButton("Skip for now") { _, _ ->
+                persistUsername(response.user.email.substringBefore('@').ifBlank { "Player" })
+                Toast.makeText(this, "Welcome! 🎉", Toast.LENGTH_SHORT).show()
+                goHome()
+            }
+            .show()
+    }
+
+    /** Persist the chosen username (two-step completion). */
+    private fun saveUsername(name: String, response: AuthResponse) {
+        setLoading(true)
+        statusView.text = "Saving username…"
+        statusView.setTextColor(Color.parseColor("#94A3B8"))
+        lifecycleScope.launch {
+            try {
+                val res = ApiClient.authApi.setUsername(SetUsernameRequest(name))
+                SessionManager.save(response.token, res.user)
+                persistUsername(res.user.username ?: name)
+                setLoading(false)
+                SoundFx.success()
+                Toast.makeText(this@LoginActivity, "Welcome, ${res.user.username ?: name}! 🎉", Toast.LENGTH_SHORT).show()
+                goHome()
+            } catch (e: HttpException) {
+                setLoading(false)
+                Toast.makeText(
+                    this@LoginActivity,
+                    when (e.code()) {
+                        409 -> "That username is already taken"
+                        400 -> "Username must be 3–32 characters"
+                        else -> "Couldn't save username (${e.code()})"
+                    },
+                    Toast.LENGTH_SHORT
+                ).show()
+                promptForUsername(response)
+            } catch (e: Exception) {
+                setLoading(false)
+                Toast.makeText(this@LoginActivity, "Couldn't save username — check your connection", Toast.LENGTH_SHORT).show()
+                promptForUsername(response)
+            }
+        }
     }
 
     /** Offline-first fallback: authenticate against the local SQLite store. */
@@ -216,14 +285,14 @@ class LoginActivity : AppCompatActivity() {
         } else {
             btnLogin.text = if (registerMode) "✨  CREATE ACCOUNT" else "🔐  SIGN IN"
         }
-        usernameInput.isEnabled = !loading
+        emailInput.isEnabled = !loading
         passwordInput.isEnabled = !loading
         confirmInput.isEnabled = !loading
     }
 
-    private fun validate(user: String, pass: String, register: Boolean): Boolean {
-        if (user.isEmpty()) { showError("Enter a username"); return false }
-        if (user.length < 3 || user.length > 32) { showError("Username must be 3–32 characters"); return false }
+    private fun validate(email: String, pass: String, register: Boolean): Boolean {
+        if (email.isEmpty()) { showError("Enter your email"); return false }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) { showError("Enter a valid email address"); return false }
         if (pass.isEmpty()) { showError("Enter a password"); return false }
         if (register) {
             if (pass.length < 8) { showError("Password must be at least 8 characters"); return false }

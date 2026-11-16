@@ -2,13 +2,18 @@ package com.jeiu.puzzleworld
 
 import kotlinx.serialization.Serializable
 
-/** Request body for both /api/auth/register and /api/auth/login. */
+/** Request body for register/login — identified by email address. */
 @Serializable
-data class AuthRequest(val username: String, val password: String)
+data class AuthRequest(val email: String, val password: String)
 
-/** User profile returned by the backend. */
+/** User profile returned by the backend (username is null until the user picks one). */
 @Serializable
-data class UserProfile(val user_id: String, val username: String)
+data class UserProfile(
+    val user_id: String,
+    val email: String,
+    val username: String? = null,
+    val has_username: Boolean = false
+)
 
 /** Register/login response: a signed JWT plus the user profile. */
 @Serializable
@@ -17,3 +22,10 @@ data class AuthResponse(val token: String, val user: UserProfile)
 /** GET /api/auth/me response (session validation). */
 @Serializable
 data class MeResponse(val user: UserProfile)
+
+/** POST /api/auth/set-username request + response. */
+@Serializable
+data class SetUsernameRequest(val username: String)
+
+@Serializable
+data class SetUsernameResponse(val ok: Boolean = false, val user: UserProfile)

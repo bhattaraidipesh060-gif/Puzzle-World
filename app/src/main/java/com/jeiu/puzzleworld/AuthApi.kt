@@ -19,4 +19,7 @@ interface AuthApi {
 
     @GET("api/auth/me")
     suspend fun me(): MeResponse
+
+    @POST("api/auth/set-username")
+    suspend fun setUsername(@Body body: SetUsernameRequest): SetUsernameResponse
 }
