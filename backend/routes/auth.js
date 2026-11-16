@@ -100,7 +100,7 @@ function authResponse(req, res, row) {
 //  REGISTRATION (OTP flow)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// POST /api/auth/register — create an unverified account, send OTP to email.
+// POST /api/auth/register — create an account and log in immediately.
 router.post('/register', wrap(async (req, res) => {
   const db = getDb();
   const email = String(req.body.email || '').trim().toLowerCase();
@@ -128,13 +128,11 @@ router.post('/register', wrap(async (req, res) => {
 
   const password_hash = hashPassword(password);
   const user_id = 'u_' + crypto.randomBytes(9).toString('hex');
-  const otp = generateOtp();
-  const otpExpires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
   try {
     db.transaction(() => {
-      db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt, is_verified, verification_otp, otp_expires_at) VALUES (?, ?, NULL, ?, ?, 0, ?, ?)')
-        .run(user_id, email, password_hash, '', otp, otpExpires);
+      db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt, is_verified) VALUES (?, ?, NULL, ?, ?, 1)')
+        .run(user_id, email, password_hash, '');
       db.prepare('INSERT INTO players (user_id, username) VALUES (?, ?)')
         .run(user_id, email.split('@')[0] || 'Player');
     })();
@@ -145,10 +143,8 @@ router.post('/register', wrap(async (req, res) => {
     throw e;
   }
 
-  // Fire-and-forget: OTP email delivery.
-  sendVerificationEmail(email, otp).catch(() => {});
-
-  res.status(201).json({ message: 'Verification code sent to ' + email + '.', email });
+  const row = db.prepare('SELECT * FROM users WHERE user_id = ?').get(user_id);
+  res.status(201).json(authResponse(req, res, row));
 }));
 
 // ═══════════════════════════════════════════════════════════════════════════
