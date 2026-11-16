@@ -44,12 +44,12 @@
       </div>
 
       <form id="authForm" novalidate>
-        <div class="field">
-          <input id="username" name="username" type="text" placeholder=" " autocomplete="username" required />
-          <label for="username">Username</label>
+        <div class="field field--email">
+          <input id="email" name="email" type="email" placeholder=" " autocomplete="email" required />
+          <label for="email">Email</label>
         </div>
 
-        <div class="field">
+        <div class="field field--password">
           <input id="password" name="password" type="password" placeholder=" " autocomplete="current-password" required />
           <label for="password">Password</label>
           <button type="button" class="reveal" data-target="password" aria-label="Toggle password visibility">👁</button>
@@ -65,6 +65,12 @@
           <input id="agree" type="checkbox" />
           <span>By creating an account, you agree to our <a href="#" data-modal="terms">Terms of Service</a> and <a href="#" data-modal="privacy">Privacy Policy</a>.</span>
         </label>
+
+        <div class="field field--username" id="usernameField" hidden>
+          <input id="username" name="username" type="text" placeholder=" " autocomplete="nickname" maxlength="32" />
+          <label for="username">Choose a username</label>
+          <p class="username-hint" id="usernameHint" style="font-size:0.78rem;color:#64748b;margin:6px 2px 0;">Pick a unique name (3–32 characters) for the leaderboard.</p>
+        </div>
 
         <div class="form-msg" id="formMsg" hidden></div>
 
@@ -123,6 +129,6 @@
   </div>
 </div>
 
-<script src="auth.js?v=20261103b"></script>
+<script src="auth.js?v=20261116"></script>
 </body>
 </html>
