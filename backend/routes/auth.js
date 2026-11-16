@@ -2,6 +2,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { promises: dns } = require('dns');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
@@ -19,6 +20,16 @@ function isValidEmail(v) {
 // Registration requires a real Google (Gmail) address.
 function isGoogleEmail(v) {
   return /^[^\s@]+@(gmail\.com|googlemail\.com)$/i.test(v);
+}
+
+// DNS MX lookup — verify the email domain can receive mail.
+async function hasMxRecord(domain) {
+  try {
+    const records = await dns.resolveMx(domain);
+    return Array.isArray(records) && records.length > 0;
+  } catch {
+    return false; // NXDOMAIN, SERVFAIL, timeout, etc.
+  }
 }
 
 // Generate a secure 6-digit OTP using CSPRNG.
@@ -90,7 +101,7 @@ function authResponse(req, res, row) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 // POST /api/auth/register — create an unverified account, send OTP to email.
-router.post('/register', wrap((req, res) => {
+router.post('/register', wrap(async (req, res) => {
   const db = getDb();
   const email = String(req.body.email || '').trim().toLowerCase();
   const password = String(req.body.password || '');
@@ -100,6 +111,10 @@ router.post('/register', wrap((req, res) => {
   }
   if (!isGoogleEmail(email)) {
     return res.status(400).json({ error: 'Please use a Gmail address (…@gmail.com).' });
+  }
+  // Validate the domain can receive mail (DNS MX lookup).
+  if (!(await hasMxRecord(email.split('@')[1]))) {
+    return res.status(400).json({ error: 'Invalid email address' });
   }
   if (password.length < 8) {
     return res.status(400).json({ error: 'Password must be at least 8 characters.' });
@@ -157,11 +172,8 @@ router.post('/verify-otp', wrap((req, res) => {
   if (!user) return res.status(400).json({ error: 'Invalid email or code.' });
   if (user.is_verified) return res.status(400).json({ error: 'Email already verified. Please log in.' });
 
-  if (user.verification_otp !== otp) {
-    return res.status(400).json({ error: 'Invalid verification code.' });
-  }
-  if (user.otp_expires_at && new Date(user.otp_expires_at) < new Date()) {
-    return res.status(400).json({ error: 'Verification code has expired. Please request a new one.' });
+  if (user.verification_otp !== otp || (user.otp_expires_at && new Date(user.otp_expires_at) < new Date())) {
+    return res.status(400).json({ error: 'Invalid or expired verification code.' });
   }
 
   db.prepare('UPDATE users SET is_verified = 1, verification_otp = NULL, otp_expires_at = NULL WHERE user_id = ?')
@@ -172,12 +184,15 @@ router.post('/verify-otp', wrap((req, res) => {
 }));
 
 // POST /api/auth/resend-otp — regenerate a fresh code and send it again.
-router.post('/resend-otp', wrap((req, res) => {
+router.post('/resend-otp', wrap(async (req, res) => {
   const db = getDb();
   const email = String(req.body.email || '').trim().toLowerCase();
 
   if (!isValidEmail(email)) {
     return res.status(400).json({ error: 'A valid email address is required.' });
+  }
+  if (!(await hasMxRecord(email.split('@')[1]))) {
+    return res.status(400).json({ error: 'Invalid email address' });
   }
 
   const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
