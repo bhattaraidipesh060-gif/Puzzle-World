@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
@@ -18,6 +19,39 @@ function isValidEmail(v) {
 // Registration requires a real Google (Gmail) address.
 function isGoogleEmail(v) {
   return /^[^\s@]+@(gmail\.com|googlemail\.com)$/i.test(v);
+}
+
+// Generate a secure 6-digit OTP using CSPRNG.
+function generateOtp() {
+  return crypto.randomInt(100000, 999999).toString();
+}
+
+// Send a verification code via Gmail SMTP.  Falls back to console logging when
+// PW_EMAIL_USER / PW_EMAIL_PASS are not set (dev / demo mode — check the log).
+async function sendVerificationEmail(email, otp) {
+  console.log(`[email] Verification code for ${email}: ${otp}`);
+  const user = process.env.PW_EMAIL_USER;
+  const pass = process.env.PW_EMAIL_PASS;
+  if (!user || !pass) {
+    console.log('[email] SMTP not configured — set PW_EMAIL_USER + PW_EMAIL_PASS for real delivery.');
+    return;
+  }
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass },
+    });
+    await transporter.sendMail({
+      from: user,
+      to: email,
+      subject: 'PuzzleWorld – Verify your email',
+      text: `Your PuzzleWorld verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you didn't create a PuzzleWorld account, please ignore this email.`,
+      html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto"><h2 style="color:#0f172a">🧩 PuzzleWorld</h2><p>Your verification code is:</p><h1 style="letter-spacing:8px;color:#0ea5e9">${otp}</h1><p style="color:#64748b;font-size:14px">This code expires in 10 minutes.</p><hr style="border:none;border-top:1px solid #e2e8f0"><p style="color:#94a3b8;font-size:12px">If you didn't create a PuzzleWorld account, please ignore this email.</p></div>`,
+    });
+    console.log(`[email] Verification code sent to ${email}.`);
+  } catch (err) {
+    console.error('[email] Failed to send:', err.message);
+  }
 }
 
 // Issue a session: sign the JWT and, for the web portal, drop it into an
@@ -51,7 +85,11 @@ function authResponse(req, res, row) {
   return { token: issueSession(req, res, user), user, mfa_enabled: !!row.mfa_enabled };
 }
 
-// POST /api/auth/register — identify by email; username is chosen in a later step.
+// ═══════════════════════════════════════════════════════════════════════════
+//  REGISTRATION (OTP flow)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// POST /api/auth/register — create an unverified account, send OTP to email.
 router.post('/register', wrap((req, res) => {
   const db = getDb();
   const email = String(req.body.email || '').trim().toLowerCase();
@@ -73,14 +111,15 @@ router.post('/register', wrap((req, res) => {
   const existing = db.prepare('SELECT user_id FROM users WHERE email = ?').get(email);
   if (existing) return res.status(409).json({ error: 'An account with that email already exists.' });
 
-  const password_hash = hashPassword(password); // scrypt; salt is embedded
+  const password_hash = hashPassword(password);
   const user_id = 'u_' + crypto.randomBytes(9).toString('hex');
+  const otp = generateOtp();
+  const otpExpires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
   try {
     db.transaction(() => {
-      db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt) VALUES (?, ?, NULL, ?, ?)')
-        .run(user_id, email, password_hash, '');
-      // Leaderboard display name until a real handle is chosen.
+      db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt, is_verified, verification_otp, otp_expires_at) VALUES (?, ?, NULL, ?, ?, 0, ?, ?)')
+        .run(user_id, email, password_hash, '', otp, otpExpires);
       db.prepare('INSERT INTO players (user_id, username) VALUES (?, ?)')
         .run(user_id, email.split('@')[0] || 'Player');
     })();
@@ -91,11 +130,75 @@ router.post('/register', wrap((req, res) => {
     throw e;
   }
 
-  const row = db.prepare('SELECT * FROM users WHERE user_id = ?').get(user_id);
-  res.status(201).json(authResponse(req, res, row));
+  // Fire-and-forget: OTP email delivery.
+  sendVerificationEmail(email, otp).catch(() => {});
+
+  res.status(201).json({ message: 'Verification code sent to ' + email + '.', email });
 }));
 
-// POST /api/auth/login — identify by email (or legacy username); optional mfa_code.
+// ═══════════════════════════════════════════════════════════════════════════
+//  EMAIL VERIFICATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// POST /api/auth/verify-otp — verify the OTP, mark account, issue a JWT.
+router.post('/verify-otp', wrap((req, res) => {
+  const db = getDb();
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const otp = String(req.body.otp || '').trim();
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: 'A valid email address is required.' });
+  }
+  if (!/^\d{6}$/.test(otp)) {
+    return res.status(400).json({ error: 'Please enter a valid 6‑digit code.' });
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (!user) return res.status(400).json({ error: 'Invalid email or code.' });
+  if (user.is_verified) return res.status(400).json({ error: 'Email already verified. Please log in.' });
+
+  if (user.verification_otp !== otp) {
+    return res.status(400).json({ error: 'Invalid verification code.' });
+  }
+  if (user.otp_expires_at && new Date(user.otp_expires_at) < new Date()) {
+    return res.status(400).json({ error: 'Verification code has expired. Please request a new one.' });
+  }
+
+  db.prepare('UPDATE users SET is_verified = 1, verification_otp = NULL, otp_expires_at = NULL WHERE user_id = ?')
+    .run(user.user_id);
+  user.is_verified = 1;
+
+  res.json(authResponse(req, res, user));
+}));
+
+// POST /api/auth/resend-otp — regenerate a fresh code and send it again.
+router.post('/resend-otp', wrap((req, res) => {
+  const db = getDb();
+  const email = String(req.body.email || '').trim().toLowerCase();
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: 'A valid email address is required.' });
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (!user) return res.status(400).json({ error: 'No account found for that email.' });
+  if (user.is_verified) return res.status(400).json({ error: 'Email already verified. Please log in.' });
+
+  const otp = generateOtp();
+  const expires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  db.prepare('UPDATE users SET verification_otp = ?, otp_expires_at = ? WHERE user_id = ?')
+    .run(otp, expires, user.user_id);
+
+  sendVerificationEmail(email, otp).catch(() => {});
+
+  res.json({ message: 'A new verification code has been sent to ' + email + '.', email });
+}));
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════════════════════════════════
+
+// POST /api/auth/login — identify by email (or legacy username); must be verified.
 router.post('/login', wrap((req, res) => {
   const db = getDb();
   const email = String(req.body.email || '').trim().toLowerCase();
@@ -131,6 +234,15 @@ router.post('/login', wrap((req, res) => {
   }
 
   if (!ok) return res.status(401).json({ error: 'Invalid email/username or password.' });
+
+  // Require email verification before issuing a session.
+  if (!user.is_verified) {
+    return res.status(403).json({
+      error: 'Email not verified. Please check your inbox for the verification code.',
+      unverified: true,
+      email: user.email,
+    });
+  }
 
   if (user.mfa_enabled) {
     if (!verifyTotp(user.mfa_secret, mfaCode)) {
@@ -187,7 +299,10 @@ router.post('/set-username', requireAuth, wrap((req, res) => {
   res.json({ ok: true, user: publicUser(row) });
 }));
 
-// ── MFA (TOTP) ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+//  MFA (TOTP)
+// ═══════════════════════════════════════════════════════════════════════════
+
 // POST /api/auth/mfa/enable — begin enrollment: generate a secret, return the
 // otpauth URL for an authenticator app (mfa stays disabled until /verify).
 router.post('/mfa/enable', requireAuth, wrap((req, res) => {

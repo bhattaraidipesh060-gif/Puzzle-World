@@ -85,7 +85,7 @@ function seedDemoAccount() {
   const passwordHash = hashPassword(DEMO_PASSWORD); // scrypt (salt embedded)
   const userId = 'u_demo_' + crypto.randomBytes(6).toString('hex');
   db.transaction(() => {
-    db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt) VALUES (?, ?, ?, ?, ?)')
+    db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt, is_verified) VALUES (?, ?, ?, ?, ?, 1)')
       .run(userId, DEMO_EMAIL, DEMO_USERNAME, passwordHash, '');
     db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)')
       .run(userId, DEMO_USERNAME);

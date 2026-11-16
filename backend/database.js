@@ -110,6 +110,16 @@ function initSchema() {
   ensureColumn('users',   'mfa_secret',     'TEXT');
   ensureColumn('users',   'mfa_enabled',    'INTEGER DEFAULT 0');
 
+  // Migration: add email-verification columns.  Existing users (registered before
+  // verification was introduced) are grandfathered as verified.
+  const uCols = db.prepare('PRAGMA table_info(users)').all();
+  if (!uCols.some(c => c.name === 'is_verified')) {
+    ensureColumn('users', 'is_verified',     'INTEGER DEFAULT 0');
+    db.exec('UPDATE users SET is_verified = 1');
+  }
+  ensureColumn('users',   'verification_otp',  'TEXT');
+  ensureColumn('users',   'otp_expires_at',    'TEXT');
+
   // Performance indexes: per-room level lookups (routes/rooms.js) and leaderboard/progress
   // retrieval (routes/progress.js, routes/stats.js) filter on these columns on every query.
   db.exec(`
