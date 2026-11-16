@@ -40,7 +40,16 @@ function currentFor(badge, ctx) {
 // Compute the full profile (stats + badge list) for a user. Returns a profile
 // object even when the player has no row yet (all badges locked, zero stats) so
 // brand-new users render gracefully instead of 404ing.
+// Short-TTL memo of computed profiles: badge evaluation runs several indexed
+// queries, and a client refreshes the same profile a few times in quick
+// succession (tab switches). Reuse the result for 3s to avoid duplicate work.
+const _memo = new Map(); // userId -> { expires, profile }
+
 function evaluate(userId) {
+  const now = Date.now();
+  const hit = _memo.get(userId);
+  if (hit && hit.expires > now) return hit.profile;
+
   const db = getDb();
   const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(userId);
 
@@ -74,7 +83,7 @@ function evaluate(userId) {
     };
   });
 
-  return {
+  const profile = {
     user_id: userId,
     username: player ? player.username : userId,
     stats: {
@@ -89,6 +98,8 @@ function evaluate(userId) {
     unlocked_count: badges.filter(b => b.unlocked).length,
     total_badges: badges.length,
   };
+  _memo.set(userId, { profile, expires: now + 3000 });
+  return profile;
 }
 
 module.exports = { evaluate, BADGES };

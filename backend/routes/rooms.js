@@ -3,19 +3,28 @@ const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
 
+// In-memory cache for the room catalogue (only changes on reseed). Short TTL so a
+// reseed is visible within 30s without manual invalidation.
+let roomsCache = { data: null, expires: 0 };
+
 // GET /api/rooms
 router.get('/', wrap((req, res) => {
+  const now = Date.now();
+  if (roomsCache.data && roomsCache.expires > now) return res.json(roomsCache.data);
+
   const db = getDb();
   const rooms = db.prepare(`
     SELECT r.*, COUNT(l.level_id) AS level_count
     FROM rooms r LEFT JOIN levels l ON l.room_id = r.room_id
     GROUP BY r.room_id ORDER BY r.room_id
   `).all();
-  res.json({ rooms: rooms.map(r => ({
+  const data = { rooms: rooms.map(r => ({
     room_id: r.room_id, room_name: r.room_name, theme: r.theme,
     description: r.description, puzzle_type: r.puzzle_type, level_count: r.level_count,
     room_graph: JSON.parse(r.room_graph || '{}')
-  })) });
+  })) };
+  roomsCache = { data, expires: now + 30_000 };
+  res.json(data);
 }));
 
 // GET /api/rooms/:roomId

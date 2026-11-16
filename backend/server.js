@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 const path = require('path');
 
 // Load backend/.env (PW_JWT_SECRET, PW_DB_PATH, PORT, CORS_ORIGINS, …) if present.
@@ -17,6 +18,9 @@ const { seedIfEmpty, seedDemoAccount } = require('./seed');
 // Render terminates TLS and sets X-Forwarded-*; trust one proxy hop so
 // `req.secure` / `req.ip` / `req.protocol` are correct.
 app.set('trust proxy', 1);
+
+// --- Compress all text responses (gzip/deflate/br) to shrink API payloads ---
+app.use(compression());
 
 // --- Security headers (CSP, X-Content-Type-Options, X-Frame-Options, HSTS…) ---
 app.use(helmet({
@@ -60,8 +64,25 @@ const apiLimiter = rateLimit({
 app.use('/api/auth', authLimiter);
 app.use('/api', apiLimiter);
 
+// --- Cache policy: catalogue + health are public & short-lived; user data is never cached.
+app.use('/api', (req, res, next) => {
+  if (req.method !== 'GET') { res.set('Cache-Control', 'no-store'); return next(); }
+  const p = req.path;
+  const cacheable = p === '/health' || p === '/rooms' || p.startsWith('/rooms/');
+  res.set('Cache-Control', cacheable ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store');
+  next();
+});
+
 // --- Web portal (static frontend) ---
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    } else if (/\.(css|js|png|jpe?g|svg|webp|woff2?)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+  },
+}));
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'puzzleworld-backend', version: '1.0.0' }));
 

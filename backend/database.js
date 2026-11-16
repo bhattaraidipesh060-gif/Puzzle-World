@@ -90,6 +90,7 @@ function initSchema() {
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_levels_room ON levels(room_id, sort_order);
     CREATE INDEX IF NOT EXISTS idx_progress_solved ON player_progress(user_id, is_solved);
+    CREATE INDEX IF NOT EXISTS idx_players_score ON players(score);
   `);
 }
 

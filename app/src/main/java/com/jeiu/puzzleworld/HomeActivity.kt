@@ -23,6 +23,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -43,6 +45,7 @@ class HomeActivity : AppCompatActivity() {
     private var query = ""
     private var username = "Player"
     private var rank: Int? = null
+    private var searchJob: Job? = null
     private lateinit var adapter: GameCardAdapter
     private lateinit var roomAdapter: GameCardAdapter
     private lateinit var world: HttpWorldService
@@ -194,8 +197,12 @@ class HomeActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
             override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {
                 query = s?.toString()?.trim()?.lowercase() ?: ""
-                applyFilter()
-                rebuildRooms()
+                searchJob?.cancel()
+                searchJob = lifecycleScope.launch {
+                    delay(250)
+                    applyFilter()
+                    rebuildRooms()
+                }
             }
             override fun afterTextChanged(s: Editable?) {}
         })
