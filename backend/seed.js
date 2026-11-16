@@ -68,26 +68,29 @@ function seedIfEmpty() {
 // tier uses ephemeral SQLite, so this account would otherwise vanish on redeploy.
 //
 // The demo account is an intentional EXCEPTION to the "no hardcoded credentials"
-// rule: it seeds with a known username/password (Dipesh / 12345678) so the demo
-// login works out of the box for grading/demo. Both are overridable via
-// PW_DEMO_USERNAME / PW_DEMO_PASSWORD. Every OTHER credential stays env-driven.
+// rule: it seeds with a known email/username/password (dipesh@example.com / Dipesh /
+// 12345678) so the demo login works out of the box for grading/demo. All three are
+// overridable via PW_DEMO_EMAIL / PW_DEMO_USERNAME / PW_DEMO_PASSWORD. Every OTHER
+// credential stays env-driven.
 const { hashPassword } = require('./lib/security');
+const DEMO_EMAIL = process.env.PW_DEMO_EMAIL || 'dipesh@example.com';
 const DEMO_USERNAME = process.env.PW_DEMO_USERNAME || 'Dipesh';
 const DEMO_PASSWORD = process.env.PW_DEMO_PASSWORD || '12345678';
 
 function seedDemoAccount() {
   const db = getDb();
-  const exists = db.prepare('SELECT user_id FROM users WHERE username = ?').get(DEMO_USERNAME);
+  const exists = db.prepare('SELECT user_id FROM users WHERE email = ? OR username = ?')
+    .get(DEMO_EMAIL, DEMO_USERNAME);
   if (exists) return false;
   const passwordHash = hashPassword(DEMO_PASSWORD); // scrypt (salt embedded)
   const userId = 'u_demo_' + crypto.randomBytes(6).toString('hex');
   db.transaction(() => {
-    db.prepare('INSERT INTO users (user_id, username, password_hash, salt) VALUES (?, ?, ?, ?)')
-      .run(userId, DEMO_USERNAME, passwordHash, '');
+    db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt) VALUES (?, ?, ?, ?, ?)')
+      .run(userId, DEMO_EMAIL, DEMO_USERNAME, passwordHash, '');
     db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)')
       .run(userId, DEMO_USERNAME);
   })();
-  console.log(`[seed] Demo account "${DEMO_USERNAME}" created.`);
+  console.log(`[seed] Demo account "${DEMO_EMAIL}" created.`);
   return true;
 }
 

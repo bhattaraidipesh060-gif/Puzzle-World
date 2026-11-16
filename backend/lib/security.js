@@ -27,7 +27,7 @@ function b64urlDecode(str) {
 function signToken(user) {
   const header = { alg: 'HS256', typ: 'JWT' };
   const now = Math.floor(Date.now() / 1000);
-  const payload = { sub: user.user_id, username: user.username, iat: now, exp: now + TOKEN_TTL_SECONDS };
+  const payload = { sub: user.user_id, username: user.username || null, email: user.email || null, iat: now, exp: now + TOKEN_TTL_SECONDS };
   const enc = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(payload))}`;
   const sig = b64url(crypto.createHmac('sha256', getJwtSecret()).update(enc).digest());
   return `${enc}.${sig}`;

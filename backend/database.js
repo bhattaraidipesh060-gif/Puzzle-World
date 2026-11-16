@@ -48,7 +48,8 @@ function initSchema() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       user_id TEXT PRIMARY KEY,
-      username TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL UNIQUE,
+      username TEXT UNIQUE,
       password_hash TEXT NOT NULL,
       salt TEXT NOT NULL,
       mfa_secret TEXT,
@@ -56,6 +57,30 @@ function initSchema() {
       created_at TEXT DEFAULT (datetime('now'))
     );
   `);
+
+  // Migration: pre-existing DBs have `username TEXT NOT NULL UNIQUE` and no `email`.
+  // Rebuild the table to add `email` (UNIQUE NOT NULL) and make `username` nullable,
+  // backfilling email from the legacy username so existing accounts keep working.
+  const usersCols = db.prepare('PRAGMA table_info(users)').all();
+  if (!usersCols.some(c => c.name === 'email')) {
+    db.exec(`
+      ALTER TABLE users RENAME TO users_old;
+      CREATE TABLE users (
+        user_id TEXT PRIMARY KEY,
+        email TEXT NOT NULL UNIQUE,
+        username TEXT UNIQUE,
+        password_hash TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        mfa_secret TEXT,
+        mfa_enabled INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+      INSERT INTO users (user_id, email, username, password_hash, salt, mfa_secret, mfa_enabled, created_at)
+        SELECT user_id, lower(username) || '@puzzleworld.local', username, password_hash, salt, mfa_secret, mfa_enabled, created_at
+        FROM users_old;
+      DROP TABLE users_old;
+    `);
+  }
 
   // Migration: drop the FK on player_progress.level_id so any app-reported level ID is accepted.
   // (level_id stays a column; solved_count = COUNT(rows) is unaffected.)
