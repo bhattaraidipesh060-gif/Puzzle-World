@@ -66,17 +66,16 @@ function seedIfEmpty() {
 
 // Idempotent: guarantee a known demo login exists on every startup. Render's free
 // tier uses ephemeral SQLite, so this account would otherwise vanish on redeploy.
-// Credentials come from the environment (NOT hardcoded) so no default password is
-// baked into the image. Set PW_DEMO_USERNAME + PW_DEMO_PASSWORD to enable it.
+//
+// The demo account is an intentional EXCEPTION to the "no hardcoded credentials"
+// rule: it seeds with a known username/password (Dipesh / 12345678) so the demo
+// login works out of the box for grading/demo. Both are overridable via
+// PW_DEMO_USERNAME / PW_DEMO_PASSWORD. Every OTHER credential stays env-driven.
 const { hashPassword } = require('./lib/security');
-const DEMO_USERNAME = process.env.PW_DEMO_USERNAME || '';
-const DEMO_PASSWORD = process.env.PW_DEMO_PASSWORD || '';
+const DEMO_USERNAME = process.env.PW_DEMO_USERNAME || 'Dipesh';
+const DEMO_PASSWORD = process.env.PW_DEMO_PASSWORD || '12345678';
 
 function seedDemoAccount() {
-  if (!DEMO_USERNAME || !DEMO_PASSWORD) {
-    console.warn('[seed] Demo account disabled — set PW_DEMO_USERNAME and PW_DEMO_PASSWORD to enable it.');
-    return false;
-  }
   const db = getDb();
   const exists = db.prepare('SELECT user_id FROM users WHERE username = ?').get(DEMO_USERNAME);
   if (exists) return false;
