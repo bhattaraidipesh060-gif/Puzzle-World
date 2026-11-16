@@ -92,6 +92,38 @@ function seedDemoAccount() {
   return true;
 }
 
-module.exports = { seed, seedIfEmpty, seedDemoAccount };
+// Demo leaderboard: seed a handful of named players with random scores + varied
+// solved counts so the leaderboard looks populated on a fresh/empty DB (e.g. a
+// new cloud deploy). Idempotent — checks for existing usernames and never
+// overwrites real players.
+const DEMO_LEADERBOARD = ['Ramesh', 'Madhav', 'Bishal', 'Anil', 'Gaurab'];
+
+function seedDemoLeaderboard() {
+  const db = getDb();
+  const levels = db.prepare('SELECT level_id FROM levels ORDER BY level_id').all();
+  if (levels.length === 0) return 0;
+
+  let created = 0;
+  db.transaction(() => {
+    for (const name of DEMO_LEADERBOARD) {
+      const exists = db.prepare('SELECT user_id FROM players WHERE username = ?').get(name);
+      if (exists) continue;
+      const userId = 'u_demo_lb_' + name.toLowerCase();
+      const score = 120 + Math.floor(Math.random() * 860);
+      db.prepare("INSERT INTO players (user_id, username, score, last_sync) VALUES (?, ?, ?, datetime('now'))")
+        .run(userId, name, score);
+      const solvedCount = 5 + Math.floor(Math.random() * Math.min(levels.length, 45));
+      for (let k = 0; k < solvedCount && k < levels.length; k++) {
+        db.prepare("INSERT OR IGNORE INTO player_progress (user_id, level_id, is_solved, solved_at) VALUES (?, ?, 1, datetime('now'))")
+          .run(userId, levels[k].level_id);
+      }
+      created++;
+    }
+  })();
+  if (created > 0) console.log(`[seed] Demo leaderboard: added ${created} players.`);
+  return created;
+}
+
+module.exports = { seed, seedIfEmpty, seedDemoAccount, seedDemoLeaderboard };
 
 if (require.main === module) seed();

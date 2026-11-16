@@ -13,7 +13,7 @@ try { process.loadEnvFile(path.join(__dirname, '.env')); } catch { /* optional *
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const { seedIfEmpty, seedDemoAccount } = require('./seed');
+const { seedIfEmpty, seedDemoAccount, seedDemoLeaderboard } = require('./seed');
 
 // Render terminates TLS and sets X-Forwarded-*; trust one proxy hop so
 // `req.secure` / `req.ip` / `req.protocol` are correct.
@@ -123,6 +123,8 @@ process.on('uncaughtException', (err) => {
 seedIfEmpty();
 // Ensure the demo login survives ephemeral DB wipes (idempotent).
 seedDemoAccount();
+// Populate a demo leaderboard on empty DBs (idempotent).
+seedDemoLeaderboard();
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`PuzzleWorld backend → http://0.0.0.0:${PORT} (all interfaces)`);
