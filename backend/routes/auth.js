@@ -13,20 +13,30 @@ const {
 const { requireAuth } = require('../middleware/auth');
 const { t, SUPPORTED } = require('../i18n');
 
-// Strict-enough RFC-ish email format check (any provider: Gmail, Naver, Yahoo,
-// Daum, Outlook, iCloud, …).
+// Use public resolvers for MX lookups — a system resolver can refuse MX
+// queries (ECONNREFUSED), which would make every domain silently "pass".
+require('dns').setServers(['8.8.8.8', '1.1.1.1']);
+
+// Strict RFC-ish email check (any provider: Gmail, Naver, Yahoo, Daum, …).
+// Rejects leading/trailing/consecutive dots, invalid domain-label edges,
+// and over-long addresses.
 function isValidEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  if (typeof v !== 'string' || v.length > 254) return false;
+  return /^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/.test(v);
 }
 
 // DNS MX lookup — verify the email domain can receive mail.
 // Fails CLOSED only when the domain definitively has no MX records
-// (ENODATA/ENOTFOUND); fails OPEN on infrastructure errors (ECONNREFUSED,
-// TIMEOUT, SERVFAIL) so registration isn't blocked by a DNS outage.
+// (ENODATA/ENOTFOUND/NXDOMAIN); fails OPEN on infrastructure errors
+// (ECONNREFUSED, TIMEOUT, SERVFAIL) — public DNS minimizes that path.
 async function hasMxRecord(domain) {
   try {
     const records = await dns.resolveMx(domain);
-    return Array.isArray(records) && records.length > 0;
+    // Reject "null MX" (a single "0 ." record — the domain explicitly accepts
+    // no mail) and any response without a real exchange host.
+    return Array.isArray(records) && records.some(
+      (r) => r && typeof r.exchange === 'string' && r.exchange.trim() !== ''
+    );
   } catch (err) {
     const code = err && err.code;
     if (code === 'ENOTFOUND' || code === 'ENODATA' || code === 'NXDOMAIN') {

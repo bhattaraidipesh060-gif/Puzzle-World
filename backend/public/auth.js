@@ -255,7 +255,17 @@
         body: JSON.stringify({ email: emailVal, password })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t('auth.something_wrong'));
+      if (!res.ok) {
+        // Login with an unverified account (403 {unverified:true}) must drop
+        // into the OTP step, not show a generic error.
+        if (mode === 'login' && data.unverified) {
+          enterOtpStep(data.email || emailVal);
+          setLoading(false);
+          showMsg(data.error || t('auth.verify_sub', { email: pendingEmail }), 'error');
+          return;
+        }
+        throw new Error(data.error || t('auth.something_wrong'));
+      }
 
       if (mode === 'register') {
         // Register returns a message (no token) — move to the OTP step.
@@ -265,11 +275,6 @@
           data.delivery === 'failed' ? t('auth.email_failed') : (data.message || t('auth.new_code_sent')),
           data.delivery === 'failed' ? 'error' : 'success'
         );
-      } else if (data.unverified) {
-        // Login blocked because email isn't verified — let them enter/resend the code.
-        enterOtpStep(emailVal);
-        setLoading(false);
-        showMsg(data.error || 'Please verify your email first.', 'error');
       } else {
         finishAuth(data);
       }
