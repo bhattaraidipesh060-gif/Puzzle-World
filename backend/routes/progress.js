@@ -4,6 +4,7 @@ const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
 const { requireAuth, requireSelf } = require('../middleware/auth');
+const { t } = require('../i18n');
 
 // POST /api/progress — sync player progress + stats (auth + self only).
 router.post('/', requireAuth, requireSelf((req) => req.body && req.body.user_id), wrap((req, res) => {
@@ -52,7 +53,7 @@ router.post('/', requireAuth, requireSelf((req) => req.body && req.body.user_id)
 router.get('/:userId', requireAuth, requireSelf((req) => req.params.userId), wrap((req, res) => {
   const db = getDb();
   const p = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.params.userId);
-  if (!p) return res.status(404).json({ error: 'Player not found' });
+  if (!p) return res.status(404).json({ error: t(req, 'player_not_found') });
   const rows = db.prepare('SELECT level_id, is_solved FROM player_progress WHERE user_id = ?').all(req.params.userId);
   const solved = {}; rows.forEach(r => { solved[r.level_id] = !!r.is_solved; });
   res.json({
@@ -76,7 +77,7 @@ router.get('/', wrap((req, res) => {
 router.delete('/:userId', requireAuth, requireSelf((req) => req.params.userId), wrap((req, res) => {
   const db = getDb();
   const p = db.prepare('SELECT user_id FROM players WHERE user_id = ?').get(req.params.userId);
-  if (!p) return res.status(404).json({ error: 'Player not found' });
+  if (!p) return res.status(404).json({ error: t(req, 'player_not_found') });
 
   db.transaction(() => {
     db.prepare('DELETE FROM player_progress WHERE user_id = ?').run(req.params.userId);

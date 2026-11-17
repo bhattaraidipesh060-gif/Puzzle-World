@@ -4,6 +4,7 @@ const router = express.Router();
 const wrap = require('./wrap');
 const { evaluate } = require('../badges');
 const { requireAuth, requireSelf } = require('../middleware/auth');
+const { t } = require('../i18n');
 
 // GET /api/user/profile?user_id=xxx  (query param)  — auth + self only
 // GET /api/user/profile/:userId    (path param)     — auth + self only
@@ -14,7 +15,7 @@ function respond(req, res, userId) {
 
 router.get('/profile', requireAuth, requireSelf((req) => req.query.user_id), wrap((req, res) => {
   const userId = String(req.query.user_id || '').trim();
-  if (!userId) return res.status(400).json({ error: 'user_id required' });
+  if (!userId) return res.status(400).json({ error: t(req, 'user_id_required') });
   respond(req, res, userId);
 }));
 

@@ -14,6 +14,7 @@ try { process.loadEnvFile(path.join(__dirname, '.env')); } catch { /* optional *
 const app = express();
 const PORT = process.env.PORT || 3000;
 const { seedIfEmpty, seedDemoAccount, seedDemoLeaderboard } = require('./seed');
+const { t } = require('./i18n');
 
 // Render terminates TLS and sets X-Forwarded-*; trust one proxy hop so
 // `req.secure` / `req.ip` / `req.protocol` are correct.
@@ -93,15 +94,15 @@ app.use('/api/daily-challenge', require('./routes/challenges'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/user', require('./routes/profile'));
 
-app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
+app.use((req, res) => res.status(404).json({ error: t(req, 'not_found') }));
 
 // --- Error handling: clean JSON, never echo stack traces or raw internals to
 // clients, and keep request bodies/tokens out of the logs.
-app.use((err, _req, res, _next) => {
+app.use((err, req, res, _next) => {
   const status = (err && (err.status || err.statusCode)) || 500;
   const msg = err && err.type === 'entity.parse.failed'
-    ? 'Invalid JSON body'
-    : (status === 500 ? 'Internal server error' : (err.message || 'Bad request'));
+    ? t(req, 'invalid_json')
+    : (status === 500 ? t(req, 'internal_error') : (err.message || t(req, 'bad_request')));
   if (process.env.NODE_ENV === 'production') {
     console.error('[error]', status, err && err.name);
   } else {

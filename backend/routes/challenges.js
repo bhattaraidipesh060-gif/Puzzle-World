@@ -4,6 +4,7 @@ const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
 const { requireAuth, requireSelf } = require('../middleware/auth');
+const { t } = require('../i18n');
 
 function dailySeed(dateStr) { let h = 0; for (let i = 0; i < dateStr.length; i++) h = ((h << 5) - h + dateStr.charCodeAt(i)) | 0; return Math.abs(h); }
 
@@ -34,7 +35,7 @@ function getOrCreateChallenge(db, date) {
          OR (json_extract(mechanic, '$.mechanic_type') = 'terminal_hack' AND json_extract(mechanic, '$.mode') = 'bin_to_hex')
       ORDER BY sort_order
     `).all();
-    if (!levels.length) return { error: 'No gradable levels' };
+    if (!levels.length) return { error: 'no_gradable_levels' };
     const pick = levels[seed % levels.length];
     db.prepare('INSERT INTO daily_challenges VALUES (?,?,?,?)').run(date, seed, pick.room_id, pick.level_id);
     c = { challenge_date: date, seed, room_id: pick.room_id, level_id: pick.level_id };
@@ -54,9 +55,9 @@ router.get('/', wrap((req, res) => {
   const db = getDb();
   const date = todayStr();
   const c = getOrCreateChallenge(db, date);
-  if (c.error) return res.status(404).json({ error: c.error });
+  if (c.error) return res.status(404).json({ error: t(req, c.error) });
   const out = challengeResponse(db, c, date);
-  if (!out) return res.status(404).json({ error: 'Level not found' });
+  if (!out) return res.status(404).json({ error: t(req, 'level_not_found') });
   res.json(out);
 }));
 
@@ -64,9 +65,9 @@ router.get('/', wrap((req, res) => {
 router.get('/:date', wrap((req, res) => {
   const db = getDb();
   const c = getOrCreateChallenge(db, req.params.date);
-  if (c.error) return res.status(404).json({ error: c.error });
+  if (c.error) return res.status(404).json({ error: t(req, c.error) });
   const out = challengeResponse(db, c, req.params.date);
-  if (!out) return res.status(404).json({ error: 'Level not found' });
+  if (!out) return res.status(404).json({ error: t(req, 'level_not_found') });
   res.json(out);
 }));
 
@@ -78,15 +79,15 @@ router.post('/complete', requireAuth, requireSelf((req) => req.body && req.body.
 
   const date = challenge_date || todayStr();
   const c = getOrCreateChallenge(db, date);
-  if (c.error) return res.status(404).json({ error: c.error });
+  if (c.error) return res.status(404).json({ error: t(req, c.error) });
 
   // Server-side grading: the client never receives the answer.
   const level = db.prepare('SELECT mechanic FROM levels WHERE level_id = ?').get(c.level_id);
-  if (!level) return res.status(404).json({ error: 'Level not found' });
+  if (!level) return res.status(404).json({ error: t(req, 'level_not_found') });
   const expected = normAnswer(JSON.parse(level.mechanic).answer);
   const got = normAnswer(req.body.answer);
   if (!got || got !== expected) {
-    return res.status(400).json({ error: 'Incorrect answer.' });
+    return res.status(400).json({ error: t(req, 'incorrect_answer') });
   }
 
   // Atomic: ensure player, mark solved, and apply stats in one transaction.

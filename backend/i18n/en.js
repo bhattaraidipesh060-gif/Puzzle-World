@@ -43,4 +43,10 @@ module.exports = {
   hint_used: 'Hint used',
   challenge_complete: 'Daily challenge complete!',
   leaderboard: 'Leaderboard',
+  room_not_found: 'Room not found',
+  level_not_found: 'Level not found',
+  player_not_found: 'Player not found',
+  incorrect_answer: 'Incorrect answer.',
+  no_gradable_levels: 'No gradable levels',
+  user_id_required: 'user_id required',
 };

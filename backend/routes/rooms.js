@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
+const { t } = require('../i18n');
 
 // In-memory cache for the room catalogue (only changes on reseed). Short TTL so a
 // reseed is visible within 30s without manual invalidation.
@@ -31,7 +32,7 @@ router.get('/', wrap((req, res) => {
 router.get('/:roomId', wrap((req, res) => {
   const db = getDb();
   const room = db.prepare('SELECT * FROM rooms WHERE room_id = ?').get(req.params.roomId);
-  if (!room) return res.status(404).json({ error: 'Room not found' });
+  if (!room) return res.status(404).json({ error: t(req, 'room_not_found') });
   const levels = db.prepare('SELECT * FROM levels WHERE room_id = ? ORDER BY sort_order').all(req.params.roomId);
   res.json({
     room_id: room.room_id, room_name: room.room_name, theme: room.theme,
@@ -51,7 +52,7 @@ router.get('/:roomId/levels/:levelId', wrap((req, res) => {
     SELECT l.*, r.room_name FROM levels l JOIN rooms r ON r.room_id = l.room_id
     WHERE l.level_id = ? AND l.room_id = ?
   `).get(req.params.levelId, req.params.roomId);
-  if (!level) return res.status(404).json({ error: 'Level not found' });
+  if (!level) return res.status(404).json({ error: t(req, 'level_not_found') });
   res.json({
     level_id: level.level_id, room_id: level.room_id, room_name: level.room_name,
     puzzle_type: level.puzzle_type, title: level.title, difficulty: level.difficulty,

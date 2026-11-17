@@ -4,6 +4,7 @@
 // `req.user` ({ user_id, username }). Also provides `requireSelf` to enforce
 // object-level authorization (a caller may only act on their own user id).
 const { verifyToken } = require('../lib/security');
+const { t } = require('../i18n');
 
 // Extract the raw token from Bearer header or cookie (dependency-free parse).
 function readToken(req) {
@@ -18,7 +19,7 @@ function requireAuth(req, res, next) {
   const token = readToken(req);
   const payload = verifyToken(token);
   if (!payload) {
-    return res.status(401).json({ error: 'Authentication required.' });
+    return res.status(401).json({ error: t(req, 'auth_required') });
   }
   req.user = { user_id: payload.sub, username: payload.username || null, email: payload.email || null, language: payload.language || null };
   next();
@@ -30,7 +31,7 @@ function requireSelf(getUserId) {
   return (req, res, next) => {
     const target = getUserId(req);
     if (!target || target !== req.user.user_id) {
-      return res.status(403).json({ error: 'You are not allowed to access this resource.' });
+      return res.status(403).json({ error: t(req, 'forbidden') });
     }
     next();
   };

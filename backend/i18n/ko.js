@@ -43,4 +43,10 @@ module.exports = {
   hint_used: '힌트 사용',
   challenge_complete: '일일 도전 완료!',
   leaderboard: '리더보드',
+  room_not_found: '방을 찾을 수 없습니다',
+  level_not_found: '레벨을 찾을 수 없습니다',
+  player_not_found: '플레이어를 찾을 수 없습니다',
+  incorrect_answer: '정답이 아닙니다.',
+  no_gradable_levels: '채점 가능한 레벨이 없습니다',
+  user_id_required: 'user_id가 필요합니다',
 };
