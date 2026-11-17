@@ -79,4 +79,76 @@
     <string name="action_cancel">취소</string>
     <string name="action_verify">인증</string>
     <string name="action_close">닫기</string>
+
+    <!-- ===== Achievements ===== -->
+    <string name="achievements_title">🏆 도전 과제</string>
+    <string name="achievements_count">%1$d / %2$d 해금됨</string>
+    <string name="achievements_unlocked_fmt">해금되었습니다!\n\n%1$s</string>
+    <string name="achievements_locked_fmt">🔒 %1$s</string>
+
+    <!-- ===== Daily ===== -->
+    <string name="daily_title">🗓️ 오늘의 도전</string>
+    <string name="daily_check">✓  확인</string>
+    <string name="daily_hint">💡  힌트</string>
+    <string name="daily_malformed">잘못된 도전 과제 — 레벨이 없습니다</string>
+
+    <!-- ===== Leaderboard ===== -->
+    <string name="leaderboard_title">🏆  리더보드</string>
+    <string name="leaderboard_refresh">↻ 새로고침</string>
+
+    <!-- ===== Home dashboard (remaining) ===== -->
+    <string name="home_stats_total_score">⭐ 총 점수</string>
+    <string name="home_stats_solved">🧩 해결 완료</string>
+    <string name="home_stats_achievements">🏅 도전 과제</string>
+    <string name="home_games_header">게임</string>
+    <string name="home_games_count">%1$d개</string>
+    <string name="home_rooms_header">방 탈출</string>
+    <string name="home_rooms_count">%1$d개 방 · %2$d개 레벨</string>
+    <string name="home_top_players">🏆 상위 플레이어</string>
+    <string name="home_view_all">전체 보기 →</string>
+    <string name="home_loading">로딩 중…</string>
+    <string name="home_settings_header">설정</string>
+    <string name="home_daily_card_title">오늘의 도전</string>
+    <string name="home_daily_card_subtitle">오늘의 퍼즐</string>
+    <string name="home_daily_card_desc">오늘의 특별 방 탈출 퍼즐을 풀고 연속 기록을 유지하세요.</string>
+    <string name="home_daily_card_btn">▶  지금 플레이</string>
+    <string name="home_surprise">✨ 랜덤 선택</string>
+    <string name="home_filter_all">전체</string>
+    <string name="home_filter_escape">🚪 탈출</string>
+    <string name="home_filter_puzzle">🧩 퍼즐</string>
+    <string name="home_filter_word">🔤 단어</string>
+    <string name="home_filter_daily">📅 데일리</string>
+    <string name="home_search_hint">🔍</string>
+    <string name="home_nav_games">🎮\n게임</string>
+
+    <!-- ===== Reset dialog ===== -->
+    <string name="reset_title">진행 상황 초기화?</string>
+    <string name="reset_message">점수, 연속 기록, 해결한 레벨이 모두 삭제됩니다. 되돌릴 수 없습니다.</string>
+
+    <!-- ===== Gameplay (MainActivity) ===== -->
+    <string name="game_room_complete">🏆 방 클리어!</string>
+    <string name="game_room_complete_msg">%1$s 클리어!\n점수: %2$d점\n연속: %3$d\n\n당신은 퍼즐 마스터입니다!</string>
+    <string name="game_next_room">다음 방</string>
+    <string name="game_no_hints">💡 힌트 소진</string>
+    <string name="game_no_hints_msg">%1$d개의 힌트를 모두 보았습니다. 계속 도전하세요 — 거의 다 왔어요!</string>
+    <string name="game_hint_title">💡 힌트 %1$d / %2$d</string>
+    <string name="game_more_hints">더 많은 힌트</string>
+    <string name="game_got_it">알겠어요!</string>
+    <string name="game_restart_title">🔄 게임 다시 시작?</string>
+    <string name="game_restart_msg">모든 진행 상황이 지워집니다:\n\n• 해결한 레벨\n• 점수 (%1$d점)\n• 연속 기록 (%2$d회)\n• 사용한 힌트\n\n되돌릴 수 없습니다.</string>
+    <string name="game_restart_confirm">예, 다시 시작</string>
+    <string name="game_ok">확인</string>
+
+    <!-- ===== Login errors (remaining) ===== -->
+    <string name="login_incorrect">이메일 또는 비밀번호가 올바르지 않습니다</string>
+    <string name="login_offline_password">비밀번호가 올바르지 않습니다 (오프라인)</string>
+    <string name="login_no_account">계정을 찾을 수 없습니다. 인터넷에 연결하거나 새로 만드세요.</string>
+    <string name="login_unknown_error">문제가 발생했습니다. 다시 시도해 주세요.</string>
+    <string name="login_email_taken">이미 등록된 이메일입니다</string>
+    <string name="login_check_email">이메일과 비밀번호를 확인해 주세요</string>
+    <string name="login_unverified">이메일이 인증되지 않았습니다</string>
+    <string name="progress">진행:</string>
+
+    <!-- ===== Sudoku ===== -->
+    <string name="sudoku_difficulty">🎯 난이도</string>
 </resources>

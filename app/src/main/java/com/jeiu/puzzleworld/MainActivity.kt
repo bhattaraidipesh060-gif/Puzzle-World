@@ -435,9 +435,9 @@ class MainActivity : AppCompatActivity() {
         if (currentRoom?.solvedCount(state.solvedLevels) == 10) {
             celebration.burst(100)
             AlertDialog.Builder(this, R.style.HintDialog)
-                .setTitle("🏆 Room Complete!")
-                .setMessage("${currentRoom?.roomName} cleared!\nScore: ${state.score} pts\nStreak: ${state.streak}\n\nYou're a puzzle master!")
-                .setPositiveButton("Next Room") { _, _ -> showRoomPicker() }
+                .setTitle(getString(R.string.game_room_complete))
+                .setMessage(getString(R.string.game_room_complete_msg, currentRoom?.roomName ?: "", state.score, state.streak))
+                .setPositiveButton(getString(R.string.game_next_room)) { _, _ -> showRoomPicker() }
                 .show()
             loadCurrentLevel()
         } else {
@@ -529,9 +529,9 @@ class MainActivity : AppCompatActivity() {
         val used = hintTier[level.levelId] ?: 0
         if (used >= chain.size) {
             AlertDialog.Builder(this, R.style.HintDialog)
-                .setTitle("💡 No more hints")
-                .setMessage("You've seen all ${chain.size} hints. Keep trying — you're close!")
-                .setPositiveButton("OK", null).show()
+                .setTitle(getString(R.string.game_no_hints))
+                .setMessage(getString(R.string.game_no_hints_msg, chain.size))
+                .setPositiveButton(getString(R.string.game_ok), null).show()
             return
         }
 
@@ -540,9 +540,9 @@ class MainActivity : AppCompatActivity() {
         state.hintsUsed++
 
         AlertDialog.Builder(this, R.style.HintDialog)
-            .setTitle("💡 Hint ${used + 1} of ${chain.size}")
+            .setTitle(getString(R.string.game_hint_title, used + 1, chain.size))
             .setMessage(hint)
-            .setPositiveButton(if (used + 1 < chain.size) "More hints" else "Got it!", null)
+            .setPositiveButton(if (used + 1 < chain.size) getString(R.string.game_more_hints) else getString(R.string.game_got_it), null)
             .show()
     }
 
@@ -802,10 +802,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showRestartDialog() {
         AlertDialog.Builder(this, R.style.HintDialog)
-            .setTitle("🔄 Restart Game?")
-            .setMessage("This will erase all progress:\n\n• Solved levels\n• Score (${state.score} pts)\n• Streak (${state.streak}x)\n• Hints used\n\nThis cannot be undone.")
-            .setPositiveButton("Yes, restart") { _, _ -> resetGame() }
-            .setNegativeButton("Cancel", null)
+            .setTitle(getString(R.string.game_restart_title))
+            .setMessage(getString(R.string.game_restart_msg, state.score, state.streak))
+            .setPositiveButton(getString(R.string.game_restart_confirm)) { _, _ -> resetGame() }
+            .setNegativeButton(getString(R.string.action_cancel), null)
             .show()
     }
 

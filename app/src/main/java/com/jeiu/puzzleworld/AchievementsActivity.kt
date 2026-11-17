@@ -174,14 +174,14 @@ class AchievementsActivity : AppCompatActivity() {
             if (unlocked) {
                 AlertDialog.Builder(this)
                     .setTitle("${b.icon} ${b.name}")
-                    .setMessage("Unlocked!\n\n${b.description}")
-                    .setPositiveButton("OK", null)
+                    .setMessage(getString(R.string.achievements_unlocked_fmt, b.description))
+                    .setPositiveButton(getString(R.string.game_ok), null)
                     .show()
             } else {
                 AlertDialog.Builder(this)
-                    .setTitle("🔒 ${b.name}")
-                    .setMessage("${b.description}\n\nProgress: ${b.current} / ${b.target}")
-                    .setPositiveButton("OK", null)
+                    .setTitle(getString(R.string.achievements_locked_fmt, b.name))
+                    .setMessage("${b.description}\n\n${getString(R.string.progress)} ${b.current} / ${b.target}")
+                    .setPositiveButton(getString(R.string.game_ok), null)
                     .show()
             }
         }

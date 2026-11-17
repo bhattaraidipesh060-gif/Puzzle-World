@@ -563,9 +563,9 @@ class HomeActivity : AppCompatActivity() {
     private fun confirmReset() {
         SoundFx.click()
         AlertDialog.Builder(this)
-            .setTitle("Reset progress?")
-            .setMessage("This clears your score, streaks, and solved levels. It can't be undone.")
-            .setPositiveButton("Reset") { _, _ ->
+            .setTitle(getString(R.string.reset_title))
+            .setMessage(getString(R.string.reset_message))
+            .setPositiveButton(getString(R.string.settings_reset_btn)) { _, _ ->
                 getSharedPreferences(STATS_PREFS, Context.MODE_PRIVATE).edit().clear().apply()
                 lifecycleScope.launch {
                     LocalStorage(applicationContext).saveState(PlayerState())
@@ -574,7 +574,7 @@ class HomeActivity : AppCompatActivity() {
                 }
                 SoundFx.success()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.action_cancel), null)
             .show()
     }
 

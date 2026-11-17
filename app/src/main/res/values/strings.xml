@@ -79,4 +79,76 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_verify">Verify</string>
     <string name="action_close">Close</string>
+
+    <!-- ===== Achievements ===== -->
+    <string name="achievements_title">🏆 Achievements</string>
+    <string name="achievements_count">%1$d / %2$d unlocked</string>
+    <string name="achievements_unlocked_fmt">Unlocked!\n\n%1$s</string>
+    <string name="achievements_locked_fmt">🔒 %1$s</string>
+
+    <!-- ===== Daily ===== -->
+    <string name="daily_title">🗓️ Daily Challenge</string>
+    <string name="daily_check">✓  CHECK</string>
+    <string name="daily_hint">💡  HINT</string>
+    <string name="daily_malformed">Malformed challenge — missing level</string>
+
+    <!-- ===== Leaderboard ===== -->
+    <string name="leaderboard_title">🏆  Leaderboard</string>
+    <string name="leaderboard_refresh">↻ Refresh</string>
+
+    <!-- ===== Home dashboard (remaining) ===== -->
+    <string name="home_stats_total_score">⭐ Total Score</string>
+    <string name="home_stats_solved">🧩 Solved</string>
+    <string name="home_stats_achievements">🏅 Achievements</string>
+    <string name="home_games_header">Games</string>
+    <string name="home_games_count">%1$d titles</string>
+    <string name="home_rooms_header">Escape Rooms</string>
+    <string name="home_rooms_count">%1$d rooms · %2$d levels</string>
+    <string name="home_top_players">🏆 Top Players</string>
+    <string name="home_view_all">View all →</string>
+    <string name="home_loading">Loading…</string>
+    <string name="home_settings_header">Settings</string>
+    <string name="home_daily_card_title">DAILY CHALLENGE</string>
+    <string name="home_daily_card_subtitle">Today\'s Puzzle</string>
+    <string name="home_daily_card_desc">Solve today\'s featured escape room and keep your streak alive.</string>
+    <string name="home_daily_card_btn">▶  Play Now</string>
+    <string name="home_surprise">✨ Surprise me</string>
+    <string name="home_filter_all">All</string>
+    <string name="home_filter_escape">🚪 Escape</string>
+    <string name="home_filter_puzzle">🧩 Puzzle</string>
+    <string name="home_filter_word">🔤 Word</string>
+    <string name="home_filter_daily">📅 Daily</string>
+    <string name="home_search_hint">🔍</string>
+    <string name="home_nav_games">🎮\nGames</string>
+
+    <!-- ===== Reset dialog ===== -->
+    <string name="reset_title">Reset progress?</string>
+    <string name="reset_message">This clears your score, streaks, and solved levels. It can\'t be undone.</string>
+
+    <!-- ===== Gameplay (MainActivity) ===== -->
+    <string name="game_room_complete">🏆 Room Complete!</string>
+    <string name="game_room_complete_msg">%1$s cleared!\nScore: %2$d pts\nStreak: %3$d\n\nYou\'re a puzzle master!</string>
+    <string name="game_next_room">Next Room</string>
+    <string name="game_no_hints">💡 No more hints</string>
+    <string name="game_no_hints_msg">You\'ve seen all %1$d hints. Keep trying — you\'re close!</string>
+    <string name="game_hint_title">💡 Hint %1$d of %2$d</string>
+    <string name="game_more_hints">More hints</string>
+    <string name="game_got_it">Got it!</string>
+    <string name="game_restart_title">🔄 Restart Game?</string>
+    <string name="game_restart_msg">This will erase all progress:\n\n• Solved levels\n• Score (%1$d pts)\n• Streak (%2$dx)\n• Hints used\n\nThis cannot be undone.</string>
+    <string name="game_restart_confirm">Yes, restart</string>
+    <string name="game_ok">OK</string>
+
+    <!-- ===== Login errors (remaining) ===== -->
+    <string name="login_incorrect">Incorrect email or password</string>
+    <string name="login_offline_password">Incorrect password (offline)</string>
+    <string name="login_no_account">No account found. Connect to the internet, or create one.</string>
+    <string name="login_unknown_error">Something went wrong. Please try again.</string>
+    <string name="login_email_taken">An account with that email already exists</string>
+    <string name="login_check_email">Please check your email and password</string>
+    <string name="login_unverified">Your email isn\'t verified yet</string>
+    <string name="progress">Progress:</string>
+
+    <!-- ===== Sudoku ===== -->
+    <string name="sudoku_difficulty">🎯 Difficulty</string>
 </resources>

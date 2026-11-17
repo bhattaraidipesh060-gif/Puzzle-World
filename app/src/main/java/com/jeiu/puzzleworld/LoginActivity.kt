@@ -144,16 +144,16 @@ class LoginActivity : AppCompatActivity() {
                     if (unverified != null) {
                         promptForOtp(unverified, "Your email isn't verified yet. Enter the code we sent to $unverified.")
                     } else {
-                        showError("Incorrect email or password")
+                        showError(getString(R.string.login_incorrect))
                     }
                 } else {
                     showError(
                         when (e.code()) {
-                            409 -> "An account with that email already exists"
-                            401 -> "Incorrect email or password"
-                            400 -> "Please check your email and password"
-                            403 -> "Your email isn't verified yet"
-                            else -> "Sign-in failed (${e.code()})"
+                            409 -> getString(R.string.login_email_taken)
+                            401 -> getString(R.string.login_incorrect)
+                            400 -> getString(R.string.login_check_email)
+                            403 -> getString(R.string.login_unverified)
+                            else -> getString(R.string.login_unknown_error, e.code())
                         }
                     )
                 }
@@ -191,20 +191,20 @@ class LoginActivity : AppCompatActivity() {
             setSingleLine()
         }
         MaterialAlertDialogBuilder(this)
-            .setTitle("Choose your username")
-            .setMessage("Pick a unique name for the leaderboard.")
+            .setTitle(getString(R.string.login_username_title))
+            .setMessage(getString(R.string.login_username_message))
             .setView(input)
             .setCancelable(false)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(getString(R.string.login_username_save)) { _, _ ->
                 val name = input.text?.toString()?.trim().orEmpty()
                 if (name.length !in 3..32) {
-                    Toast.makeText(this, "Username must be 3–32 characters", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.login_username_hint), Toast.LENGTH_SHORT).show()
                     promptForUsername(response)
                 } else {
                     saveUsername(name, response)
                 }
             }
-            .setNegativeButton("Skip for now") { _, _ ->
+            .setNegativeButton(getString(R.string.login_username_skip)) { _, _ ->
                 persistUsername(response.user.email.substringBefore('@').ifBlank { "Player" })
                 Toast.makeText(this, "Welcome! 🎉", Toast.LENGTH_SHORT).show()
                 goHome()
@@ -256,20 +256,20 @@ class LoginActivity : AppCompatActivity() {
             setSingleLine()
         }
         MaterialAlertDialogBuilder(this)
-            .setTitle("Verify your email")
+            .setTitle(getString(R.string.login_otp_title))
             .setMessage(message)
             .setView(input)
             .setCancelable(false)
-            .setPositiveButton("Verify") { _, _ ->
+            .setPositiveButton(getString(R.string.login_otp_verify)) { _, _ ->
                 val otp = input.text?.toString()?.trim().orEmpty()
                 if (otp.length != 6) {
-                    Toast.makeText(this, "Enter the 6-digit code", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.login_otp_hint), Toast.LENGTH_SHORT).show()
                     promptForOtp(email, message)
                 } else {
                     verifyOtp(email, otp)
                 }
             }
-            .setNegativeButton("Resend code") { _, _ -> resendOtp(email, message) }
+            .setNegativeButton(getString(R.string.login_otp_resend)) { _, _ -> resendOtp(email, message) }
             .show()
     }
 
@@ -324,13 +324,13 @@ class LoginActivity : AppCompatActivity() {
         val ok = try {
             if (db.exists(user)) {
                 if (!db.verify(user, pass)) {
-                    showError("Incorrect password (offline)")
+                    showError(getString(R.string.login_offline_password))
                     false
                 } else true
             } else if (registerMode) {
                 db.register(user, pass)
             } else {
-                showError("No account found. Connect to the internet, or create one.")
+                showError(getString(R.string.login_no_account))
                 false
             }
         } finally {
@@ -380,20 +380,20 @@ class LoginActivity : AppCompatActivity() {
 
     private fun validate(ident: String, pass: String, register: Boolean): Boolean {
         if (ident.isEmpty()) {
-            showError("Enter your email address")
+            showError(getString(R.string.login_enter_email))
             return false
         }
         val isEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(ident).matches()
-        if (!isEmail) { showError("Enter a valid email address"); return false }
-        if (pass.isEmpty()) { showError("Enter a password"); return false }
+        if (!isEmail) { showError(getString(R.string.login_invalid_email)); return false }
+        if (pass.isEmpty()) { showError(getString(R.string.login_enter_password)); return false }
         if (register) {
-            if (pass.length < 8) { showError("Password must be at least 8 characters"); return false }
+            if (pass.length < 8) { showError(getString(R.string.login_password_len)); return false }
             if (!pass.any { it.isUpperCase() } || !pass.any { it.isLowerCase() } || !pass.any { it.isDigit() }) {
-                showError("Password needs an uppercase letter, a lowercase letter, and a number")
+                showError(getString(R.string.login_password_policy))
                 return false
             }
             val confirm = confirmInput.text?.toString().orEmpty()
-            if (confirm != pass) { showError("Passwords don't match"); return false }
+            if (confirm != pass) { showError(getString(R.string.login_password_mismatch)); return false }
         }
         return true
     }
