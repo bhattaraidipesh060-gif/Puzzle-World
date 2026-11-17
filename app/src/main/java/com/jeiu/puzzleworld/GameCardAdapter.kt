@@ -27,7 +27,8 @@ class GameCardAdapter(
         val badgeColorRes: Int,
         val artRes: Int,
         val cat: String = "",
-        val searchText: String = ""
+        val searchText: String = "",
+        val imageRes: Int? = null
     )
 
     private val items = initial.toMutableList()
@@ -40,6 +41,7 @@ class GameCardAdapter(
 
     class Holder(view: View) : RecyclerView.ViewHolder(view) {
         val art: TextView = view.findViewById(R.id.game_art)
+        val artImg: android.widget.ImageView = view.findViewById(R.id.game_art_img)
         val title: TextView = view.findViewById(R.id.game_title)
         val desc: TextView = view.findViewById(R.id.game_desc)
         val badge: TextView = view.findViewById(R.id.game_badge)
@@ -51,8 +53,16 @@ class GameCardAdapter(
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val item = items[position]
-        holder.art.text = item.emoji
-        holder.art.setBackgroundResource(item.artRes)
+        if (item.imageRes != null) {
+            holder.artImg.visibility = View.VISIBLE
+            holder.artImg.setImageResource(item.imageRes)
+            holder.art.visibility = View.GONE
+        } else {
+            holder.artImg.visibility = View.GONE
+            holder.art.visibility = View.VISIBLE
+            holder.art.text = item.emoji
+            holder.art.setBackgroundResource(item.artRes)
+        }
         holder.title.text = item.title
         holder.desc.text = item.desc
         holder.badge.text = item.badgeText

@@ -22,6 +22,9 @@ local.properties
 # JVM crash logs
 hs_err_pid*.log
 replay_pid*.log
+
+# Source image material (downscaled copies live in backend/public/images + drawable-nodpi)
+generated images/
 *.apk
 *.jks
 *.keystore

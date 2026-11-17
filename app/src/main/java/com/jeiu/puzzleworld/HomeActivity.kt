@@ -53,29 +53,30 @@ class HomeActivity : AppCompatActivity() {
 
     private data class RoomCard(
         val id: String, val name: String, val icon: String,
-        val artRes: Int, val tagline: String, var solved: Int = 0
+        val artRes: Int, val tagline: String, var solved: Int = 0,
+        val imageRes: Int? = null
     )
 
     // Themed room icons mirror the web ROOM_EMOJI order exactly.
     private val roomCards = listOf(
         RoomCard("room_01_vault", "The First Vault", "🏦", R.drawable.ps_art_cyan,
-            "Crack the codes of an abandoned underground vault."),
+            "Crack the codes of an abandoned underground vault.", imageRes = R.drawable.room_01_vault),
         RoomCard("room_02_cipher_lab", "The Cipher Laboratory", "🔬", R.drawable.ps_art_purple,
             "Decode cryptic notes in a mysterious laboratory."),
         RoomCard("room_03_observatory", "The Clockwork Observatory", "🔭", R.drawable.ps_art_emerald,
-            "Stop the celestial clock before time runs out."),
+            "Stop the celestial clock before time runs out.", imageRes = R.drawable.room_03_observatory),
         RoomCard("room_04_study", "The Puzzle Master's Study", "📚", R.drawable.ps_art_amber,
-            "Solve the Puzzle Master's greatest brain-teasers."),
+            "Solve the Puzzle Master's greatest brain-teasers.", imageRes = R.drawable.room_04_study),
         RoomCard("room_05_crypto", "The Cryptographer's Cache", "🔐", R.drawable.ps_art_cyan,
-            "Crack layered encryptions to unlock the cache."),
+            "Crack layered encryptions to unlock the cache.", imageRes = R.drawable.room_05_crypto),
         RoomCard("room_06_alchemy", "The Alchemist's Laboratory", "⚗️", R.drawable.ps_art_purple,
-            "Complete the Great Work — puzzles into gold."),
+            "Complete the Great Work — puzzles into gold.", imageRes = R.drawable.room_06_alchemy),
         RoomCard("room_07_cartography", "The Cartographer's Vault", "🗺️", R.drawable.ps_art_emerald,
-            "Chart lost maps through riddles and ciphers."),
+            "Chart lost maps through riddles and ciphers.", imageRes = R.drawable.room_07_cartography),
         RoomCard("room_08_locksmith", "The Locksmith's Forge", "🔑", R.drawable.ps_art_amber,
-            "Crack the forged locks, claim the master key."),
+            "Crack the forged locks, claim the master key.", imageRes = R.drawable.room_08_locksmith),
         RoomCard("room_09_arcade", "The Neon Arcade", "🕹️", R.drawable.ps_art_cyan,
-            "Beat the machine at its own flashing game.")
+            "Beat the machine at its own flashing game.", imageRes = R.drawable.room_09_arcade)
     )
 
     private val allGames = listOf(
@@ -371,7 +372,8 @@ class HomeActivity : AppCompatActivity() {
                     else -> R.color.ps_cyan
                 },
                 artRes = rc.artRes, cat = "escape",
-                searchText = "${rc.name} ${rc.id}"
+                searchText = "${rc.name} ${rc.id}",
+                imageRes = rc.imageRes
             )
         }
         roomAdapter.update(items)

@@ -222,6 +222,16 @@
   const DIFF_BADGE = { easy: 'badge--easy', medium: 'badge--medium', hard: 'badge--hard', expert: 'badge--expert' };
   const ROOM_STYLES = ['blue', 'purple', 'emerald', 'rose', 'amber'];
   const ROOM_EMOJI  = ['🏦', '🔬', '🔭', '📚', '🔐', '⚗️', '🗺️', '🔑', '🕹️'];
+  const ROOM_IMAGES = {
+    room_01_vault: 'images/room_01_vault.jpg',
+    room_03_observatory: 'images/room_03_observatory.jpg',
+    room_04_study: 'images/room_04_study.jpg',
+    room_05_crypto: 'images/room_05_crypto.jpg',
+    room_06_alchemy: 'images/room_06_alchemy.jpg',
+    room_07_cartography: 'images/room_07_cartography.jpg',
+    room_08_locksmith: 'images/room_08_locksmith.jpg',
+    room_09_arcade: 'images/room_09_arcade.jpg',
+  };
   const ROOM_DIFF    = ['easy', 'medium', 'hard', 'expert'];
 
   let ROOMS = [];
@@ -304,11 +314,12 @@
     grid.innerHTML = '';
     ROOMS.forEach((r, i) => {
       const cls = ROOM_STYLES[i % ROOM_STYLES.length];
+      const img = ROOM_IMAGES[r.room_id];
       const emoji = ROOM_EMOJI[i % ROOM_EMOJI.length];
       const stars = (4.5 + (i % 5) * 0.1).toFixed(1);
       const diff = ROOM_DIFF[i % ROOM_DIFF.length];
       const card = el('button', `card card--${cls}`, `
-        <div class="card__art">${emoji}</div>
+        <div class="card__art">${img ? `<img class="card__img" src="${img}" alt="${esc(r.room_name || '')}" loading="lazy">` : emoji}</div>
         <div class="card__body">
           <h3 class="card__title">${esc(roomName(r.room_id, r.room_name))}</h3>
           <p class="card__desc">${esc(r.description || '')}</p>
