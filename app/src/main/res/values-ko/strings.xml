@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PuzzleWorld</string>
+    <string name="terms_text">PuzzleWorld를 사용함으로써 공정하게 플레이하고, 즐기며, 저희 퍼즐 알고리즘을 역설계하지 않을 것에 동의하게 됩니다. 이 앱은 엔터테인먼트 목적으로 제공됩니다. 모든 퍼즐 콘텐츠는 PuzzleWorld 팀이 절차적으로 생성하거나 제작했습니다. 게임 내 점수와 관련된 실제 상품이나 금전적 가치는 없습니다. 저희는 언제든지 본 약관을 업데이트할 권리가 있습니다.</string>
+    <string name="privacy_text">PuzzleWorld는 게임 진행 상황, 점수, 사용자 이름을 기기에만 로컬로 저장합니다. 선택적 클라우드 동기화 서비스에 명시적으로 연결하지 않는 한 개인 데이터는 외부 서버로 전송되지 않습니다. 저희는 귀하의 정보를 수집, 판매, 공유하지 않습니다. 이 앱은 광고 추적기를 사용하지 않습니다. 데이터는 기기에 남아 있으며 — 귀하가 소유합니다.</string>
+    <string name="tutorial_pattern_lock">🔓 패턴 잠금\n\n3×3 점 격자입니다. 손가락을 끌어 올바른 순서로 점들을 연결하세요. 그리는 패턴이 숨겨진 패턴과 정확히 일치해야 합니다 — 순서가 중요합니다!</string>
+    <string name="tutorial_color_sequence">🎨 색 순서\n\n네 개의 색 패널이 특정 순서로 깜빡입니다. 주의 깊게 본 후, 정확히 같은 순서로 다시 누르세요. 기억력 테스트입니다!</string>
+    <string name="tutorial_wire_maze">🔌 전선 미로\n\n녹색 전원 콘센트에서 전구까지 끌어 회로를 완성하세요. 어두운 벽 타일은 피하세요 — 경로를 막습니다. 최단 경로(파)와 일치할 수 있나요?</string>
+    <string name="tutorial_cipher">🔐 암호\n\n암호화된 텍스트를 해독해 숨겨진 메시지를 밝혀내세요. 패턴 인식과 제공된 힌트를 활용하세요. 답을 입력하고 제출하세요!</string>
+    <string name="tutorial_riddle">🤔 수수께끼\n\n수수께끼를 주의 깊게 읽으세요. 고정관념에서 벗어나 생각하세요 — 답은 보통 한 단어입니다. 막히면 힌트를 사용하세요!</string>
+    <string name="tutorial_deduction">🧩 추론 그리드\n\n단서를 사용해 항목을 카테고리에 맞추세요. 논리 퍼즐이라고 생각하세요. 해답을 순서대로 입력하세요 (예: \"RedCoffee BlueDog GreenWater\").</string>
+    <string name="tutorial_mechanical_lock">🔒 기계식 자물쇠\n\n3자리 숫자 조합 자물쇠입니다. 시도 횟수가 제한되어 있습니다 — 시행착오로 맞추거나 이전 퍼즐의 단서를 사용하세요!</string>
+    <string name="tutorial_sudoku">🧩 스도쿠\n\n각 행, 열, 3×3 박스에 1-9 숫자가 정확히 한 번씩 들어가도록 9×9 격자를 채우세요. 셀을 누른 뒤 숫자를 누르세요. 연필 표시에는 NOTES 모드를 사용하세요!</string>
+    <string name="tutorial_word_scramble">🔤 단어 맞추기\n\n글자를 재배열해 올바른 단어를 만드세요. 답을 입력하세요 — 힌트는 글자를 하나씩 보여줍니다. 빠를수록 더 많은 점수를 얻습니다!</string>
+
+    <!-- ===== Login / auth ===== -->
+    <string name="login_subtitle">계속하려면 로그인하세요</string>
+    <string name="login_subtitle_register">계정을 만드세요</string>
+    <string name="login_email_hint">이메일 주소</string>
+    <string name="login_password_hint">비밀번호</string>
+    <string name="login_confirm_hint">비밀번호 확인</string>
+    <string name="login_sign_in">🔐  로그인</string>
+    <string name="login_create_account">✨  계정 만들기</string>
+    <string name="login_guest">👤  게스트로 플레이</string>
+    <string name="login_toggle_login">처음이신가요? 계정 만들기</string>
+    <string name="login_toggle_register">이미 계정이 있으신가요? 로그인</string>
+    <string name="login_terms_check">동의합니다 </string>
+    <string name="login_terms_link">약관 및 개인정보처리방침</string>
+    <string name="login_enter_email">이메일 주소를 입력하세요</string>
+    <string name="login_invalid_email">유효한 이메일 주소를 입력하세요</string>
+    <string name="login_enter_password">비밀번호를 입력하세요</string>
+    <string name="login_password_len">비밀번호는 8자 이상이어야 합니다</string>
+    <string name="login_password_policy">비밀번호에 대문자, 소문자, 숫자가 각각 포함되어야 합니다</string>
+    <string name="login_password_mismatch">비밀번호가 일치하지 않습니다</string>
+    <string name="login_accept_terms">계속하려면 약관 및 개인정보처리방침에 동의해야 합니다</string>
+    <string name="login_creating">계정 만드는 중…</string>
+    <string name="login_signing">로그인 중…</string>
+    <string name="login_verifying">인증 중…</string>
+    <string name="login_saving_username">사용자 이름 저장 중…</string>
+    <string name="login_otp_title">이메일 인증</string>
+    <string name="login_otp_hint">6자리 코드</string>
+    <string name="login_otp_verify">인증</string>
+    <string name="login_otp_resend">코드 다시 받기</string>
+    <string name="login_otp_invalid">코드가 올바르지 않거나 만료되었습니다</string>
+    <string name="login_username_title">사용자 이름 선택</string>
+    <string name="login_username_hint">사용자 이름 (3–32자)</string>
+    <string name="login_username_message">리더보드에 표시될 고유한 이름을 정하세요.</string>
+    <string name="login_username_save">저장</string>
+    <string name="login_username_skip">나중에</string>
+    <string name="login_welcome">환영합니다, %1$s! 🎉</string>
+
+    <!-- ===== Home / dashboard ===== -->
+    <string name="home_welcome">환영합니다, %1$s 👋</string>
+    <string name="tab_games">모든 게임</string>
+    <string name="tab_board">리더보드</string>
+    <string name="tab_stats">내 통계</string>
+    <string name="tab_settings">설정</string>
+
+    <!-- ===== Settings ===== -->
+    <string name="settings_sound">🔊 효과음</string>
+    <string name="settings_sound_sub">합성 UI 효과음</string>
+    <string name="settings_language">🌐 언어</string>
+    <string name="settings_language_sub">English · 한국어</string>
+    <string name="settings_account">👤 계정</string>
+    <string name="settings_reset">🗑️ 진행 상황 초기화</string>
+    <string name="settings_reset_sub">점수, 연속 기록, 해결한 레벨을 지웁니다</string>
+    <string name="settings_reset_btn">초기화</string>
+    <string name="settings_terms">📜  약관 및 개인정보</string>
+    <string name="settings_logout">로그아웃</string>
+
+    <!-- ===== Language ===== -->
+    <string name="language_title">🌐 언어</string>
+    <string name="language_cancel">취소</string>
+    <string name="language_set_ko">한국어로 설정되었습니다</string>
+    <string name="language_set_en">Language set to English</string>
+
+    <!-- ===== Common ===== -->
+    <string name="action_save">저장</string>
+    <string name="action_cancel">취소</string>
+    <string name="action_verify">인증</string>
+    <string name="action_close">닫기</string>
+</resources>

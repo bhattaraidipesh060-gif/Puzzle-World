@@ -12,4 +12,71 @@
     <string name="tutorial_mechanical_lock">🔒 MECHANICAL LOCK\n\nA 3-digit combination lock. You have limited attempts — guess the combination by trial and error or use clues from earlier puzzles!</string>
     <string name="tutorial_sudoku">🧩 SUDOKU\n\nFill the 9×9 grid so each row, column, and 3×3 box contains digits 1-9 exactly once. Tap a cell, then tap a number. Use NOTES mode for pencil marks!</string>
     <string name="tutorial_word_scramble">🔤 WORD DESCRAMBLER\n\nUnscramble the letters to form the correct word. Type your answer — hints reveal letters one at a time. Faster answers earn more points!</string>
+
+    <!-- ===== Login / auth ===== -->
+    <string name="login_subtitle">Sign in to continue</string>
+    <string name="login_subtitle_register">Create your account</string>
+    <string name="login_email_hint">Email address</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_confirm_hint">Confirm password</string>
+    <string name="login_sign_in">🔐  SIGN IN</string>
+    <string name="login_create_account">✨  CREATE ACCOUNT</string>
+    <string name="login_guest">👤  Play as Guest</string>
+    <string name="login_toggle_login">New here? Create an account</string>
+    <string name="login_toggle_register">Already have an account? Sign in</string>
+    <string name="login_terms_check">I agree to the </string>
+    <string name="login_terms_link">Terms &amp; Privacy Policy</string>
+    <string name="login_enter_email">Enter your email address</string>
+    <string name="login_invalid_email">Enter a valid email address</string>
+    <string name="login_enter_password">Enter a password</string>
+    <string name="login_password_len">Password must be at least 8 characters</string>
+    <string name="login_password_policy">Password needs an uppercase letter, a lowercase letter, and a number</string>
+    <string name="login_password_mismatch">Passwords don\'t match</string>
+    <string name="login_accept_terms">You must accept the Terms &amp; Privacy Policy to continue</string>
+    <string name="login_creating">Creating account…</string>
+    <string name="login_signing">Signing in…</string>
+    <string name="login_verifying">Verifying…</string>
+    <string name="login_saving_username">Saving username…</string>
+    <string name="login_otp_title">Verify your email</string>
+    <string name="login_otp_hint">6-digit code</string>
+    <string name="login_otp_verify">Verify</string>
+    <string name="login_otp_resend">Resend code</string>
+    <string name="login_otp_invalid">Invalid or expired code</string>
+    <string name="login_username_title">Choose your username</string>
+    <string name="login_username_hint">Username (3–32 characters)</string>
+    <string name="login_username_message">Pick a unique name for the leaderboard.</string>
+    <string name="login_username_save">Save</string>
+    <string name="login_username_skip">Skip for now</string>
+    <string name="login_welcome">Welcome, %1$s! 🎉</string>
+
+    <!-- ===== Home / dashboard ===== -->
+    <string name="home_welcome">Welcome, %1$s 👋</string>
+    <string name="tab_games">All Games</string>
+    <string name="tab_board">Leaderboard</string>
+    <string name="tab_stats">My Stats</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- ===== Settings ===== -->
+    <string name="settings_sound">🔊 Sound effects</string>
+    <string name="settings_sound_sub">Synthesized UI tones</string>
+    <string name="settings_language">🌐 Language</string>
+    <string name="settings_language_sub">English · 한국어</string>
+    <string name="settings_account">👤 Account</string>
+    <string name="settings_reset">🗑️ Reset progress</string>
+    <string name="settings_reset_sub">Clears score, streaks &amp; solved levels</string>
+    <string name="settings_reset_btn">Reset</string>
+    <string name="settings_terms">📜  Terms &amp; Privacy</string>
+    <string name="settings_logout">Sign out</string>
+
+    <!-- ===== Language ===== -->
+    <string name="language_title">🌐 Language</string>
+    <string name="language_cancel">Cancel</string>
+    <string name="language_set_ko">한국어로 설정되었습니다</string>
+    <string name="language_set_en">Language set to English</string>
+
+    <!-- ===== Common ===== -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_verify">Verify</string>
+    <string name="action_close">Close</string>
 </resources>

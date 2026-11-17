@@ -111,7 +111,7 @@ class HomeActivity : AppCompatActivity() {
         val welcome = findViewById<TextView>(R.id.home_welcome)
         val avatar = findViewById<TextView>(R.id.home_logout)
         val soundBtn = findViewById<TextView>(R.id.home_sound)
-        welcome.text = "Welcome, $username 👋"
+        welcome.text = getString(R.string.home_welcome, username)
         avatar.text = username.trim().take(1).uppercase().ifEmpty { "P" }
 
         // ---- Sound toggle ----
@@ -592,12 +592,12 @@ class HomeActivity : AppCompatActivity() {
         val langs = arrayOf("en", "ko")
         val current = LanguageManager.current(this)
         AlertDialog.Builder(this)
-            .setTitle("🌐 Language")
+            .setTitle(getString(R.string.language_title))
             .setSingleChoiceItems(options, if (current == "ko") 1 else 0) { dialog, which ->
                 dialog.dismiss()
                 if (langs[which] != current) applyLanguage(langs[which])
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.language_cancel), null)
             .show()
     }
 
@@ -610,7 +610,7 @@ class HomeActivity : AppCompatActivity() {
         }
         findViewById<TextView>(R.id.settings_language).text = LanguageManager.label(this)
         SoundFx.success()
-        Toast.makeText(this, if (lang == "ko") "한국어로 설정되었습니다" else "Language set to English", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, if (lang == "ko") getString(R.string.language_set_ko) else getString(R.string.language_set_en), Toast.LENGTH_SHORT).show()
         recreate()
     }
 

@@ -215,7 +215,7 @@ class LoginActivity : AppCompatActivity() {
     /** Persist the chosen username (two-step completion). */
     private fun saveUsername(name: String, response: AuthResponse) {
         setLoading(true)
-        statusView.text = "Saving username…"
+        statusView.text = getString(R.string.login_saving_username)
         statusView.setTextColor(Color.parseColor("#94A3B8"))
         lifecycleScope.launch {
             try {
@@ -275,7 +275,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun verifyOtp(email: String, otp: String) {
         setLoading(true)
-        statusView.text = "Verifying…"
+        statusView.text = getString(R.string.login_verifying)
         statusView.setTextColor(Color.parseColor("#94A3B8"))
         lifecycleScope.launch {
             try {
@@ -354,9 +354,9 @@ class LoginActivity : AppCompatActivity() {
         confirmLayout.visibility = if (registerMode) View.VISIBLE else View.GONE
         findViewById<TextInputLayout>(R.id.login_password_layout).helperText =
             if (registerMode) "8+ characters — uppercase, lowercase & a number" else null
-        subtitleView.text = if (registerMode) "Create your account" else "Sign in to continue"
-        btnLogin.text = if (registerMode) "✨  CREATE ACCOUNT" else "🔐  SIGN IN"
-        toggleView.text = if (registerMode) "Already have an account? Sign in" else "New here? Create an account"
+        subtitleView.text = if (registerMode) getString(R.string.login_subtitle_register) else getString(R.string.login_subtitle)
+        btnLogin.text = if (registerMode) getString(R.string.login_create_account) else getString(R.string.login_sign_in)
+        toggleView.text = if (registerMode) getString(R.string.login_toggle_register) else getString(R.string.login_toggle_login)
         statusView.text = ""
         statusView.setTextColor(Color.parseColor("#94A3B8"))
         SoundFx.click()
@@ -371,7 +371,7 @@ class LoginActivity : AppCompatActivity() {
         if (loading) {
             btnLogin.text = ""
         } else {
-            btnLogin.text = if (registerMode) "✨  CREATE ACCOUNT" else "🔐  SIGN IN"
+            btnLogin.text = if (registerMode) getString(R.string.login_create_account) else getString(R.string.login_sign_in)
         }
         emailInput.isEnabled = !loading
         passwordInput.isEnabled = !loading
@@ -410,7 +410,7 @@ class LoginActivity : AppCompatActivity() {
         val check = findViewById<CheckBox>(R.id.login_terms_check)
         if (!check.isChecked) {
             statusView.setTextColor(Color.parseColor("#FF4081"))
-            statusView.text = "You must accept the Terms & Privacy Policy to continue"
+            statusView.text = getString(R.string.login_accept_terms)
             check.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake_x))
             SoundFx.error()
             return false

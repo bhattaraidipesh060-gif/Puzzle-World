@@ -51,13 +51,13 @@
 
         <div class="field field--password">
           <input id="password" name="password" type="password" placeholder=" " autocomplete="current-password" required />
-          <label for="password">Password</label>
+          <label for="password" data-i18n="auth.password">Password</label>
           <button type="button" class="reveal" data-target="password" aria-label="Toggle password visibility">👁</button>
         </div>
 
         <div class="field field--confirm" hidden>
           <input id="confirm" name="confirm" type="password" placeholder=" " autocomplete="new-password" />
-          <label for="confirm">Confirm password</label>
+          <label for="confirm" data-i18n="auth.confirm">Confirm password</label>
           <button type="button" class="reveal" data-target="confirm" aria-label="Toggle password visibility">👁</button>
         </div>
 
@@ -68,14 +68,14 @@
 
         <div class="field field--otp" id="otpField" hidden>
           <input id="otp" name="otp" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder=" " autocomplete="one-time-code" />
-          <label for="otp">Verification code</label>
-          <p class="username-hint" id="otpHint" style="font-size:0.78rem;color:#64748b;margin:6px 2px 0;">Enter the 6-digit code sent to your email. <a href="#" id="resendOtp">Resend code</a></p>
+          <label for="otp" data-i18n="auth.otp">Verification code</label>
+          <p class="username-hint" id="otpHint" style="font-size:0.78rem;color:#64748b;margin:6px 2px 0;"><span data-i18n="auth.otp_hint">Enter the 6-digit code sent to your email.</span> <a href="#" id="resendOtp" data-i18n="auth.resend">Resend code</a></p>
         </div>
 
         <div class="field field--username" id="usernameField" hidden>
           <input id="username" name="username" type="text" placeholder=" " autocomplete="nickname" maxlength="32" />
-          <label for="username">Choose a username</label>
-          <p class="username-hint" id="usernameHint" style="font-size:0.78rem;color:#64748b;margin:6px 2px 0;">Pick a unique name (3–32 characters) for the leaderboard.</p>
+          <label for="username" data-i18n="auth.username">Choose a username</label>
+          <p class="username-hint" id="usernameHint" style="font-size:0.78rem;color:#64748b;margin:6px 2px 0;" data-i18n="auth.username_hint">Pick a unique name (3–32 characters) for the leaderboard.</p>
         </div>
 
         <div class="form-msg" id="formMsg" hidden></div>
@@ -84,7 +84,7 @@
       </form>
 
       <p class="switch" id="switchText">New here? <a href="#" data-mode="register">Create an account</a></p>
-      <p class="guest"><a href="/">← Continue as guest</a></p>
+      <p class="guest"><a href="/" data-i18n="auth.guest">← Continue as guest</a></p>
     </div>
   </main>
 </div>
@@ -135,6 +135,7 @@
   </div>
 </div>
 
+<script src="i18n.js?v=20261116"></script>
 <script src="auth.js?v=20261116"></script>
 </body>
 </html>

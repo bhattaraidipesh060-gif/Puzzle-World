@@ -6,6 +6,9 @@
 
   const API = '/api';
   const currentLang = () => localStorage.getItem('pw_lang') || 'en';
+  const t = (k, v) => window.t(k, v);
+  const roomName = (id, fb) => window.I18N.roomName(id, fb);
+  const ptype = (raw) => window.I18N.puzzleType(raw);
 
   // ---------- DOM helpers ----------
   const $  = (s, r = document) => r.querySelector(s);
@@ -203,18 +206,18 @@
   //  Data: games catalogue + room styles
   // =========================================================
   const GAMES = [
-    { id: 'rooms', cls: 'blue', emoji: '🚪', title: 'Escape Rooms', cat: 'escape', rating: '4.9',
-      difficulty: 'easy', desc: '9 themed rooms · 90 brain-melting levels across 7 mechanics.',
-      chips: [['9 Rooms', 'chip'], ['90 Levels', 'chip--purple']] },
-    { id: 'sudoku', cls: 'purple', emoji: '🔢', title: 'Sudoku', cat: 'puzzle', rating: '4.7',
-      difficulty: 'medium', desc: 'Classic 9×9 logic with notes, undo, hints and a live timer.',
-      chips: [['Logic', 'chip--purple'], ['4 Difficulties', 'chip--emerald']] },
-    { id: 'word', cls: 'emerald', emoji: '🔤', title: 'Word Descrambler', cat: 'word', rating: '4.6',
-      difficulty: 'medium', desc: 'Unscramble words against the clock. Streaks multiply your score.',
-      chips: [['Word Game', 'chip--emerald'], ['Streaks', 'chip--rose']] },
-    { id: 'daily', cls: 'amber', emoji: '📅', title: 'Daily Challenge', cat: 'daily', rating: '4.8',
-      difficulty: 'hard', desc: 'One fresh puzzle every day. Compete on the global leaderboard.',
-      chips: [['Daily', 'chip--amber'], ['Global', 'chip']] },
+    { id: 'rooms', cls: 'blue', emoji: '🚪', title: 'game.rooms.title', cat: 'escape', rating: '4.9',
+      difficulty: 'easy', desc: 'game.rooms.desc',
+      chips: [['game.rooms.chip1', 'chip'], ['game.rooms.chip2', 'chip--purple']] },
+    { id: 'sudoku', cls: 'purple', emoji: '🔢', title: 'game.sudoku.title', cat: 'puzzle', rating: '4.7',
+      difficulty: 'medium', desc: 'game.sudoku.desc',
+      chips: [['game.sudoku.chip1', 'chip--purple'], ['game.sudoku.chip2', 'chip--emerald']] },
+    { id: 'word', cls: 'emerald', emoji: '🔤', title: 'game.word.title', cat: 'word', rating: '4.6',
+      difficulty: 'medium', desc: 'game.word.desc',
+      chips: [['game.word.chip1', 'chip--emerald'], ['game.word.chip2', 'chip--rose']] },
+    { id: 'daily', cls: 'amber', emoji: '📅', title: 'game.daily.title', cat: 'daily', rating: '4.8',
+      difficulty: 'hard', desc: 'game.daily.desc',
+      chips: [['game.daily.chip1', 'chip--amber'], ['game.daily.chip2', 'chip']] },
   ];
   const DIFF_BADGE = { easy: 'badge--easy', medium: 'badge--medium', hard: 'badge--hard', expert: 'badge--expert' };
   const ROOM_STYLES = ['blue', 'purple', 'emerald', 'rose', 'amber'];
@@ -242,15 +245,15 @@
       const card = el('button', `card card--${g.cls}`, `
         <div class="card__art">${g.emoji}</div>
         <div class="card__body">
-          <h3 class="card__title">${esc(g.title)}</h3>
-          <p class="card__desc">${esc(g.desc)}</p>
+          <h3 class="card__title">${esc(t(g.title))}</h3>
+          <p class="card__desc">${esc(t(g.desc))}</p>
           <div class="card__meta">
-            <span class="badge ${badge}">${esc(g.difficulty)}</span>
-            ${g.chips.map(([t, c]) => `<span class="chip ${c}">${esc(t)}</span>`).join('')}
+            <span class="badge ${badge}">${esc(t('diff.' + g.difficulty))}</span>
+            ${g.chips.map(([c, cl]) => `<span class="chip ${cl}">${esc(t(c))}</span>`).join('')}
           </div>
           <div class="card__footer">
             <span class="card__rating"><span class="card__stars">★★★★★</span> ${g.rating}</span>
-            <span class="card__play">▶ Play</span>
+            <span class="card__play">▶ ${esc(t('game.play'))}</span>
           </div>
         </div>`);
       card.dataset.title = g.title.toLowerCase();
@@ -290,7 +293,7 @@
       ROOMS = data.rooms || [];
       renderRooms();
     } catch (e) {
-      grid.innerHTML = '<div class="empty"><span class="empty__icon">📡</span><span class="empty__title">Rooms offline</span><span>Start the backend to load rooms.</span></div>';
+      grid.innerHTML = '<div class="empty"><span class="empty__icon">📡</span><span class="empty__title">' + esc(t('rooms.offline')) + '</span><span>' + esc(t('rooms.offline_sub')) + '</span></div>';
       showBanner('error', `Couldn't load rooms: ${e.message}`);
       Audio.sfx.error();
     }
@@ -307,16 +310,16 @@
       const card = el('button', `card card--${cls}`, `
         <div class="card__art">${emoji}</div>
         <div class="card__body">
-          <h3 class="card__title">${esc(r.room_name)}</h3>
-          <p class="card__desc">${esc(r.description || 'A themed escape room.')}</p>
+          <h3 class="card__title">${esc(roomName(r.room_id, r.room_name))}</h3>
+          <p class="card__desc">${esc(r.description || '')}</p>
           <div class="card__meta">
-            <span class="chip">${r.level_count || 10} Levels</span>
-            <span class="chip chip--purple">${esc(r.theme || 'Mystery')}</span>
-            <span class="badge ${DIFF_BADGE[diff] || 'badge--medium'}">${esc(diff)}</span>
+            <span class="chip">${esc(t('rooms.levels', { n: r.level_count || 10 }))}</span>
+            <span class="chip chip--purple">${esc(t('theme.' + (r.theme || 'mystery')))}</span>
+            <span class="badge ${DIFF_BADGE[diff] || 'badge--medium'}">${esc(t('diff.' + diff))}</span>
           </div>
           <div class="card__footer">
             <span class="card__rating"><span class="card__stars">★★★★★</span> ${stars}</span>
-            <span class="card__play">▶ Enter</span>
+            <span class="card__play">▶ ${esc(t('rooms.enter'))}</span>
           </div>
         </div>`);
       card.dataset.search = `${r.room_name || ''} ${r.theme || ''} ${r.description || ''}`.toLowerCase();
@@ -324,7 +327,7 @@
       grid.appendChild(card);
     });
     const totalLevels = ROOMS.reduce((n, r) => n + (r.level_count || 0), 0);
-    $('#roomsHint').textContent = `${ROOMS.length} rooms · ${totalLevels} levels`;
+    $('#roomsHint').textContent = t('rooms.summary', { rooms: ROOMS.length, levels: totalLevels });
     applyFilters();
   }
 
@@ -338,16 +341,16 @@
         <button class="level-row" data-level="${esc(l.level_id)}" data-idx="${i}">
           <span class="level-row__num">${i + 1}</span>
           <span class="level-row__body">
-            <span class="level-row__title">${esc(l.title || 'Level ' + (i + 1))}</span>
-            <span class="level-row__mech">${esc((l.mechanic?.mechanic_type || l.puzzle_type || 'puzzle').replace(/_/g, ' '))} · ${esc(l.difficulty || '')}</span>
+            <span class="level-row__title">${esc(l.title || t('rooms.level', { n: i + 1 }))}</span>
+            <span class="level-row__mech">${esc(ptype(l.mechanic?.mechanic_type || l.puzzle_type || 'puzzle'))} · ${esc(l.difficulty ? t('diff.' + l.difficulty) : '')}</span>
           </span>
           <span class="level-row__state">${done ? '✅' : '▶'}</span>
         </button>`;
     }).join('');
     modalBody.innerHTML = `
       <h3>${esc(data.room_name || room.room_name)}</h3>
-      <p class="sub">${esc(data.description || '')} · ${levels.length} levels</p>
-      <div class="level-list">${rows || '<p class="sub">No levels yet.</p>'}</div>`;
+      <p class="sub">${esc(data.description || '')} · ${t('rooms.levels_count', { n: levels.length })}</p>
+      <div class="level-list">${rows || '<p class="sub">' + esc(t('rooms.no_levels')) + '</p>'}</div>`;
     if (wasOpen) {
       requestAnimationFrame(() => {
         modalBody.style.opacity = '1';
@@ -404,12 +407,12 @@
     const render = PuzzleWorld.dispatch(puzzleType) || g.render;
     openModal(`
       <div class="game-head">
-        <div class="game-head__title">${esc(level.title || 'Puzzle')}</div>
+        <div class="game-head__title">${esc(level.title || t('game.puzzle'))}</div>
         <div class="game-head__meta">
-          <button class="text-btn" id="btnBackLevels">← Levels</button>
-          <span class="chip">${esc(puzzleType.replace(/_/g, ' '))}</span>
-          <span class="badge ${DIFF_BADGE[(level.difficulty || '').toLowerCase()] || 'badge--medium'}">${esc(level.difficulty || '')}</span>
-          ${(level.hints && level.hints.length) ? '<button class="text-btn" id="btnHint">💡 Hint</button>' : ''}
+          <button class="text-btn" id="btnBackLevels">← ${esc(t('game.levels'))}</button>
+          <span class="chip">${esc(ptype(puzzleType))}</span>
+          <span class="badge ${DIFF_BADGE[(level.difficulty || '').toLowerCase()] || 'badge--medium'}">${esc(level.difficulty ? t('diff.' + level.difficulty) : '')}</span>
+          ${(level.hints && level.hints.length) ? '<button class="text-btn" id="btnHint">💡 ' + esc(t('game.hint')) + '</button>' : ''}
         </div>
       </div>
       <div id="gameHints" class="g-col" style="gap:6px;margin-bottom:12px"></div>
@@ -434,7 +437,7 @@
   function revealHint() {
     const g = currentGame;
     const hints = (g && g.level && g.level.hints) || [];
-    if (g.hintIndex >= hints.length) { showBanner('info', 'No more hints.'); return; }
+    if (g.hintIndex >= hints.length) { showBanner('info', t('game.no_more_hints')); return; }
     const box = $('#gameHints');
     box.appendChild(el('div', 'g-hint', '💡 ' + esc(hints[g.hintIndex++])));
     Audio.sfx.success();
@@ -475,12 +478,12 @@
     root.innerHTML = `
       <div class="result">
         <div class="result__icon">${won ? '🎉' : '😵'}</div>
-        <div class="result__title">${won ? 'Level solved!' : 'Locked out'}</div>
-        <div class="result__sub">${won ? esc((g && g.level.title) || '') : 'Give it another try.'}</div>
+        <div class="result__title">${won ? t('game.level_solved') : t('game.locked_out')}</div>
+        <div class="result__sub">${won ? esc((g && g.level.title) || '') : t('game.try_again')}</div>
         <div class="modal__actions" style="justify-content:center">
-          ${next ? '<button class="btn btn--primary" id="btnNext"><span class="btn__label">▶ Next level</span></button>' : ''}
-          ${won ? '' : '<button class="btn btn--primary" id="btnRetry"><span class="btn__label">↻ Retry</span></button>'}
-          <button class="btn btn--ghost" id="btnDone"><span class="btn__label">Close</span></button>
+          ${next ? '<button class="btn btn--primary" id="btnNext"><span class="btn__label">▶ ' + esc(t('game.next_level')) + '</span></button>' : ''}
+          ${won ? '' : '<button class="btn btn--primary" id="btnRetry"><span class="btn__label">↻ ' + esc(t('game.retry')) + '</span></button>'}
+          <button class="btn btn--ghost" id="btnDone"><span class="btn__label">${esc(t('game.close'))}</span></button>
         </div>
       </div>`;
     if (won) Audio.sfx.win(); else Audio.sfx.loss();
@@ -507,7 +510,7 @@
     const box = $('#miniBoard');
     const top = rows.slice(0, 5);
     if (!top.length) {
-      box.innerHTML = '<p style="color:var(--muted);font-size:13px">No scores yet — be the first!</p>';
+      box.innerHTML = '<p style="color:var(--muted);font-size:13px">' + esc(t('lb.no_scores')) + '</p>';
       return;
     }
     const max = Math.max(1, ...top.map(r => r.solved_count || 0));
@@ -522,8 +525,8 @@
       return `<div style="${i ? 'border-top:1px solid var(--stroke);padding-top:8px;margin-top:8px' : ''}">
         <div class="mini-lb__row">
           ${medal}
-          <span class="mini-lb__name${me}">${esc(r.username || 'Player')}</span>
-          <span class="mini-lb__solved">${r.solved_count || 0} solved</span>
+          <span class="mini-lb__name${me}">${esc(r.username || t('lb.player'))}</span>
+          <span class="mini-lb__solved">${t('lb.solved', { n: r.solved_count || 0 })}</span>
         </div>
         <div class="progress ${barCls}" style="margin-left:46px"><i style="width:${pct}%"></i></div>
       </div>`;
@@ -540,20 +543,20 @@
       refreshHero();
       renderMini(rows);
       if (!rows.length) {
-        list.innerHTML = '<li class="lb-row"><span class="lb-name">No scores yet — be the first!</span></li>';
+        list.innerHTML = '<li class="lb-row"><span class="lb-name">' + esc(t('lb.no_scores')) + '</span></li>';
         return;
       }
       const medals = ['🥇', '🥈', '🥉'];
       list.innerHTML = rows.map((r, i) => `
         <li class="lb-row">
           <span class="lb-rank">${i < 3 ? medals[i] : i + 1}</span>
-          <span class="lb-name${r.user_id === uid ? ' is-me' : ''}">${esc(r.username || 'Player')}${r.user_id === uid ? ' (you)' : ''}</span>
-          <span class="lb-solved">${r.solved_count || 0} solved</span>
+          <span class="lb-name${r.user_id === uid ? ' is-me' : ''}">${esc(r.username || t('lb.player'))}${r.user_id === uid ? ' ' + t('lb.you') : ''}</span>
+          <span class="lb-solved">${t('lb.solved', { n: r.solved_count || 0 })}</span>
           <span class="lb-score">${(r.score || 0).toLocaleString()}</span>
         </li>`).join('');
       if (showSpin) Audio.sfx.success();
     } catch (e) {
-      list.innerHTML = '<li class="lb-row"><span class="lb-name">Leaderboard unavailable (offline)</span></li>';
+      list.innerHTML = '<li class="lb-row"><span class="lb-name">' + esc(t('lb.offline')) + '</span></li>';
       showBanner('error', `Leaderboard: ${e.message}`);
       Audio.sfx.error();
     }
@@ -575,27 +578,27 @@
     const streakPct = Math.min(100, Math.round(streak / 10 * 100));
     $('#statsDetail').innerHTML = `
       <div class="stat-block">
-        <div class="stat-block__row"><span>🧩 Puzzles solved</span><strong class="grad">${solved}<small style="font-size:12px;color:var(--muted)"> / 90</small></strong></div>
+        <div class="stat-block__row"><span>🧩 ${esc(t('stat.puzzles_solved'))}</span><strong class="grad">${solved}<small style="font-size:12px;color:var(--muted)"> / 90</small></strong></div>
         <div class="progress"><i style="width:${solvedPct}%"></i></div>
       </div>
       <div class="stat-block">
-        <div class="stat-block__row"><span>⭐ Total score</span><strong class="grad">${(STATS.total_score || 0).toLocaleString()}</strong></div>
+        <div class="stat-block__row"><span>⭐ ${esc(t('stat.total_score'))}</span><strong class="grad">${(STATS.total_score || 0).toLocaleString()}</strong></div>
       </div>
       <div class="stat-block">
-        <div class="stat-block__row"><span>🔥 Best streak</span><strong>${streak}</strong></div>
+        <div class="stat-block__row"><span>🔥 ${esc(t('stat.best_streak'))}</span><strong>${streak}</strong></div>
         <div class="progress progress--gold"><i style="width:${streakPct}%"></i></div>
       </div>
       <div class="stat-block">
-        <div class="stat-block__row"><span>🎮 Games played</span><strong>${(STATS.total_attempts || 0).toLocaleString()}</strong></div>
+        <div class="stat-block__row"><span>🎮 ${esc(t('stat.games_played'))}</span><strong>${(STATS.total_attempts || 0).toLocaleString()}</strong></div>
       </div>
       <div class="stat-block">
-        <div class="stat-block__row"><span>💡 Hints used</span><strong>${STATS.hints_used || 0}</strong></div>
+        <div class="stat-block__row"><span>💡 ${esc(t('stat.hints_used'))}</span><strong>${STATS.hints_used || 0}</strong></div>
       </div>
       <div class="stat-block">
-        <div class="stat-block__row"><span>🏆 Global rank</span><strong>${RANK ? '#' + RANK : '—'}</strong></div>
+        <div class="stat-block__row"><span>🏆 ${esc(t('stat.global_rank'))}</span><strong>${RANK ? '#' + RANK : '—'}</strong></div>
       </div>
       <div class="account-box">
-        <span style="color:var(--muted);font-size:12px">Signed in as</span>
+        <span style="color:var(--muted);font-size:12px">${esc(t('stat.signed_in_as'))}</span>
         <strong>${esc(uname)}</strong>
         <code>${esc(uid)}</code>
       </div>`;
@@ -628,12 +631,12 @@
       if (!announce) return;
       Audio.sfx.nav();
       openModal(`
-        <h3>🔥 ${esc(d.level?.title || 'Daily Challenge')}</h3>
-        <p class="sub">${esc(d.level?.room_name || '')} · ${esc(d.level?.difficulty || '')} · ${esc((d.level?.mechanic?.mechanic_type || 'puzzle').replace(/_/g, ' '))}</p>
-        <p class="sub">Play the full daily puzzle in the PuzzleWorld mobile app, or mark it solved here to claim your points.</p>
+        <h3>🔥 ${esc(d.level?.title || t('daily.title'))}</h3>
+        <p class="sub">${esc(d.level?.room_name || '')} · ${esc(d.level?.difficulty ? t('diff.' + d.level.difficulty) : '')} · ${esc(ptype(d.level?.mechanic?.mechanic_type || 'puzzle'))}</p>
+        <p class="sub">${esc(t('daily.sub'))}</p>
         <div class="modal__actions">
-          <button class="btn btn--ghost" id="mDailyOk"><span class="btn__label">Got it</span></button>
-          <button class="btn btn--primary" id="mDailyDone"><span class="btn__label">✅ Mark solved</span></button>
+          <button class="btn btn--ghost" id="mDailyOk"><span class="btn__label">${esc(t('daily.got_it'))}</span></button>
+          <button class="btn btn--primary" id="mDailyDone"><span class="btn__label">✅ ${esc(t('daily.mark_solved'))}</span></button>
         </div>`);
       $('#mDailyOk')?.addEventListener('click', () => { Audio.sfx.click(); closeModal(); });
       $('#mDailyDone')?.addEventListener('click', (e) => withButtonSpinner(e.currentTarget, async () => {
@@ -643,7 +646,7 @@
             body: JSON.stringify({ user_id: uid, challenge_date: d.challenge_date }),
           });
           Audio.sfx.win();
-          showBanner('success', '🎉 Daily challenge solved! Points added.');
+          showBanner('success', '🎉 ' + t('daily.solved'));
           loadStats(); loadLeaderboard(false);
           closeModal();
         } catch (err) {
@@ -751,11 +754,11 @@
     const initial = (isSignedIn ? uname.trim().charAt(0) : 'G').toUpperCase();
     $('#avatarInitial').textContent = initial;
     $('#heroAvatar').textContent = initial;
-    $('#greeting').textContent = `Welcome, ${uname}`;
-    $('#heroGreeting').textContent = `Welcome back, ${uname}`;
+    $('#greeting').textContent = t('hero.welcome', { name: uname });
+    $('#heroGreeting').textContent = t('hero.welcome', { name: uname });
     $('#menuName').textContent = uname;
     $('#menuId').textContent = isSignedIn ? uid : 'guest';
-    $('#menuLogout').innerHTML = isSignedIn ? '🚪&nbsp; Log out' : '🔑&nbsp; Sign in';
+    $('#menuLogout').innerHTML = isSignedIn ? '🚪&nbsp; ' + t('menu.logout') : '🔑&nbsp; ' + t('menu.login');
     $('#menuLogout').dataset.act = isSignedIn ? 'logout' : 'login';
     $('#signinLink').hidden = isSignedIn;
   }
@@ -894,16 +897,16 @@
       <div class="pf-name">${esc(uname)}</div>
       <div class="pf-id"><code>${esc(uid)}</code></div>
       <div class="pf-stats">
-        <div class="pf-stat"><span class="pf-stat__v">${score}</span><span class="pf-stat__l">Score</span></div>
-        <div class="pf-stat"><span class="pf-stat__v">${rank}</span><span class="pf-stat__l">Rank</span></div>
-        <div class="pf-stat"><span class="pf-stat__v">${solved}</span><span class="pf-stat__l">Solved</span></div>
-        <div class="pf-stat"><span class="pf-stat__v">🔥 ${streak}</span><span class="pf-stat__l">Best Streak</span></div>
+        <div class="pf-stat"><span class="pf-stat__v">${score}</span><span class="pf-stat__l">${esc(t('pf.score'))}</span></div>
+        <div class="pf-stat"><span class="pf-stat__v">${rank}</span><span class="pf-stat__l">${esc(t('pf.rank'))}</span></div>
+        <div class="pf-stat"><span class="pf-stat__v">${solved}</span><span class="pf-stat__l">${esc(t('pf.solved'))}</span></div>
+        <div class="pf-stat"><span class="pf-stat__v">🔥 ${streak}</span><span class="pf-stat__l">${esc(t('pf.best_streak'))}</span></div>
       </div>
-      <div class="pf-badges-head"><span class="pf-badges-head__title">Badges</span>${headerBadge}</div>
+      <div class="pf-badges-head"><span class="pf-badges-head__title">${esc(t('pf.badges'))}</span>${headerBadge}</div>
       <div class="pf-badges">${badgeHTML}</div>
       <div class="modal__actions" style="margin-top:10px">
-        <button class="btn btn--ghost" id="mProfileClose">Close</button>
-        <button class="btn btn--primary" id="mProfileReset">Reset progress</button>
+        <button class="btn btn--ghost" id="mProfileClose">${esc(t('pf.close'))}</button>
+        <button class="btn btn--primary" id="mProfileReset">${esc(t('pf.reset'))}</button>
       </div>`);
 
     // Wire badge tooltip toggles (click to show tip for locked badges)
@@ -925,12 +928,12 @@
 
   function openTerms() {
     openModal(`
-      <h3>Terms &amp; Privacy Policy</h3>
-      <p class="sub">PuzzleWorld · effective 2026</p>
-      <p class="sub"><strong>Terms of Service.</strong> By using PuzzleWorld you agree to play fairly. Scores and progress may be stored locally and, if you connect, synced to our servers. Don't attempt to exploit or disrupt the service.</p>
-      <p class="sub"><strong>Privacy Policy.</strong> We store only what's needed to run the game: a player ID, your chosen username, and gameplay stats (score, streaks, solved levels). Passwords are salted and hashed — never stored in plaintext. We never sell your data.</p>
+      <h3>${esc(t('terms.title'))}</h3>
+      <p class="sub">${esc(t('terms.sub'))}</p>
+      <p class="sub"><strong>${esc(t('terms.title'))}</strong> ${esc(t('terms.body'))}</p>
+      <p class="sub">${esc(t('terms.privacy'))}</p>
       <div class="modal__actions">
-        <button class="btn btn--primary" id="mTermsOk"><span class="btn__label">Accept &amp; Close</span></button>
+        <button class="btn btn--primary" id="mTermsOk"><span class="btn__label">${esc(t('terms.accept'))}</span></button>
       </div>`);
     $('#mTermsOk')?.addEventListener('click', () => { Audio.sfx.success(); closeModal(); });
   }
@@ -941,27 +944,27 @@
   function renderSettings() {
     $('#settingsPanel').innerHTML = `
       <div class="settings__row">
-        <div><div class="lbl">🔊 Sound effects</div><div class="sub">Synthesized UI tones</div></div>
+        <div><div class="lbl">🔊 ${esc(t('settings.sound'))}</div><div class="sub">${esc(t('settings.sound_sub'))}</div></div>
         <button class="switch ${Audio.isMuted() ? '' : 'on'}" id="setSound" aria-label="Toggle sound"></button>
       </div>
       <div class="settings__row">
-        <div><div class="lbl">🌐 Language</div><div class="sub">English · 한국어</div></div>
+        <div><div class="lbl">🌐 ${esc(t('settings.language'))}</div><div class="sub">${esc(t('settings.language_sub'))}</div></div>
         <div class="lang-switch">
           <button class="lang-btn ${currentLang() === 'en' ? 'is-active' : ''}" id="setLangEn">English</button>
           <button class="lang-btn ${currentLang() === 'ko' ? 'is-active' : ''}" id="setLangKo">한국어</button>
         </div>
       </div>
       <div class="settings__row">
-        <div><div class="lbl">👤 Account</div><div class="sub">${esc(uname)}</div></div>
-        <button class="text-btn" id="setAccountAct">${isSignedIn ? 'Profile' : 'Sign in'}</button>
+        <div><div class="lbl">👤 ${esc(t('settings.account'))}</div><div class="sub">${esc(uname)}</div></div>
+        <button class="text-btn" id="setAccountAct">${isSignedIn ? esc(t('settings.profile')) : esc(t('settings.sign_in'))}</button>
       </div>
       <div class="settings__row">
-        <div><div class="lbl">🗑️ Reset progress</div><div class="sub">Clears score, streaks &amp; solved levels</div></div>
-        <button class="btn btn--ghost" id="setReset" style="height:38px;padding:0 16px">Reset</button>
+        <div><div class="lbl">🗑️ ${esc(t('settings.reset'))}</div><div class="sub">${esc(t('settings.reset_sub'))}</div></div>
+        <button class="btn btn--ghost" id="setReset" style="height:38px;padding:0 16px">${esc(t('settings.reset_btn'))}</button>
       </div>
       <div class="settings__links">
-        <button class="text-btn" id="setTerms">📜 Terms &amp; Privacy</button>
-        ${isSignedIn ? '<button class="btn btn--danger" id="setLogout" style="height:40px;padding:0 18px">Log out</button>' : '<a class="text-btn" href="auth.html">Create account</a>'}
+        <button class="text-btn" id="setTerms">📜 ${esc(t('settings.terms'))}</button>
+        ${isSignedIn ? '<button class="btn btn--danger" id="setLogout" style="height:40px;padding:0 18px">' + esc(t('settings.logout')) + '</button>' : '<a class="text-btn" href="auth.html">' + esc(t('settings.create_account')) + '</a>'}
       </div>`;
   }
 
@@ -996,14 +999,10 @@
   // =========================================================
   //  Boot
   // =========================================================
-  async function setLanguage(lang) {
+  function setLanguage(lang) {
     Audio.sfx.click();
-    localStorage.setItem('pw_lang', lang);
-    if (isSignedIn) {
-      try { await api('/auth/language', { method: 'POST', body: JSON.stringify({ language: lang }) }); } catch (_) { /* guest or offline — still kept locally */ }
-    }
-    renderSettings();
-    toast(lang === 'ko' ? '🌐 한국어로 설정되었습니다' : '🌐 Language set to English', 'success', 1800);
+    window.I18N.setLang(lang, { persist: isSignedIn });
+    toast(lang === 'ko' ? '🌐 ' + t('toast.lang_ko') : '🌐 ' + t('toast.lang_en'), 'success', 1800);
   }
 
   function boot() {
@@ -1014,6 +1013,15 @@
     bindFilters();
     bindSound();
     bindSettings();
+
+    window.addEventListener('pw:lang', () => {
+      renderGames();
+      renderSettings();
+      refreshIdentity();
+      if (ROOMS.length) renderRooms();
+      loadLeaderboard(false);
+      loadStats();
+    });
 
     $('#btnRefreshLb')?.addEventListener('click', (e) => withButtonSpinner(e.currentTarget, async () => {
       Audio.sfx.click();

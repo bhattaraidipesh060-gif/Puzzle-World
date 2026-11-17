@@ -2,6 +2,7 @@
   'use strict';
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const t = (k, v) => window.t(k, v);
 
   let mode = 'login';
   let phase = 'auth'; // 'auth' (email+password) → 'otp' (verify) → 'username' (handle)
@@ -31,14 +32,14 @@
     $('#otpField').hidden = !isOtp;
     $('#usernameField').hidden = !isUsername;
     if (isOtp) {
-      $('#formTitle').textContent = 'Verify your email';
-      $('#formSub').textContent = 'We sent a 6-digit code to ' + pendingEmail + '.';
-      $('#btnLabel').textContent = 'Verify';
+      $('#formTitle').textContent = t('auth.verify_title');
+      $('#formSub').textContent = t('auth.verify_sub', { email: pendingEmail });
+      $('#btnLabel').textContent = t('auth.verify');
       $('#switchText').innerHTML = '';
     } else if (isUsername) {
-      $('#formTitle').textContent = 'Choose your username';
-      $('#formSub').textContent = 'Almost done — pick the name that shows on the leaderboard.';
-      $('#btnLabel').textContent = 'Save username';
+      $('#formTitle').textContent = t('auth.username_title');
+      $('#formSub').textContent = t('auth.username_sub');
+      $('#btnLabel').textContent = t('auth.save_username');
       $('#switchText').innerHTML = '';
     }
   }
@@ -49,13 +50,13 @@
     const isReg = next === 'register';
     $$('.tab').forEach((t) => t.classList.toggle('is-active', t.dataset.mode === next));
     $$('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.mode === next)));
-    $('#formTitle').textContent = isReg ? 'Create your account' : 'Welcome back';
-    $('#formSub').textContent = isReg ? 'Join PuzzleWorld and sync your progress.' : 'Sign in to continue your progress.';
-    $('#btnLabel').textContent = isReg ? 'Create Account' : 'Sign In';
-    $('#emailLabel').textContent = 'Email address';
+    $('#formTitle').textContent = isReg ? t('auth.create_account') : t('auth.welcome_back');
+    $('#formSub').textContent = isReg ? t('auth.join_sub') : t('auth.sign_in_sub');
+    $('#btnLabel').textContent = isReg ? t('auth.create_btn') : t('auth.sign_in');
+    $('#emailLabel').textContent = t('auth.email');
     $('#switchText').innerHTML = isReg
-      ? 'Already have an account? <a href="#" data-mode="login">Sign in</a>'
-      : 'New here? <a href="#" data-mode="register">Create an account</a>';
+      ? t('auth.have_account') + ' <a href="#" data-mode="login">' + t('auth.sign_in') + '</a>'
+      : t('auth.new_here') + ' <a href="#" data-mode="register">' + t('auth.create_account') + '</a>';
     renderPhase();
     hideMsg();
     setLoading(false);
@@ -86,7 +87,7 @@
     if (profile.email) localStorage.setItem('pw_email', profile.email);
     if (profile.username) {
       localStorage.setItem('pw_username', profile.username);
-      showMsg('Welcome back, ' + profile.username + '!', 'success');
+      showMsg(t('auth.welcome', { name: profile.username }), 'success');
       setTimeout(() => { location.href = '/'; }, 700);
     } else {
       localStorage.removeItem('pw_username');
@@ -138,8 +139,8 @@
         body: JSON.stringify({ email: pendingEmail })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Could not resend the code.');
-      showMsg(data.message || 'A new code has been sent.', 'success');
+      if (!res.ok) throw new Error(data.error || t('auth.resend_failed'));
+      showMsg(data.message || t('auth.resend_done'), 'success');
     } catch (err) {
       showMsg(err.message, 'error');
     }
@@ -154,7 +155,7 @@
     // Phase: verify OTP
     if (phase === 'otp') {
       const otp = $('#otp').value.trim();
-      if (!/^\d{6}$/.test(otp)) return showMsg('Please enter the 6-digit code.', 'error');
+      if (!/^\d{6}$/.test(otp)) return showMsg(t('auth.enter_otp'), 'error');
       setLoading(true);
       try {
         const res = await fetch('/api/auth/verify-otp', {
@@ -163,7 +164,7 @@
           body: JSON.stringify({ email: pendingEmail, otp })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Verification failed.');
+        if (!res.ok) throw new Error(data.error || t('auth.verify_failed'));
         finishAuth(data);
       } catch (err) {
         showMsg(err.message, 'error');
@@ -175,7 +176,7 @@
     // Phase: choose username
     if (phase === 'username') {
       const username = $('#username').value.trim();
-      if (username.length < 3 || username.length > 32) return showMsg('Username must be 3–32 characters.', 'error');
+      if (username.length < 3 || username.length > 32) return showMsg(t('auth.username_len'), 'error');
       setLoading(true);
       try {
         const res = await fetch('/api/auth/set-username', {
@@ -184,9 +185,9 @@
           body: JSON.stringify({ username })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Could not save username.');
+        if (!res.ok) throw new Error(data.error || t('auth.could_not_save'));
         localStorage.setItem('pw_username', data.user.username);
-        showMsg('Welcome, ' + data.user.username + '!', 'success');
+        showMsg(t('auth.welcome', { name: data.user.username }), 'success');
         setTimeout(() => { location.href = '/'; }, 700);
       } catch (err) {
         showMsg(err.message, 'error');
@@ -199,15 +200,15 @@
     const emailVal = $('#email').value.trim().toLowerCase();
     const password = $('#password').value;
 
-    if (!emailVal) return showMsg('Please enter your email address.', 'error');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) return showMsg('Please enter a valid email address.', 'error');
-    if (!password) return showMsg('Please enter a password.', 'error');
+    if (!emailVal) return showMsg(t('auth.enter_email'), 'error');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) return showMsg(t('auth.invalid_email'), 'error');
+    if (!password) return showMsg(t('auth.enter_password'), 'error');
     if (mode === 'register') {
-      if (password.length < 8) return showMsg('Password must be at least 8 characters.', 'error');
+      if (password.length < 8) return showMsg(t('auth.password_len'), 'error');
       if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password))
-        return showMsg('Password needs an uppercase letter, a lowercase letter, and a number.', 'error');
-      if (password !== $('#confirm').value) return showMsg('Passwords do not match.', 'error');
-      if (!$('#agree').checked) return showMsg('Please accept the Terms of Service and Privacy Policy.', 'error');
+        return showMsg(t('auth.password_policy'), 'error');
+      if (password !== $('#confirm').value) return showMsg(t('auth.password_mismatch'), 'error');
+      if (!$('#agree').checked) return showMsg(t('auth.accept_terms'), 'error');
     }
 
     setLoading(true);
@@ -218,13 +219,13 @@
         body: JSON.stringify({ email: emailVal, password })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+      if (!res.ok) throw new Error(data.error || t('auth.something_wrong'));
 
       if (mode === 'register') {
         // Register returns a message (no token) — move to the OTP step.
         enterOtpStep(emailVal);
         setLoading(false);
-        showMsg(data.message || 'Check your email for the code.', 'success');
+        showMsg(data.message || t('auth.new_code_sent'), 'success');
       } else if (data.unverified) {
         // Login blocked because email isn't verified — let them enter/resend the code.
         enterOtpStep(emailVal);
