@@ -4,7 +4,8 @@
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
   let mode = 'login';
-  let phase = 'auth'; // 'auth' (email + password) or 'username' (choose handle)
+  let phase = 'auth'; // 'auth' (email+password) → 'otp' (verify) → 'username' (handle)
+  let pendingEmail = '';
 
   function hideMsg() { $('#formMsg').hidden = true; }
   function showMsg(text, kind) {
@@ -19,14 +20,22 @@
 
   // Toggle field visibility for the current phase/mode.
   function renderPhase() {
+    const isAuth = phase === 'auth';
+    const isOtp = phase === 'otp';
     const isUsername = phase === 'username';
     const isReg = mode === 'register';
-    $('.tabs').style.display = isUsername ? 'none' : '';
-    $$('.field--email, .field--password').forEach((f) => { f.hidden = isUsername; });
-    $$('.field--confirm').forEach((f) => { f.hidden = isUsername || !isReg; });
-    $$('.agree').forEach((a) => { a.hidden = isUsername || !isReg; });
+    $('.tabs').style.display = isAuth ? '' : 'none';
+    $$('.field--email, .field--password').forEach((f) => { f.hidden = !isAuth; });
+    $$('.field--confirm').forEach((f) => { f.hidden = !isAuth || !isReg; });
+    $$('.agree').forEach((a) => { a.hidden = !isAuth || !isReg; });
+    $('#otpField').hidden = !isOtp;
     $('#usernameField').hidden = !isUsername;
-    if (isUsername) {
+    if (isOtp) {
+      $('#formTitle').textContent = 'Verify your email';
+      $('#formSub').textContent = 'We sent a 6-digit code to ' + pendingEmail + '.';
+      $('#btnLabel').textContent = 'Verify';
+      $('#switchText').innerHTML = '';
+    } else if (isUsername) {
       $('#formTitle').textContent = 'Choose your username';
       $('#formSub').textContent = 'Almost done — pick the name that shows on the leaderboard.';
       $('#btnLabel').textContent = 'Save username';
@@ -43,7 +52,7 @@
     $('#formTitle').textContent = isReg ? 'Create your account' : 'Welcome back';
     $('#formSub').textContent = isReg ? 'Join PuzzleWorld and sync your progress.' : 'Sign in to continue your progress.';
     $('#btnLabel').textContent = isReg ? 'Create Account' : 'Sign In';
-    $('#emailLabel').textContent = isReg ? 'Gmail address' : 'Email or username';
+    $('#emailLabel').textContent = 'Email address';
     $('#switchText').innerHTML = isReg
       ? 'Already have an account? <a href="#" data-mode="login">Sign in</a>'
       : 'New here? <a href="#" data-mode="register">Create an account</a>';
@@ -52,7 +61,14 @@
     setLoading(false);
   }
 
-  // Enter the "choose username" step after auth with no username yet.
+  function enterOtpStep(email) {
+    pendingEmail = email;
+    phase = 'otp';
+    renderPhase();
+    $('#otp').value = '';
+    $('#otp').focus();
+  }
+
   function enterUsernameStep() {
     phase = 'username';
     renderPhase();
@@ -62,7 +78,7 @@
     $('#username').focus();
   }
 
-  // After a successful login/register, persist identity and either redirect
+  // After a successful login/verify, persist identity and either redirect
   // (username already set) or move to the username step.
   function finishAuth(data) {
     const profile = data.user || {};
@@ -110,12 +126,53 @@
   const email = localStorage.getItem('pw_email');
   if (email) { $('#email').value = email; }
 
+  // Resend OTP link
+  $('#resendOtp').addEventListener('click', async (e) => {
+    e.preventDefault();
+    hideMsg();
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: pendingEmail })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not resend the code.');
+      showMsg(data.message || 'A new code has been sent.', 'success');
+    } catch (err) {
+      showMsg(err.message, 'error');
+    }
+    setLoading(false);
+  });
+
   // Submit → backend
   $('#authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     hideMsg();
 
-    // Step 2: choose username
+    // Phase: verify OTP
+    if (phase === 'otp') {
+      const otp = $('#otp').value.trim();
+      if (!/^\d{6}$/.test(otp)) return showMsg('Please enter the 6-digit code.', 'error');
+      setLoading(true);
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: pendingEmail, otp })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Verification failed.');
+        finishAuth(data);
+      } catch (err) {
+        showMsg(err.message, 'error');
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Phase: choose username
     if (phase === 'username') {
       const username = $('#username').value.trim();
       if (username.length < 3 || username.length > 32) return showMsg('Username must be 3–32 characters.', 'error');
@@ -138,18 +195,12 @@
       return;
     }
 
-    // Step 1: email/username + password
-    const ident = $('#email').value.trim();
+    // Phase: auth (login / register)
+    const emailVal = $('#email').value.trim().toLowerCase();
     const password = $('#password').value;
 
-    if (!ident) return showMsg('Please enter your email or username.', 'error');
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ident);
-    if (mode === 'register') {
-      if (!isEmail) return showMsg('Please enter a valid email address.', 'error');
-      if (!/^[^\s@]+@(gmail\.com|googlemail\.com)$/i.test(ident)) return showMsg('Please use a Gmail address (…@gmail.com).', 'error');
-    } else if (ident.includes('@') && !isEmail) {
-      return showMsg('Please enter a valid email address.', 'error');
-    }
+    if (!emailVal) return showMsg('Please enter your email address.', 'error');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) return showMsg('Please enter a valid email address.', 'error');
     if (!password) return showMsg('Please enter a password.', 'error');
     if (mode === 'register') {
       if (password.length < 8) return showMsg('Password must be at least 8 characters.', 'error');
@@ -159,20 +210,29 @@
       if (!$('#agree').checked) return showMsg('Please accept the Terms of Service and Privacy Policy.', 'error');
     }
 
-    const body = mode === 'register' || isEmail
-      ? { email: ident.toLowerCase(), password }
-      : { username: ident, password };
-
     setLoading(true);
     try {
       const res = await fetch('/api/auth/' + mode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ email: emailVal, password })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
-      finishAuth(data);
+
+      if (mode === 'register') {
+        // Register returns a message (no token) — move to the OTP step.
+        enterOtpStep(emailVal);
+        setLoading(false);
+        showMsg(data.message || 'Check your email for the code.', 'success');
+      } else if (data.unverified) {
+        // Login blocked because email isn't verified — let them enter/resend the code.
+        enterOtpStep(emailVal);
+        setLoading(false);
+        showMsg(data.error || 'Please verify your email first.', 'error');
+      } else {
+        finishAuth(data);
+      }
     } catch (err) {
       showMsg(err.message, 'error');
       setLoading(false);

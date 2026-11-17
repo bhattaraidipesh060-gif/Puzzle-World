@@ -115,44 +115,53 @@ class LoginActivity : AppCompatActivity() {
 
     private fun attemptSubmit() {
         if (!termsAccepted()) return
-        val ident = emailInput.text?.toString()?.trim().orEmpty()
+        val email = emailInput.text?.toString()?.trim().orEmpty()
         val pass = passwordInput.text?.toString().orEmpty()
-        if (!validate(ident, pass, registerMode)) return
+        if (!validate(email, pass, registerMode)) return
 
         setLoading(true)
         statusView.text = if (registerMode) "Creating account…" else "Signing in…"
         statusView.setTextColor(Color.parseColor("#94A3B8"))
 
-        val request = if (registerMode || ident.contains("@")) {
-            AuthRequest(email = ident, password = pass)
-        } else {
-            AuthRequest(username = ident, password = pass)
-        }
+        val request = AuthRequest(email = email, password = pass)
 
         lifecycleScope.launch {
             try {
-                val response = if (registerMode) {
+                if (registerMode) {
+                    // Register sends a verification code — no token yet.
                     ApiClient.authApi.register(request)
+                    setLoading(false)
+                    promptForOtp(email, "We emailed a 6-digit code to $email.")
                 } else {
-                    ApiClient.authApi.login(request)
+                    val response = ApiClient.authApi.login(request)
+                    onAuthSuccess(response)
                 }
-                onAuthSuccess(response)
             } catch (e: HttpException) {
                 setLoading(false)
-                showError(
-                    when (e.code()) {
-                        409 -> "An account with that email already exists"
-                        401 -> "Incorrect email, username or password"
-                        400 -> "Please check your email/username and password"
-                        else -> "Sign-in failed (${e.code()})"
+                if (!registerMode && e.code() == 403) {
+                    val unverified = parseUnverifiedEmail(e)
+                    if (unverified != null) {
+                        promptForOtp(unverified, "Your email isn't verified yet. Enter the code we sent to $unverified.")
+                    } else {
+                        showError("Incorrect email or password")
                     }
-                )
+                } else {
+                    showError(
+                        when (e.code()) {
+                            409 -> "An account with that email already exists"
+                            401 -> "Incorrect email or password"
+                            400 -> "Please check your email and password"
+                            403 -> "Your email isn't verified yet"
+                            else -> "Sign-in failed (${e.code()})"
+                        }
+                    )
+                }
             } catch (e: IOException) {
                 setLoading(false)
-                offlineAuth(ident, pass)
+                offlineAuth(email, pass)
             } catch (e: Exception) {
                 setLoading(false)
-                offlineAuth(ident, pass)
+                offlineAuth(email, pass)
             }
         }
     }
@@ -236,6 +245,78 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    /** Step 1b: ask for the 6-digit OTP after registration / unverified login. */
+    private fun promptForOtp(email: String, message: String) {
+        val input = TextInputEditText(this).apply {
+            hint = "6-digit code"
+            setTextColor(Color.parseColor("#E2E8F0"))
+            setHintTextColor(Color.parseColor("#64748B"))
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setSingleLine()
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Verify your email")
+            .setMessage(message)
+            .setView(input)
+            .setCancelable(false)
+            .setPositiveButton("Verify") { _, _ ->
+                val otp = input.text?.toString()?.trim().orEmpty()
+                if (otp.length != 6) {
+                    Toast.makeText(this, "Enter the 6-digit code", Toast.LENGTH_SHORT).show()
+                    promptForOtp(email, message)
+                } else {
+                    verifyOtp(email, otp)
+                }
+            }
+            .setNegativeButton("Resend code") { _, _ -> resendOtp(email, message) }
+            .show()
+    }
+
+    private fun verifyOtp(email: String, otp: String) {
+        setLoading(true)
+        statusView.text = "Verifying…"
+        statusView.setTextColor(Color.parseColor("#94A3B8"))
+        lifecycleScope.launch {
+            try {
+                val response = ApiClient.authApi.verifyOtp(VerifyOtpRequest(email, otp))
+                onAuthSuccess(response)
+            } catch (e: HttpException) {
+                setLoading(false)
+                Toast.makeText(
+                    this@LoginActivity,
+                    if (e.code() == 400) "Invalid or expired code" else "Verification failed (${e.code()})",
+                    Toast.LENGTH_SHORT
+                ).show()
+                promptForOtp(email, "Enter the 6-digit code sent to $email.")
+            } catch (e: Exception) {
+                setLoading(false)
+                Toast.makeText(this@LoginActivity, "Check your connection and try again", Toast.LENGTH_SHORT).show()
+                promptForOtp(email, "Enter the 6-digit code sent to $email.")
+            }
+        }
+    }
+
+    private fun resendOtp(email: String, message: String) {
+        lifecycleScope.launch {
+            try {
+                ApiClient.authApi.resendOtp(ResendOtpRequest(email))
+                Toast.makeText(this@LoginActivity, "New code sent to $email", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@LoginActivity, "Couldn't resend — check your connection", Toast.LENGTH_SHORT).show()
+            }
+            promptForOtp(email, message)
+        }
+    }
+
+    /** Reads the `unverified` email from a 403 login response body, if present. */
+    private fun parseUnverifiedEmail(e: HttpException): String? = try {
+        val body = e.response()?.errorBody()?.string().orEmpty()
+        val obj = org.json.JSONObject(body)
+        if (obj.optBoolean("unverified", false)) obj.optString("email", "").ifBlank { null } else null
+    } catch (ex: Exception) {
+        null
+    }
+
     /** Offline-first fallback: authenticate against the local SQLite store. */
     private fun offlineAuth(user: String, pass: String) {
         val db = AuthDatabase(this)
@@ -298,20 +379,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun validate(ident: String, pass: String, register: Boolean): Boolean {
         if (ident.isEmpty()) {
-            showError(if (register) "Enter your Gmail address" else "Enter your email or username")
+            showError("Enter your email address")
             return false
         }
         val isEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(ident).matches()
-        if (register) {
-            if (!isEmail) { showError("Enter a valid email address"); return false }
-            if (!ident.endsWith("@gmail.com", ignoreCase = true) && !ident.endsWith("@googlemail.com", ignoreCase = true)) {
-                showError("Please use a Gmail address (…@gmail.com)")
-                return false
-            }
-        } else {
-            // login: email or username
-            if (ident.contains("@") && !isEmail) { showError("Enter a valid email address"); return false }
-        }
+        if (!isEmail) { showError("Enter a valid email address"); return false }
         if (pass.isEmpty()) { showError("Enter a password"); return false }
         if (register) {
             if (pass.length < 8) { showError("Password must be at least 8 characters"); return false }
