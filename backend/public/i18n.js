@@ -2,6 +2,21 @@
    PuzzleWorld frontend localization (English / 한국어)
    Loaded before app.js and auth.js. Exposes window.I18N.
    ========================================================= */
+
+// Resolve the backend API base URL once, before app.js/auth.js run.
+// Default '' = same-origin: the backend serves this frontend, so relative
+// /api/... paths work both locally (`node server.js` → http://localhost:3000/)
+// and on the deployed host. If the frontend is served from a DIFFERENT origin,
+// point it at the backend with `?api=http://localhost:3000` in the URL, or set
+// window.PW_API_BASE = 'http://localhost:3000' before this script loads.
+(function resolveApiBase() {
+  var fromQuery = '';
+  try { fromQuery = new URLSearchParams(window.location.search).get('api') || ''; } catch (_) {}
+  var base = (window.PW_API_BASE || fromQuery || '').replace(/\/+$/, '');
+  base = base.replace(/\/api\/?$/, ''); // tolerate a '.../api' value without doubling it
+  window.PW_API_BASE = base;
+})();
+
 (function () {
   'use strict';
 
@@ -561,7 +576,7 @@
     document.documentElement.lang = l === 'ko' ? 'ko' : 'en';
     apply();
     if (opts && opts.persist) {
-      fetch('/api/auth/language', {
+      fetch(window.PW_API_BASE + '/api/auth/language', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: l }),

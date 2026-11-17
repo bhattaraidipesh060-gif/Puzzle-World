@@ -3,6 +3,9 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
   const t = (k, v) => window.t(k, v);
+  // Backend API base — '' = same-origin (backend serves this frontend);
+  // overridable via window.PW_API_BASE or ?api=... (resolved by i18n.js).
+  const API = (window.PW_API_BASE || '') + '/api';
 
   let mode = 'login';
   let phase = 'auth'; // 'auth' (email+password) → 'otp' (verify) → 'username' (handle)
@@ -165,7 +168,7 @@
     hideMsg();
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/resend-otp', {
+      const res = await fetch(API + '/auth/resend-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: pendingEmail })
@@ -194,7 +197,7 @@
       if (!/^\d{6}$/.test(otp)) return showMsg(t('auth.enter_otp'), 'error');
       setLoading(true);
       try {
-        const res = await fetch('/api/auth/verify-otp', {
+        const res = await fetch(API + '/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: pendingEmail, otp })
@@ -215,7 +218,7 @@
       if (username.length < 3 || username.length > 32) return showMsg(t('auth.username_len'), 'error');
       setLoading(true);
       try {
-        const res = await fetch('/api/auth/set-username', {
+        const res = await fetch(API + '/auth/set-username', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username })
@@ -249,7 +252,7 @@
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/' + mode, {
+      const res = await fetch(API + '/auth/' + mode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailVal, password })

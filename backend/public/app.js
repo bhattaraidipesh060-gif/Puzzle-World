@@ -4,7 +4,7 @@
 (() => {
   'use strict';
 
-  const API = '/api';
+  const API = (window.PW_API_BASE || '') + '/api';
   const currentLang = () => localStorage.getItem('pw_lang') || 'en';
   const t = (k, v) => window.t(k, v);
   const roomName = (id, fb) => window.I18N.roomName(id, fb);
@@ -803,7 +803,7 @@
 
   function signout() {
     // Clear the httpOnly auth cookie on the server, then wipe local identifiers.
-    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    fetch(API + '/auth/logout', { method: 'POST' }).catch(() => {});
     localStorage.removeItem('pw_user_id');
     localStorage.removeItem('pw_username');
     localStorage.removeItem('pw_token'); // legacy — no longer used
