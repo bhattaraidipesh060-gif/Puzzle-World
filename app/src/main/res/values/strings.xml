@@ -71,6 +71,7 @@
 
     <!-- ===== Language ===== -->
     <string name="language_title">🌐 Language</string>
+    <string name="language_choose">Choose your language</string>
     <string name="language_cancel">Cancel</string>
     <string name="language_set_ko">한국어로 설정되었습니다</string>
     <string name="language_set_en">Language set to English</string>

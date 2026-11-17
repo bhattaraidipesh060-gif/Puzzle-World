@@ -29,6 +29,12 @@ object ApiClient {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .addInterceptor(AuthInterceptor { SessionManager.token() })
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("Accept-Language", LanguageManager.currentTag())
+                    .build()
+                chain.proceed(request)
+            }
             .build()
     }
 

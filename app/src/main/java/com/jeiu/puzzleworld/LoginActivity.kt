@@ -58,11 +58,19 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        LanguageManager.apply(this, LanguageManager.current(this))
+        if (LanguageManager.hasLanguage(this)) {
+            LanguageManager.apply(this, LanguageManager.current(this))
+        }
         setContentView(R.layout.activity_login)
         SoundFx.init(this)
         SessionManager.init(this)
         AnimatedBackgroundDrawable.applyTo(this, Color.parseColor("#0A1428"), Color.parseColor("#001B33"), Color.parseColor("#00E5FF"))
+
+        // Mandatory pre-login language selection on first launch.
+        if (!LanguageManager.hasLanguage(this)) {
+            showLanguageSelection()
+            return
+        }
 
         // Auto-login: a stored, non-expired session skips the login form.
         if (SessionManager.isLoggedIn()) {
@@ -95,6 +103,18 @@ class LoginActivity : AppCompatActivity() {
         }
 
         playEntrance()
+    }
+
+    /** First-launch gate: require an explicit English/Korean choice before login. */
+    private fun showLanguageSelection() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.language_choose))
+            .setCancelable(false)
+            .setItems(arrayOf("English", "한국어")) { _, which ->
+                LanguageManager.apply(this, if (which == 0) "en" else "ko")
+                recreate()
+            }
+            .show()
     }
 
     /** Staggered entrance: card + inputs slide up and fade in; buttons scale in. */
