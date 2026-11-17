@@ -120,14 +120,15 @@ function initSchema() {
   ensureColumn('users',   'verification_otp',  'TEXT');
   ensureColumn('users',   'otp_expires_at',    'TEXT');
 
-  // Migration: remove email NOT-NULL and UNIQUE constraints (username-only auth).
+  // Migration: ensure email is NOT NULL UNIQUE (universal email authentication).
   const emailInfo = uCols.find(c => c.name === 'email');
-  if (emailInfo && emailInfo.notnull) {
+  if (emailInfo && !emailInfo.notnull) {
+    db.exec("UPDATE users SET email = lower(username) || '@puzzleworld.local' WHERE email IS NULL OR email = ''");
     db.exec(`
       ALTER TABLE users RENAME TO users_old;
       CREATE TABLE users (
         user_id TEXT PRIMARY KEY,
-        email TEXT,
+        email TEXT NOT NULL UNIQUE,
         username TEXT UNIQUE,
         password_hash TEXT NOT NULL,
         salt TEXT NOT NULL,

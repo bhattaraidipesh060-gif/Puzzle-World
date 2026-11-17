@@ -1,6 +1,8 @@
 'use strict';
 const express = require('express');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const { promises: dns } = require('dns');
 const router = express.Router();
 const wrap = require('./wrap');
 const { getDb } = require('../database');
@@ -9,6 +11,63 @@ const {
   legacySha256, isLegacyHash, generateTotpSecret, verifyTotp, otpauthUrl,
 } = require('../lib/security');
 const { requireAuth } = require('../middleware/auth');
+const { t } = require('../lib/i18n');
+
+// Strict-enough RFC-ish email format check (any provider: Gmail, Naver, Yahoo,
+// Daum, Outlook, iCloud, …).
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+}
+
+// DNS MX lookup — verify the email domain can receive mail.
+// Fails CLOSED only when the domain definitively has no MX records
+// (ENODATA/ENOTFOUND); fails OPEN on infrastructure errors (ECONNREFUSED,
+// TIMEOUT, SERVFAIL) so registration isn't blocked by a DNS outage.
+async function hasMxRecord(domain) {
+  try {
+    const records = await dns.resolveMx(domain);
+    return Array.isArray(records) && records.length > 0;
+  } catch (err) {
+    const code = err && err.code;
+    if (code === 'ENOTFOUND' || code === 'ENODATA' || code === 'NXDOMAIN') {
+      return false;
+    }
+    return true; // can't determine — allow through
+  }
+}
+
+// Generate a secure 6-digit OTP using CSPRNG.
+function generateOtp() {
+  return crypto.randomInt(100000, 999999).toString();
+}
+
+// Send a verification code via SMTP. Falls back to console logging when
+// PW_EMAIL_USER / PW_EMAIL_PASS are not set (dev / demo mode — check the log).
+async function sendVerificationEmail(email, otp) {
+  console.log(`[email] Verification code for ${email}: ${otp}`);
+  const user = process.env.PW_EMAIL_USER;
+  const pass = process.env.PW_EMAIL_PASS;
+  if (!user || !pass) {
+    console.log('[email] SMTP not configured — set PW_EMAIL_USER + PW_EMAIL_PASS for real delivery.');
+    return;
+  }
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass },
+    });
+    await transporter.sendMail({
+      from: user,
+      to: email,
+      subject: 'PuzzleWorld – 이메일 인증 / Email Verification',
+      text: `Your PuzzleWorld verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nPuzzleWorld 인증 코드: ${otp} (10분 후 만료).`,
+      html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto"><h2 style="color:#0f172a">🧩 PuzzleWorld</h2><p>Your verification code is / 인증 코드:</p><h1 style="letter-spacing:8px;color:#0ea5e9">${otp}</h1><p style="color:#64748b;font-size:14px">This code expires in 10 minutes. · 코드는 10분 후 만료됩니다.</p></div>`,
+    });
+    console.log(`[email] Verification code sent to ${email}.`);
+  } catch (err) {
+    console.error('[email] Failed to send:', err.message);
+  }
+}
 
 // Issue a session: sign the JWT and, for the web portal, drop it into an
 // httpOnly cookie so the token never touches client-side localStorage.
@@ -28,7 +87,9 @@ function issueSession(req, res, user) {
 function publicUser(row) {
   return {
     user_id: row.user_id,
-    username: row.username,
+    email: row.email || null,
+    username: row.username || null,
+    has_username: !!row.username,
   };
 }
 
@@ -38,73 +99,145 @@ function authResponse(req, res, row) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  REGISTRATION
+//  REGISTRATION (universal email + OTP)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// POST /api/auth/register — username + password, returns JWT immediately.
-router.post('/register', wrap((req, res) => {
+// POST /api/auth/register — validate email + password, create unverified account, send OTP.
+router.post('/register', wrap(async (req, res) => {
   const db = getDb();
-  const username = String(req.body.username || '').trim();
+  const email = String(req.body.email || '').trim().toLowerCase();
   const password = String(req.body.password || '');
 
-  if (username.length < 3 || username.length > 32) {
-    return res.status(400).json({ error: 'Username must be 3–32 characters.' });
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: t(req, 'invalid_email') });
+  }
+  // Verify the domain can receive mail (DNS MX lookup).
+  if (!(await hasMxRecord(email.split('@')[1]))) {
+    return res.status(400).json({ error: t(req, 'invalid_email') });
   }
   if (password.length < 8) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+    return res.status(400).json({ error: t(req, 'password_length') });
   }
   if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
-    return res.status(400).json({ error: 'Password must include an uppercase letter, a lowercase letter, and a number.' });
+    return res.status(400).json({ error: t(req, 'password_policy') });
   }
 
-  const existing = db.prepare('SELECT user_id FROM users WHERE username = ?').get(username);
-  if (existing) return res.status(409).json({ error: 'That username is already taken.' });
+  const existing = db.prepare('SELECT user_id FROM users WHERE email = ?').get(email);
+  if (existing) return res.status(409).json({ error: t(req, 'email_exists') });
 
   const password_hash = hashPassword(password);
   const user_id = 'u_' + crypto.randomBytes(9).toString('hex');
+  const otp = generateOtp();
+  const otpExpires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
   try {
     db.transaction(() => {
-      db.prepare('INSERT INTO users (user_id, username, password_hash, salt) VALUES (?, ?, ?, ?)')
-        .run(user_id, username, password_hash, '');
+      db.prepare('INSERT INTO users (user_id, email, username, password_hash, salt, is_verified, verification_otp, otp_expires_at) VALUES (?, ?, NULL, ?, ?, 0, ?, ?)')
+        .run(user_id, email, password_hash, '', otp, otpExpires);
       db.prepare('INSERT INTO players (user_id, username) VALUES (?, ?)')
-        .run(user_id, username);
+        .run(user_id, email.split('@')[0] || 'Player');
     })();
   } catch (e) {
     if (e && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-      return res.status(409).json({ error: 'That username is already taken.' });
+      return res.status(409).json({ error: t(req, 'email_exists') });
     }
     throw e;
   }
 
-  const row = db.prepare('SELECT * FROM users WHERE user_id = ?').get(user_id);
-  res.status(201).json(authResponse(req, res, row));
+  // Fire-and-forget: OTP email delivery.
+  sendVerificationEmail(email, otp).catch(() => {});
+
+  res.status(201).json({ message: t(req, 'otp_sent', { email }), email });
+}));
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  EMAIL VERIFICATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+// POST /api/auth/verify-otp — verify the OTP, mark account, issue a JWT.
+router.post('/verify-otp', wrap((req, res) => {
+  const db = getDb();
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const otp = String(req.body.otp || '').trim();
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: t(req, 'invalid_email') });
+  }
+  if (!/^\d{6}$/.test(otp)) {
+    return res.status(400).json({ error: t(req, 'otp_format') });
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (!user) return res.status(400).json({ error: t(req, 'otp_no_account') });
+  if (user.is_verified) return res.status(400).json({ error: t(req, 'otp_already_verified') });
+
+  // Strict character-for-character match + expiry check.
+  if (user.verification_otp !== otp || (user.otp_expires_at && new Date(user.otp_expires_at) < new Date())) {
+    return res.status(400).json({ error: t(req, 'otp_invalid') });
+  }
+
+  db.prepare('UPDATE users SET is_verified = 1, verification_otp = NULL, otp_expires_at = NULL WHERE user_id = ?')
+    .run(user.user_id);
+  user.is_verified = 1;
+
+  res.json(authResponse(req, res, user));
+}));
+
+// POST /api/auth/resend-otp — regenerate a fresh code and send it again.
+router.post('/resend-otp', wrap(async (req, res) => {
+  const db = getDb();
+  const email = String(req.body.email || '').trim().toLowerCase();
+
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: t(req, 'invalid_email') });
+  }
+  if (!(await hasMxRecord(email.split('@')[1]))) {
+    return res.status(400).json({ error: t(req, 'invalid_email') });
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (!user) return res.status(400).json({ error: t(req, 'otp_no_account') });
+  if (user.is_verified) return res.status(400).json({ error: t(req, 'otp_already_verified') });
+
+  const otp = generateOtp();
+  const expires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  db.prepare('UPDATE users SET verification_otp = ?, otp_expires_at = ? WHERE user_id = ?')
+    .run(otp, expires, user.user_id);
+
+  sendVerificationEmail(email, otp).catch(() => {});
+
+  res.json({ message: t(req, 'otp_resent', { email }), email });
 }));
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  LOGIN
 // ═══════════════════════════════════════════════════════════════════════════
 
-// POST /api/auth/login — username + password.
+// POST /api/auth/login — identify by email (or legacy username); must be verified.
 router.post('/login', wrap((req, res) => {
   const db = getDb();
+  const email = String(req.body.email || '').trim().toLowerCase();
   const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
   const mfaCode = String(req.body.mfa_code || '').trim();
 
-  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  let user;
+  if (email) {
+    user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  } else if (username) {
+    // Legacy fallback for accounts registered during the username-only period.
+    user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  }
 
   if (!user) {
-    // Burn a hash to reduce identifier-enumeration timing differences.
     legacySha256(password, crypto.randomBytes(16).toString('hex'));
-    return res.status(401).json({ error: 'Invalid username or password.' });
+    return res.status(401).json({ error: t(req, 'invalid_login') });
   }
 
   let ok = false;
   if (isLegacyHash(user.password_hash)) {
     ok = legacySha256(password, user.salt) === user.password_hash;
     if (ok) {
-      // Opportunistic migration to scrypt.
       const upgraded = hashPassword(password);
       db.prepare('UPDATE users SET password_hash = ?, salt = ? WHERE user_id = ?')
         .run(upgraded, '', user.user_id);
@@ -114,16 +247,25 @@ router.post('/login', wrap((req, res) => {
     ok = verifyPassword(password, user.password_hash);
   }
 
-  if (!ok) return res.status(401).json({ error: 'Invalid username or password.' });
+  if (!ok) return res.status(401).json({ error: t(req, 'invalid_login') });
+
+  // Require email verification before issuing a session.
+  if (!user.is_verified) {
+    return res.status(403).json({
+      error: t(req, 'unverified'),
+      unverified: true,
+      email: user.email,
+    });
+  }
 
   if (user.mfa_enabled) {
     if (!verifyTotp(user.mfa_secret, mfaCode)) {
-      return res.status(401).json({ error: 'Invalid or missing MFA code.', mfa_required: true });
+      return res.status(401).json({ error: t(req, 'mfa_invalid'), mfa_required: true });
     }
   }
 
   db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)')
-    .run(user.user_id, user.username);
+    .run(user.user_id, user.username || 'Player');
 
   res.json(authResponse(req, res, user));
 }));
@@ -136,9 +278,39 @@ router.post('/logout', wrap((req, res) => {
 
 // GET /api/auth/me — validates the Bearer/cookie token (auto-login / session check).
 router.get('/me', requireAuth, wrap((req, res) => {
-  const user = getDb().prepare('SELECT user_id, username, mfa_enabled FROM users WHERE user_id = ?').get(req.user.user_id);
-  if (!user) return res.status(401).json({ error: 'Account not found.' });
+  const user = getDb().prepare('SELECT user_id, email, username, mfa_enabled FROM users WHERE user_id = ?').get(req.user.user_id);
+  if (!user) return res.status(401).json({ error: t(req, 'account_not_found') });
   res.json({ user: { ...publicUser(user), mfa_enabled: !!user.mfa_enabled } });
+}));
+
+// POST /api/auth/set-username — choose or update the unique username (profile setup).
+router.post('/set-username', requireAuth, wrap((req, res) => {
+  const db = getDb();
+  const username = String(req.body.username || '').trim();
+
+  if (username.length < 3 || username.length > 32) {
+    return res.status(400).json({ error: t(req, 'username_length') });
+  }
+
+  const existing = db.prepare('SELECT user_id FROM users WHERE username = ? AND user_id != ?')
+    .get(username, req.user.user_id);
+  if (existing) return res.status(409).json({ error: t(req, 'username_taken') });
+
+  try {
+    db.transaction(() => {
+      db.prepare('UPDATE users SET username = ? WHERE user_id = ?').run(username, req.user.user_id);
+      db.prepare('INSERT OR IGNORE INTO players (user_id, username) VALUES (?, ?)').run(req.user.user_id, username);
+      db.prepare('UPDATE players SET username = ? WHERE user_id = ?').run(username, req.user.user_id);
+    })();
+  } catch (e) {
+    if (e && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return res.status(409).json({ error: t(req, 'username_taken') });
+    }
+    throw e;
+  }
+
+  const row = db.prepare('SELECT * FROM users WHERE user_id = ?').get(req.user.user_id);
+  res.json({ ok: true, user: publicUser(row) });
 }));
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -149,20 +321,20 @@ router.get('/me', requireAuth, wrap((req, res) => {
 // otpauth URL for an authenticator app (mfa stays disabled until /verify).
 router.post('/mfa/enable', requireAuth, wrap((req, res) => {
   const db = getDb();
-  const user = db.prepare('SELECT user_id, username FROM users WHERE user_id = ?').get(req.user.user_id);
-  if (!user) return res.status(404).json({ error: 'Account not found.' });
+  const user = db.prepare('SELECT user_id, username, email FROM users WHERE user_id = ?').get(req.user.user_id);
+  if (!user) return res.status(404).json({ error: t(req, 'account_not_found') });
   const secret = generateTotpSecret();
   db.prepare('UPDATE users SET mfa_secret = ? WHERE user_id = ?').run(secret, user.user_id);
-  res.json({ secret, otpauth_url: otpauthUrl(secret, user.username) });
+  res.json({ secret, otpauth_url: otpauthUrl(secret, user.username || user.email) });
 }));
 
 // POST /api/auth/mfa/verify — confirm a code and activate MFA.
 router.post('/mfa/verify', requireAuth, wrap((req, res) => {
   const db = getDb();
   const user = db.prepare('SELECT mfa_secret FROM users WHERE user_id = ?').get(req.user.user_id);
-  if (!user || !user.mfa_secret) return res.status(400).json({ error: 'MFA enrollment has not been started.' });
+  if (!user || !user.mfa_secret) return res.status(400).json({ error: t(req, 'mfa_not_started') });
   if (!verifyTotp(user.mfa_secret, req.body.code)) {
-    return res.status(400).json({ error: 'Invalid code.' });
+    return res.status(400).json({ error: t(req, 'mfa_invalid_code') });
   }
   db.prepare('UPDATE users SET mfa_enabled = 1 WHERE user_id = ?').run(req.user.user_id);
   res.json({ ok: true, mfa_enabled: true });
@@ -172,9 +344,9 @@ router.post('/mfa/verify', requireAuth, wrap((req, res) => {
 router.post('/mfa/disable', requireAuth, wrap((req, res) => {
   const db = getDb();
   const user = db.prepare('SELECT mfa_secret FROM users WHERE user_id = ?').get(req.user.user_id);
-  if (!user || !user.mfa_enabled) return res.status(400).json({ error: 'MFA is not enabled.' });
+  if (!user || !user.mfa_enabled) return res.status(400).json({ error: t(req, 'mfa_not_enabled') });
   if (!verifyTotp(user.mfa_secret, req.body.code)) {
-    return res.status(400).json({ error: 'Invalid code.' });
+    return res.status(400).json({ error: t(req, 'mfa_invalid_code') });
   }
   db.prepare('UPDATE users SET mfa_enabled = 0, mfa_secret = NULL WHERE user_id = ?').run(req.user.user_id);
   res.json({ ok: true, mfa_enabled: false });
