@@ -206,16 +206,16 @@
   //  Data: games catalogue + room styles
   // =========================================================
   const GAMES = [
-    { id: 'rooms', cls: 'blue', emoji: '🚪', title: 'game.rooms.title', cat: 'escape', rating: '4.9',
+    { id: 'rooms', cls: 'blue', emoji: '🚪', img: 'images/game_rooms.jpg', title: 'game.rooms.title', cat: 'escape', rating: '4.9',
       difficulty: 'easy', desc: 'game.rooms.desc',
       chips: [['game.rooms.chip1', 'chip'], ['game.rooms.chip2', 'chip--purple']] },
-    { id: 'sudoku', cls: 'purple', emoji: '🔢', title: 'game.sudoku.title', cat: 'puzzle', rating: '4.7',
+    { id: 'sudoku', cls: 'purple', emoji: '🔢', img: 'images/game_sudoku.jpg', title: 'game.sudoku.title', cat: 'puzzle', rating: '4.7',
       difficulty: 'medium', desc: 'game.sudoku.desc',
       chips: [['game.sudoku.chip1', 'chip--purple'], ['game.sudoku.chip2', 'chip--emerald']] },
-    { id: 'word', cls: 'emerald', emoji: '🔤', title: 'game.word.title', cat: 'word', rating: '4.6',
+    { id: 'word', cls: 'emerald', emoji: '🔤', img: 'images/game_word.jpg', title: 'game.word.title', cat: 'word', rating: '4.6',
       difficulty: 'medium', desc: 'game.word.desc',
       chips: [['game.word.chip1', 'chip--emerald'], ['game.word.chip2', 'chip--rose']] },
-    { id: 'daily', cls: 'amber', emoji: '📅', title: 'game.daily.title', cat: 'daily', rating: '4.8',
+    { id: 'daily', cls: 'amber', emoji: '📅', img: 'images/game_daily.jpg', title: 'game.daily.title', cat: 'daily', rating: '4.8',
       difficulty: 'hard', desc: 'game.daily.desc',
       chips: [['game.daily.chip1', 'chip--amber'], ['game.daily.chip2', 'chip']] },
   ];
@@ -224,6 +224,7 @@
   const ROOM_EMOJI  = ['🏦', '🔬', '🔭', '📚', '🔐', '⚗️', '🗺️', '🔑', '🕹️'];
   const ROOM_IMAGES = {
     room_01_vault: 'images/room_01_vault.jpg',
+    room_02_cipher_lab: 'images/room_02_cipher_lab.jpg',
     room_03_observatory: 'images/room_03_observatory.jpg',
     room_04_study: 'images/room_04_study.jpg',
     room_05_crypto: 'images/room_05_crypto.jpg',
@@ -253,7 +254,7 @@
     GAMES.forEach((g, i) => {
       const badge = DIFF_BADGE[g.difficulty] || 'badge--medium';
       const card = el('button', `card card--${g.cls}`, `
-        <div class="card__art">${g.emoji}</div>
+        <div class="card__art">${g.img ? `<img class="card__img" src="${g.img}" alt="${esc(t(g.title))}" loading="lazy">` : g.emoji}</div>
         <div class="card__body">
           <h3 class="card__title">${esc(t(g.title))}</h3>
           <p class="card__desc">${esc(t(g.desc))}</p>

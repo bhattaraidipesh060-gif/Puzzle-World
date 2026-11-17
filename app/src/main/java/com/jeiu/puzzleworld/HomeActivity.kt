@@ -62,7 +62,7 @@ class HomeActivity : AppCompatActivity() {
         RoomCard("room_01_vault", "The First Vault", "🏦", R.drawable.ps_art_cyan,
             "Crack the codes of an abandoned underground vault.", imageRes = R.drawable.room_01_vault),
         RoomCard("room_02_cipher_lab", "The Cipher Laboratory", "🔬", R.drawable.ps_art_purple,
-            "Decode cryptic notes in a mysterious laboratory."),
+            "Decode cryptic notes in a mysterious laboratory.", imageRes = R.drawable.room_02_cipher_lab),
         RoomCard("room_03_observatory", "The Clockwork Observatory", "🔭", R.drawable.ps_art_emerald,
             "Stop the celestial clock before time runs out.", imageRes = R.drawable.room_03_observatory),
         RoomCard("room_04_study", "The Puzzle Master's Study", "📚", R.drawable.ps_art_amber,
@@ -82,16 +82,20 @@ class HomeActivity : AppCompatActivity() {
     private val allGames = listOf(
         GameCardAdapter.GameItem("rooms", "🚪", "Escape Rooms",
             "9 themed rooms · 90 brain-melting levels.", "EASY", R.color.ps_emerald,
-            R.drawable.ps_art_cyan, "escape", "escape rooms vault rooms"),
+            R.drawable.ps_art_cyan, "escape", "escape rooms vault rooms",
+            imageRes = R.drawable.game_rooms),
         GameCardAdapter.GameItem("sudoku", "🔢", "Sudoku",
             "Classic 9×9 logic with notes, undo, hints.", "MEDIUM", R.color.ps_amber,
-            R.drawable.ps_art_purple, "puzzle", "sudoku logic numbers grid"),
+            R.drawable.ps_art_purple, "puzzle", "sudoku logic numbers grid",
+            imageRes = R.drawable.game_sudoku),
         GameCardAdapter.GameItem("word", "🔤", "Word Descrambler",
             "Unscramble words against the clock. Streaks multiply.", "MEDIUM", R.color.ps_amber,
-            R.drawable.ps_art_emerald, "word", "word descrambler letters scramble"),
+            R.drawable.ps_art_emerald, "word", "word descrambler letters scramble",
+            imageRes = R.drawable.game_word),
         GameCardAdapter.GameItem("daily", "📅", "Daily Challenge",
             "One fresh puzzle every day. Compete globally.", "HARD", R.color.ps_rose,
-            R.drawable.ps_art_amber, "daily", "daily challenge today streak")
+            R.drawable.ps_art_amber, "daily", "daily challenge today streak",
+            imageRes = R.drawable.game_daily)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
