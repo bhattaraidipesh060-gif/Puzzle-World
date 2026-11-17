@@ -41,31 +41,91 @@ function generateOtp() {
   return crypto.randomInt(100000, 999999).toString();
 }
 
-// Send a verification code via SMTP. Falls back to console logging when
-// PW_EMAIL_USER / PW_EMAIL_PASS are not set (dev / demo mode — check the log).
-async function sendVerificationEmail(email, otp) {
-  console.log(`[email] Verification code for ${email}: ${otp}`);
+// ── SMTP / email delivery configuration ────────────────────────────────────
+// Provider presets for common hosts. Override any field via PW_SMTP_* env vars
+// so the same code serves Gmail, Naver, Daum, Yahoo, Outlook, etc. without
+// source edits. PW_EMAIL_USER / PW_EMAIL_PASS carry the account credentials
+// (for Gmail, a 16-character App Password — NOT the account password; requires
+// 2-Step Verification enabled on the Google account).
+const SMTP_PRESETS = {
+  gmail:   { host: 'smtp.gmail.com',         port: 465, secure: true  },
+  naver:   { host: 'smtp.naver.com',         port: 465, secure: true  },
+  daum:    { host: 'smtp.daum.net',          port: 465, secure: true  },
+  yahoo:   { host: 'smtp.mail.yahoo.com',    port: 465, secure: true  },
+  outlook: { host: 'smtp-mail.outlook.com',  port: 587, secure: false }, // STARTTLS
+};
+
+function resolveSmtpConfig() {
   const user = process.env.PW_EMAIL_USER;
   const pass = process.env.PW_EMAIL_PASS;
-  if (!user || !pass) {
-    console.log('[email] SMTP not configured — set PW_EMAIL_USER + PW_EMAIL_PASS for real delivery.');
-    return;
+  if (!user || !pass) return null;
+  const provider = String(process.env.PW_SMTP_PROVIDER || 'gmail').toLowerCase();
+  const preset = SMTP_PRESETS[provider] || SMTP_PRESETS.gmail;
+  const host = process.env.PW_SMTP_HOST || preset.host;
+  const port = parseInt(process.env.PW_SMTP_PORT || String(preset.port), 10);
+  const secure = String(process.env.PW_SMTP_SECURE || 'true') !== 'false';
+  return {
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+    from: process.env.PW_EMAIL_FROM || user,
+    provider,
+  };
+}
+
+// Send a verification code via SMTP. Falls back to console logging when SMTP
+// is not configured (dev / demo mode — the code appears in the server log).
+// Returns { sent, reason } so callers can surface delivery failures.
+async function sendVerificationEmail(email, otp) {
+  const cfg = resolveSmtpConfig();
+  if (!cfg) {
+    console.warn(
+      `[email] SMTP not configured — set PW_EMAIL_USER + PW_EMAIL_PASS ` +
+      `(optionally PW_SMTP_PROVIDER/HOST/PORT/SECURE) for real delivery. ` +
+      `Console fallback code for ${email}: ${otp}`
+    );
+    return { sent: false, reason: 'not_configured' };
   }
+
+  console.log(
+    `[email] Sending code to ${email} via ${cfg.provider} ` +
+    `(${cfg.host}:${cfg.port}, secure=${cfg.secure})…`
+  );
+
+  const transporter = nodemailer.createTransport({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    auth: cfg.auth,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 30000,
+  });
+
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user, pass },
-    });
-    await transporter.sendMail({
-      from: user,
+    const info = await transporter.sendMail({
+      from: cfg.from,
       to: email,
       subject: 'PuzzleWorld – 이메일 인증 / Email Verification',
       text: `Your PuzzleWorld verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nPuzzleWorld 인증 코드: ${otp} (10분 후 만료).`,
       html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto"><h2 style="color:#0f172a">🧩 PuzzleWorld</h2><p>Your verification code is / 인증 코드:</p><h1 style="letter-spacing:8px;color:#0ea5e9">${otp}</h1><p style="color:#64748b;font-size:14px">This code expires in 10 minutes. · 코드는 10분 후 만료됩니다.</p></div>`,
     });
-    console.log(`[email] Verification code sent to ${email}.`);
+    console.log(`[email] Delivered to ${email}: ${info.messageId || 'accepted'}`);
+    return { sent: true, reason: 'ok' };
   } catch (err) {
-    console.error('[email] Failed to send:', err.message);
+    // Robust diagnostics — surface the exact failure reason in the server log.
+    console.error('[email] Delivery FAILED:');
+    console.error(`  target: ${cfg.host}:${cfg.port} secure=${cfg.secure} from=${cfg.from} to=${email}`);
+    console.error(`  code=${err.code || 'n/a'} command=${err.command || 'n/a'} response=${err.response || err.responseCode || 'n/a'}`);
+    console.error(`  message=${err.message}`);
+    if (err.code === 'EAUTH') {
+      console.error('  Hint: SMTP authentication rejected. Gmail requires a 16-char App Password (2-Step Verification ON), not the account password. Naver/Daum require SMTP enabled in account settings.');
+    } else if (err.code === 'ESOCKET' || err.code === 'ETIMEDOUT' || err.code === 'ECONNECTION' || err.code === 'ECONNREFUSED') {
+      console.error('  Hint: could not reach the SMTP host — check PW_SMTP_HOST/PORT/SECURE and outbound firewall (ports 465/587).');
+    }
+    if (err.stack) console.error(err.stack);
+    return { sent: false, reason: err.code || 'error' };
   }
 }
 
@@ -145,10 +205,14 @@ router.post('/register', wrap(async (req, res) => {
     throw e;
   }
 
-  // Fire-and-forget: OTP email delivery.
-  sendVerificationEmail(email, otp).catch(() => {});
+  // Await OTP email delivery so we can surface failures to the client.
+  const delivery = await sendVerificationEmail(email, otp);
 
-  res.status(201).json({ message: t(req, 'otp_sent', { email }), email });
+  res.status(201).json({
+    message: t(req, 'otp_sent', { email }),
+    email,
+    delivery: delivery.sent ? 'ok' : (delivery.reason === 'not_configured' ? 'console' : 'failed'),
+  });
 }));
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -205,9 +269,13 @@ router.post('/resend-otp', wrap(async (req, res) => {
   db.prepare('UPDATE users SET verification_otp = ?, otp_expires_at = ? WHERE user_id = ?')
     .run(otp, expires, user.user_id);
 
-  sendVerificationEmail(email, otp).catch(() => {});
+  const delivery = await sendVerificationEmail(email, otp);
 
-  res.json({ message: t(req, 'otp_resent', { email }), email });
+  res.json({
+    message: t(req, 'otp_resent', { email }),
+    email,
+    delivery: delivery.sent ? 'ok' : (delivery.reason === 'not_configured' ? 'console' : 'failed'),
+  });
 }));
 
 // ═══════════════════════════════════════════════════════════════════════════

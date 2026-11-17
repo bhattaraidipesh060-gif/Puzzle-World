@@ -7,6 +7,8 @@
   let mode = 'login';
   let phase = 'auth'; // 'auth' (email+password) → 'otp' (verify) → 'username' (handle)
   let pendingEmail = '';
+  let resendCooldown = 0;
+  let resendInterval = null;
 
   function hideMsg() { $('#formMsg').hidden = true; }
   function showMsg(text, kind) {
@@ -68,6 +70,35 @@
     renderPhase();
     $('#otp').value = '';
     $('#otp').focus();
+    startResendCountdown(RESEND_COOLDOWN);
+  }
+
+  const RESEND_COOLDOWN = 60; // seconds before a new code can be requested
+
+  function stopResendCountdown() {
+    if (resendInterval) { clearInterval(resendInterval); resendInterval = null; }
+  }
+
+  function startResendCountdown(seconds) {
+    stopResendCountdown();
+    const link = $('#resendOtp');
+    if (!link) return;
+    resendCooldown = seconds;
+    const update = () => {
+      if (resendCooldown <= 0) {
+        stopResendCountdown();
+        link.textContent = t('auth.resend');
+        link.classList.remove('is-disabled');
+        link.removeAttribute('aria-disabled');
+        return;
+      }
+      link.textContent = t('auth.resend_in', { s: resendCooldown });
+      link.classList.add('is-disabled');
+      link.setAttribute('aria-disabled', 'true');
+      resendCooldown -= 1;
+    };
+    update();
+    resendInterval = setInterval(update, 1000);
   }
 
   function enterUsernameStep() {
@@ -130,6 +161,7 @@
   // Resend OTP link
   $('#resendOtp').addEventListener('click', async (e) => {
     e.preventDefault();
+    if (resendCooldown > 0) return; // still cooling down
     hideMsg();
     setLoading(true);
     try {
@@ -140,7 +172,11 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t('auth.resend_failed'));
-      showMsg(data.message || t('auth.resend_done'), 'success');
+      startResendCountdown(RESEND_COOLDOWN);
+      showMsg(
+        data.delivery === 'failed' ? t('auth.email_failed') : (data.message || t('auth.resend_done')),
+        data.delivery === 'failed' ? 'error' : 'success'
+      );
     } catch (err) {
       showMsg(err.message, 'error');
     }
@@ -225,7 +261,10 @@
         // Register returns a message (no token) — move to the OTP step.
         enterOtpStep(emailVal);
         setLoading(false);
-        showMsg(data.message || t('auth.new_code_sent'), 'success');
+        showMsg(
+          data.delivery === 'failed' ? t('auth.email_failed') : (data.message || t('auth.new_code_sent')),
+          data.delivery === 'failed' ? 'error' : 'success'
+        );
       } else if (data.unverified) {
         // Login blocked because email isn't verified — let them enter/resend the code.
         enterOtpStep(emailVal);

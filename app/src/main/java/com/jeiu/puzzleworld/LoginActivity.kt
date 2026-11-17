@@ -50,6 +50,12 @@ class LoginActivity : AppCompatActivity() {
 
     private var registerMode = false
 
+    // OTP resend cooldown + live countdown on the dialog's Resend button.
+    private val RESEND_COOLDOWN_MS = 60_000L
+    private var otpResendReadyAt = 0L
+    private var otpCountdownRunnable: Runnable? = null
+    private val otpHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LanguageManager.apply(this, LanguageManager.current(this))
@@ -132,6 +138,7 @@ class LoginActivity : AppCompatActivity() {
                     // Register sends a verification code — no token yet.
                     ApiClient.authApi.register(request)
                     setLoading(false)
+                    armResendCooldown()
                     promptForOtp(email, "We emailed a 6-digit code to $email.")
                 } else {
                     val response = ApiClient.authApi.login(request)
@@ -142,6 +149,7 @@ class LoginActivity : AppCompatActivity() {
                 if (!registerMode && e.code() == 403) {
                     val unverified = parseUnverifiedEmail(e)
                     if (unverified != null) {
+                        armResendCooldown()
                         promptForOtp(unverified, "Your email isn't verified yet. Enter the code we sent to $unverified.")
                     } else {
                         showError(getString(R.string.login_incorrect))
@@ -255,7 +263,7 @@ class LoginActivity : AppCompatActivity() {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
             setSingleLine()
         }
-        MaterialAlertDialogBuilder(this)
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.login_otp_title))
             .setMessage(message)
             .setView(input)
@@ -271,6 +279,34 @@ class LoginActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.login_otp_resend)) { _, _ -> resendOtp(email, message) }
             .show()
+        startResendCountdown(dialog)
+    }
+
+    /** Arm the cooldown whenever a code is actually sent (register/resend/login). */
+    private fun armResendCooldown() {
+        otpResendReadyAt = System.currentTimeMillis() + RESEND_COOLDOWN_MS
+    }
+
+    /** Live countdown on the dialog's Resend button until the cooldown elapses. */
+    private fun startResendCountdown(dialog: androidx.appcompat.app.AlertDialog) {
+        otpCountdownRunnable?.let { otpHandler.removeCallbacks(it) }
+        val btn = dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
+        val runnable = object : Runnable {
+            override fun run() {
+                val remaining = otpResendReadyAt - System.currentTimeMillis()
+                if (remaining <= 0) {
+                    btn.isEnabled = true
+                    btn.text = getString(R.string.login_otp_resend)
+                    return
+                }
+                val secs = ((remaining + 999) / 1000).toInt()
+                btn.isEnabled = false
+                btn.text = getString(R.string.login_otp_resend_in, secs)
+                otpHandler.postDelayed(this, 500)
+            }
+        }
+        otpCountdownRunnable = runnable
+        otpHandler.post(runnable)
     }
 
     private fun verifyOtp(email: String, otp: String) {
@@ -298,15 +334,23 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun resendOtp(email: String, message: String) {
+        if (System.currentTimeMillis() < otpResendReadyAt) return // still cooling down
         lifecycleScope.launch {
             try {
                 ApiClient.authApi.resendOtp(ResendOtpRequest(email))
+                armResendCooldown()
                 Toast.makeText(this@LoginActivity, "New code sent to $email", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Toast.makeText(this@LoginActivity, "Couldn't resend — check your connection", Toast.LENGTH_SHORT).show()
             }
             promptForOtp(email, message)
         }
+    }
+
+    override fun onDestroy() {
+        otpCountdownRunnable?.let { otpHandler.removeCallbacks(it) }
+        otpCountdownRunnable = null
+        super.onDestroy()
     }
 
     /** Reads the `unverified` email from a 403 login response body, if present. */

@@ -158,6 +158,10 @@ body {
 .switch { text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
 .switch a { color: var(--cyan); font-weight: 700; text-decoration: none; }
 .switch a:hover { text-decoration: underline; }
+
+#resendOtp { color: var(--cyan); font-weight: 700; text-decoration: none; }
+#resendOtp:hover { text-decoration: underline; }
+#resendOtp.is-disabled { opacity: .45; pointer-events: none; cursor: default; text-decoration: none; }
 .guest { text-align: center; margin-top: 10px; }
 .guest a { color: var(--dim); font-size: 12.5px; text-decoration: none; font-weight: 600; transition: color .15s; }
 .guest a:hover { color: var(--muted); }

@@ -41,6 +41,7 @@
     <string name="login_otp_hint">6-digit code</string>
     <string name="login_otp_verify">Verify</string>
     <string name="login_otp_resend">Resend code</string>
+    <string name="login_otp_resend_in">Resend in %1$ds</string>
     <string name="login_otp_invalid">Invalid or expired code</string>
     <string name="login_username_title">Choose your username</string>
     <string name="login_username_hint">Username (3–32 characters)</string>

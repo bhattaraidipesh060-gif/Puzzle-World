@@ -41,6 +41,7 @@
     <string name="login_otp_hint">6자리 코드</string>
     <string name="login_otp_verify">인증</string>
     <string name="login_otp_resend">코드 다시 받기</string>
+    <string name="login_otp_resend_in">%1$d초 후 다시 받기</string>
     <string name="login_otp_invalid">코드가 올바르지 않거나 만료되었습니다</string>
     <string name="login_username_title">사용자 이름 선택</string>
     <string name="login_username_hint">사용자 이름 (3–32자)</string>
