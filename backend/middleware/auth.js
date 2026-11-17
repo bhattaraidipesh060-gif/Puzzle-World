@@ -20,7 +20,7 @@ function requireAuth(req, res, next) {
   if (!payload) {
     return res.status(401).json({ error: 'Authentication required.' });
   }
-  req.user = { user_id: payload.sub, username: payload.username || null, email: payload.email || null };
+  req.user = { user_id: payload.sub, username: payload.username || null, email: payload.email || null, language: payload.language || null };
   next();
 }
 

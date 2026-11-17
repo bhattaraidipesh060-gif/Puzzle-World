@@ -109,6 +109,7 @@ function initSchema() {
   ensureColumn('players', 'current_room',   'TEXT');
   ensureColumn('users',   'mfa_secret',     'TEXT');
   ensureColumn('users',   'mfa_enabled',    'INTEGER DEFAULT 0');
+  ensureColumn('users',   'language',       "TEXT DEFAULT 'en'");
 
   // Migration: add email-verification columns.  Existing users (registered before
   // verification was introduced) are grandfathered as verified.

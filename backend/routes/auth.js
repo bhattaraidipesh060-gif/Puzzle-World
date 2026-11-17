@@ -11,7 +11,7 @@ const {
   legacySha256, isLegacyHash, generateTotpSecret, verifyTotp, otpauthUrl,
 } = require('../lib/security');
 const { requireAuth } = require('../middleware/auth');
-const { t } = require('../lib/i18n');
+const { t, SUPPORTED } = require('../i18n');
 
 // Strict-enough RFC-ish email format check (any provider: Gmail, Naver, Yahoo,
 // Daum, Outlook, iCloud, …).
@@ -90,6 +90,7 @@ function publicUser(row) {
     email: row.email || null,
     username: row.username || null,
     has_username: !!row.username,
+    language: row.language || 'en',
   };
 }
 
@@ -278,9 +279,20 @@ router.post('/logout', wrap((req, res) => {
 
 // GET /api/auth/me — validates the Bearer/cookie token (auto-login / session check).
 router.get('/me', requireAuth, wrap((req, res) => {
-  const user = getDb().prepare('SELECT user_id, email, username, mfa_enabled FROM users WHERE user_id = ?').get(req.user.user_id);
+  const user = getDb().prepare('SELECT user_id, email, username, language, mfa_enabled FROM users WHERE user_id = ?').get(req.user.user_id);
   if (!user) return res.status(401).json({ error: t(req, 'account_not_found') });
   res.json({ user: { ...publicUser(user), mfa_enabled: !!user.mfa_enabled } });
+}));
+
+// POST /api/auth/language — store the user's preferred language ('en' or 'ko').
+router.post('/language', requireAuth, wrap((req, res) => {
+  const db = getDb();
+  const language = String(req.body.language || '').toLowerCase();
+  if (!SUPPORTED.includes(language)) {
+    return res.status(400).json({ error: t(req, 'invalid_language') });
+  }
+  db.prepare('UPDATE users SET language = ? WHERE user_id = ?').run(language, req.user.user_id);
+  res.json({ ok: true, language });
 }));
 
 // POST /api/auth/set-username — choose or update the unique username (profile setup).
