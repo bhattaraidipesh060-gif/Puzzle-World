@@ -16,6 +16,7 @@ import android.view.Window
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -123,6 +124,9 @@ class HomeActivity : AppCompatActivity() {
         syncSound()
         soundBtn.setOnClickListener { toggleSound(); syncSound() }
         findViewById<TextView>(R.id.settings_sound).setOnClickListener { toggleSound(); syncSound() }
+        val langBtn = findViewById<TextView>(R.id.settings_language)
+        langBtn.text = LanguageManager.label(this)
+        langBtn.setOnClickListener { SoundFx.click(); showLanguageDialog() }
 
         // ---- Avatar menu ----
         avatar.setOnClickListener {
@@ -581,6 +585,33 @@ class HomeActivity : AppCompatActivity() {
         startActivity(Intent(this, LoginActivity::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
+    }
+
+    private fun showLanguageDialog() {
+        val options = arrayOf("English", "한국어")
+        val langs = arrayOf("en", "ko")
+        val current = LanguageManager.current(this)
+        AlertDialog.Builder(this)
+            .setTitle("🌐 Language")
+            .setSingleChoiceItems(options, if (current == "ko") 1 else 0) { dialog, which ->
+                dialog.dismiss()
+                if (langs[which] != current) applyLanguage(langs[which])
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun applyLanguage(lang: String) {
+        LanguageManager.apply(this, lang)
+        if (SessionManager.isLoggedIn()) {
+            lifecycleScope.launch {
+                try { ApiClient.authApi.setLanguage(SetLanguageRequest(lang)) } catch (_: Exception) {}
+            }
+        }
+        findViewById<TextView>(R.id.settings_language).text = LanguageManager.label(this)
+        SoundFx.success()
+        Toast.makeText(this, if (lang == "ko") "한국어로 설정되었습니다" else "Language set to English", Toast.LENGTH_SHORT).show()
+        recreate()
     }
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density + 0.5f).toInt()

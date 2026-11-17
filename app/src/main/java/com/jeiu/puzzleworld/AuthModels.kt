@@ -45,3 +45,10 @@ data class SetUsernameRequest(val username: String)
 
 @Serializable
 data class SetUsernameResponse(val ok: Boolean = false, val user: UserProfile)
+
+/** POST /api/auth/language request + response. */
+@Serializable
+data class SetLanguageRequest(val language: String)
+
+@Serializable
+data class SetLanguageResponse(val ok: Boolean = false, val language: String? = null)

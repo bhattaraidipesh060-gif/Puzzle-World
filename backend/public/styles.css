@@ -533,6 +533,12 @@ img { max-width: 100%; display: block; }
 .switch.on { background: var(--grad-cyan); }
 .switch.on::after { transform: translateX(21px); }
 
+/* language segmented control */
+.lang-switch { display: inline-flex; gap: 4px; padding: 3px; border-radius: 10px; background: rgba(255, 255, 255, .06); border: 1px solid var(--stroke-strong); }
+.lang-btn { border: 0; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 7px; cursor: pointer; transition: all .18s; }
+.lang-btn:hover { color: var(--text); }
+.lang-btn.is-active { background: var(--grad-cyan); color: #04121a; }
+
 /* ===================== MODAL / TOAST / BANNER / LOADER ===================== */
 .modal { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; padding: 20px; }
 .modal.is-open { display: grid; }

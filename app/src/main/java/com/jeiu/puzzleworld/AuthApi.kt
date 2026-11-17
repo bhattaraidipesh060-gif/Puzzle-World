@@ -28,4 +28,7 @@ interface AuthApi {
 
     @POST("api/auth/set-username")
     suspend fun setUsername(@Body body: SetUsernameRequest): SetUsernameResponse
+
+    @POST("api/auth/language")
+    suspend fun setLanguage(@Body body: SetLanguageRequest): SetLanguageResponse
 }

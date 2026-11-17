@@ -52,6 +52,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LanguageManager.apply(this, LanguageManager.current(this))
         setContentView(R.layout.activity_login)
         SoundFx.init(this)
         SessionManager.init(this)

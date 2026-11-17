@@ -5,6 +5,7 @@
   'use strict';
 
   const API = '/api';
+  const currentLang = () => localStorage.getItem('pw_lang') || 'en';
 
   // ---------- DOM helpers ----------
   const $  = (s, r = document) => r.querySelector(s);
@@ -180,7 +181,8 @@
   //  Networking + identity
   // =========================================================
   async function api(path, opts) {
-    const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+    const sep = path.includes('?') ? '&' : '?';
+    const res = await fetch(API + path + sep + 'lang=' + currentLang(), { headers: { 'Content-Type': 'application/json' }, ...opts });
     if (!res.ok) {
       let msg = `HTTP ${res.status}`;
       try { const j = await res.json(); if (j.error) msg = j.error; } catch (_) {}
@@ -943,6 +945,13 @@
         <button class="switch ${Audio.isMuted() ? '' : 'on'}" id="setSound" aria-label="Toggle sound"></button>
       </div>
       <div class="settings__row">
+        <div><div class="lbl">🌐 Language</div><div class="sub">English · 한국어</div></div>
+        <div class="lang-switch">
+          <button class="lang-btn ${currentLang() === 'en' ? 'is-active' : ''}" id="setLangEn">English</button>
+          <button class="lang-btn ${currentLang() === 'ko' ? 'is-active' : ''}" id="setLangKo">한국어</button>
+        </div>
+      </div>
+      <div class="settings__row">
         <div><div class="lbl">👤 Account</div><div class="sub">${esc(uname)}</div></div>
         <button class="text-btn" id="setAccountAct">${isSignedIn ? 'Profile' : 'Sign in'}</button>
       </div>
@@ -968,6 +977,8 @@
         if (!next) Audio.sfx.toggle();
         renderSettings();
         toast(next ? '🔇 Sound muted' : '🔊 Sound on', 'info', 1400);
+      } else if (t.id === 'setLangEn' || t.id === 'setLangKo') {
+        setLanguage(t.id === 'setLangEn' ? 'en' : 'ko');
       } else if (t.id === 'setReset') {
         Audio.sfx.click();
         withButtonSpinner(t, resetProgress);
@@ -985,6 +996,16 @@
   // =========================================================
   //  Boot
   // =========================================================
+  async function setLanguage(lang) {
+    Audio.sfx.click();
+    localStorage.setItem('pw_lang', lang);
+    if (isSignedIn) {
+      try { await api('/auth/language', { method: 'POST', body: JSON.stringify({ language: lang }) }); } catch (_) { /* guest or offline — still kept locally */ }
+    }
+    renderSettings();
+    toast(lang === 'ko' ? '🌐 한국어로 설정되었습니다' : '🌐 Language set to English', 'success', 1800);
+  }
+
   function boot() {
     bindDropdown();
     renderGames();
