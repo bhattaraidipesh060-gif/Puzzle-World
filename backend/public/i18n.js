@@ -568,6 +568,7 @@
   }
 
   window.I18N = { CATALOGS, SUPPORTED, getLang, setLang, t, roomName, puzzleType, apply };
+  window.t = t;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => { apply(); });
