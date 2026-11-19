@@ -48,7 +48,7 @@ object SessionManager {
         prefs.edit()
             .putString(KEY_TOKEN, token)
             .putString(KEY_USER_ID, user.user_id)
-            .putString(KEY_EMAIL, user.email)
+            .putString(KEY_EMAIL, user.email ?: "")
             .putString(KEY_USERNAME, user.username ?: "")
             .putLong(KEY_EXP, decodeExp(token))
             .apply()

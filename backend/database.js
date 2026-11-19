@@ -45,38 +45,62 @@ function initSchema() {
     );
   `);
 
+  // Users: username is the unique login identifier. No email requirement, no
+  // verification state — accounts are active immediately on registration.
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       user_id TEXT PRIMARY KEY,
-      email TEXT NOT NULL UNIQUE,
-      username TEXT UNIQUE,
+      username TEXT NOT NULL UNIQUE,
+      email TEXT,
       password_hash TEXT NOT NULL,
       salt TEXT NOT NULL,
       mfa_secret TEXT,
       mfa_enabled INTEGER DEFAULT 0,
+      language TEXT DEFAULT 'en',
       created_at TEXT DEFAULT (datetime('now'))
     );
   `);
 
-  // Migration: pre-existing DBs have `username TEXT NOT NULL UNIQUE` and no `email`.
-  // Rebuild the table to add `email` (UNIQUE NOT NULL) and make `username` nullable,
-  // backfilling email from the legacy username so existing accounts keep working.
-  const usersCols = db.prepare('PRAGMA table_info(users)').all();
-  if (!usersCols.some(c => c.name === 'email')) {
+  // Backfill optional columns before any rebuild so the old table always has them.
+  ensureColumn('users', 'mfa_secret',  'TEXT');
+  ensureColumn('users', 'mfa_enabled', 'INTEGER DEFAULT 0');
+  ensureColumn('users', 'language',    "TEXT DEFAULT 'en'");
+
+  // Migration: rebuild the users table if it still reflects the old email/OTP
+  // schema (email NOT NULL UNIQUE, nullable username, or verification columns).
+  // Username becomes the identifier; existing rows backfill username from the
+  // legacy username, then the email local-part, then a user_id-derived fallback.
+  const uCols = db.prepare('PRAGMA table_info(users)').all();
+  const emailCol = uCols.find(c => c.name === 'email');
+  const usernameCol = uCols.find(c => c.name === 'username');
+  const legacyVerification = uCols.some(c => ['is_verified', 'verification_otp', 'otp_expires_at'].includes(c.name));
+  const needsRebuild = legacyVerification
+    || (emailCol && emailCol.notnull)
+    || (usernameCol && !usernameCol.notnull);
+  if (needsRebuild) {
     db.exec(`
       ALTER TABLE users RENAME TO users_old;
       CREATE TABLE users (
         user_id TEXT PRIMARY KEY,
-        email TEXT NOT NULL UNIQUE,
-        username TEXT UNIQUE,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT,
         password_hash TEXT NOT NULL,
         salt TEXT NOT NULL,
         mfa_secret TEXT,
         mfa_enabled INTEGER DEFAULT 0,
+        language TEXT DEFAULT 'en',
         created_at TEXT DEFAULT (datetime('now'))
       );
-      INSERT INTO users (user_id, email, username, password_hash, salt, mfa_secret, mfa_enabled, created_at)
-        SELECT user_id, lower(username) || '@puzzleworld.local', username, password_hash, salt, mfa_secret, mfa_enabled, created_at
+      INSERT INTO users (user_id, username, email, password_hash, salt, mfa_secret, mfa_enabled, language, created_at)
+        SELECT
+          user_id,
+          COALESCE(
+            NULLIF(TRIM(username), ''),
+            NULLIF(TRIM(LOWER(SUBSTR(email, 1, INSTR(email, '@') - 1))), ''),
+            'user_' || SUBSTR(user_id, 1, 8)
+          ),
+          email,
+          password_hash, salt, mfa_secret, mfa_enabled, language, created_at
         FROM users_old;
       DROP TABLE users_old;
     `);
@@ -107,43 +131,6 @@ function initSchema() {
   ensureColumn('players', 'hints_used',     'INTEGER DEFAULT 0');
   ensureColumn('players', 'total_attempts', 'INTEGER DEFAULT 0');
   ensureColumn('players', 'current_room',   'TEXT');
-  ensureColumn('users',   'mfa_secret',     'TEXT');
-  ensureColumn('users',   'mfa_enabled',    'INTEGER DEFAULT 0');
-  ensureColumn('users',   'language',       "TEXT DEFAULT 'en'");
-
-  // Migration: add email-verification columns.  Existing users (registered before
-  // verification was introduced) are grandfathered as verified.
-  const uCols = db.prepare('PRAGMA table_info(users)').all();
-  if (!uCols.some(c => c.name === 'is_verified')) {
-    ensureColumn('users', 'is_verified',     'INTEGER DEFAULT 0');
-    db.exec('UPDATE users SET is_verified = 1');
-  }
-  ensureColumn('users',   'verification_otp',  'TEXT');
-  ensureColumn('users',   'otp_expires_at',    'TEXT');
-
-  // Migration: ensure email is NOT NULL UNIQUE (universal email authentication).
-  const emailInfo = uCols.find(c => c.name === 'email');
-  if (emailInfo && !emailInfo.notnull) {
-    db.exec("UPDATE users SET email = lower(username) || '@puzzleworld.local' WHERE email IS NULL OR email = ''");
-    db.exec(`
-      ALTER TABLE users RENAME TO users_old;
-      CREATE TABLE users (
-        user_id TEXT PRIMARY KEY,
-        email TEXT NOT NULL UNIQUE,
-        username TEXT UNIQUE,
-        password_hash TEXT NOT NULL,
-        salt TEXT NOT NULL,
-        mfa_secret TEXT,
-        mfa_enabled INTEGER DEFAULT 0,
-        created_at TEXT DEFAULT (datetime('now')),
-        is_verified INTEGER DEFAULT 0,
-        verification_otp TEXT,
-        otp_expires_at TEXT
-      );
-      INSERT INTO users SELECT user_id, email, username, password_hash, salt, mfa_secret, mfa_enabled, created_at, is_verified, verification_otp, otp_expires_at FROM users_old;
-      DROP TABLE users_old;
-    `);
-  }
 
   // Performance indexes: per-room level lookups (routes/rooms.js) and leaderboard/progress
   // retrieval (routes/progress.js, routes/stats.js) filter on these columns on every query.

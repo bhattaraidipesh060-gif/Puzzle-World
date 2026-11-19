@@ -22,13 +22,10 @@ import java.io.IOException
 
 /**
  * Login / registration screen. Authenticates against the Express/SQLite backend
- * (POST /api/auth/register, POST /api/auth/login) and persists the returned JWT
- * in an encrypted session store. Falls back to local SQLite credentials when the
- * backend is unreachable (offline-first). Auto-logins on launch when a valid
- * session exists.
- *
- * Two-step setup: accounts are identified by email; a brand-new user is prompted
- * to pick a unique username (POST /api/auth/set-username) before entering the app.
+ * (POST /api/auth/register, POST /api/auth/login) with a username + password and
+ * persists the returned JWT in an encrypted session store. Falls back to local
+ * SQLite credentials when the backend is unreachable (offline-first).
+ * Auto-logins on launch when a valid session exists.
  */
 class LoginActivity : AppCompatActivity() {
 
@@ -37,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
         private const val KEY_USERNAME = "username"
     }
 
-    private lateinit var emailInput: TextInputEditText
+    private lateinit var usernameInput: TextInputEditText
     private lateinit var passwordInput: TextInputEditText
     private lateinit var confirmInput: TextInputEditText
     private lateinit var confirmLayout: TextInputLayout
@@ -49,12 +46,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loading: ProgressBar
 
     private var registerMode = false
-
-    // OTP resend cooldown + live countdown on the dialog's Resend button.
-    private val RESEND_COOLDOWN_MS = 60_000L
-    private var otpResendReadyAt = 0L
-    private var otpCountdownRunnable: Runnable? = null
-    private val otpHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        emailInput = findViewById(R.id.login_username)
+        usernameInput = findViewById(R.id.login_username)
         passwordInput = findViewById(R.id.login_password)
         confirmInput = findViewById(R.id.login_confirm)
         confirmLayout = findViewById(R.id.login_confirm_layout)
@@ -142,55 +133,36 @@ class LoginActivity : AppCompatActivity() {
 
     private fun attemptSubmit() {
         if (!termsAccepted()) return
-        val email = emailInput.text?.toString()?.trim().orEmpty()
+        val username = usernameInput.text?.toString()?.trim().orEmpty()
         val pass = passwordInput.text?.toString().orEmpty()
-        if (!validate(email, pass, registerMode)) return
+        if (!validate(username, pass, registerMode)) return
 
         setLoading(true)
-        statusView.text = if (registerMode) "Creating account…" else "Signing in…"
+        statusView.text = if (registerMode) getString(R.string.login_creating) else getString(R.string.login_signing)
         statusView.setTextColor(Color.parseColor("#94A3B8"))
 
-        val request = AuthRequest(email = email, password = pass)
+        val request = AuthRequest(username = username, password = pass)
 
         lifecycleScope.launch {
             try {
-                if (registerMode) {
-                    // Register sends a verification code — no token yet.
-                    ApiClient.authApi.register(request)
-                    setLoading(false)
-                    armResendCooldown()
-                    promptForOtp(email, "We emailed a 6-digit code to $email.")
-                } else {
-                    val response = ApiClient.authApi.login(request)
-                    onAuthSuccess(response)
-                }
+                val response = if (registerMode) ApiClient.authApi.register(request) else ApiClient.authApi.login(request)
+                onAuthSuccess(response)
             } catch (e: HttpException) {
                 setLoading(false)
-                if (!registerMode && e.code() == 403) {
-                    val unverified = parseUnverifiedEmail(e)
-                    if (unverified != null) {
-                        armResendCooldown()
-                        promptForOtp(unverified, "Your email isn't verified yet. Enter the code we sent to $unverified.")
-                    } else {
-                        showError(getString(R.string.login_incorrect))
+                showError(
+                    when (e.code()) {
+                        409 -> getString(R.string.login_username_taken)
+                        401 -> getString(R.string.login_incorrect)
+                        400 -> getString(R.string.login_check_credentials)
+                        else -> getString(R.string.login_unknown_error, e.code())
                     }
-                } else {
-                    showError(
-                        when (e.code()) {
-                            409 -> getString(R.string.login_email_taken)
-                            401 -> getString(R.string.login_incorrect)
-                            400 -> getString(R.string.login_check_email)
-                            403 -> getString(R.string.login_unverified)
-                            else -> getString(R.string.login_unknown_error, e.code())
-                        }
-                    )
-                }
+                )
             } catch (e: IOException) {
                 setLoading(false)
-                offlineAuth(email, pass)
+                offlineAuth(username, pass)
             } catch (e: Exception) {
                 setLoading(false)
-                offlineAuth(email, pass)
+                offlineAuth(username, pass)
             }
         }
     }
@@ -198,201 +170,23 @@ class LoginActivity : AppCompatActivity() {
     private fun onAuthSuccess(response: AuthResponse) {
         SessionManager.save(response.token, response.user)
         setLoading(false)
-        SoundFx.success()
-        val name = response.user.username
-        if (name.isNullOrBlank()) {
-            // Two-step setup: account identified by email; username not chosen yet.
-            promptForUsername(response)
-        } else {
-            persistUsername(name)
-            Toast.makeText(this, "Welcome back, $name! 🎉", Toast.LENGTH_SHORT).show()
-            goHome()
-        }
-    }
-
-    /** Step 2: ask for a unique username after an email-based sign-up/sign-in. */
-    private fun promptForUsername(response: AuthResponse) {
-        val input = TextInputEditText(this).apply {
-            hint = "Username (3–32 characters)"
-            setTextColor(Color.parseColor("#E2E8F0"))
-            setHintTextColor(Color.parseColor("#64748B"))
-            setSingleLine()
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.login_username_title))
-            .setMessage(getString(R.string.login_username_message))
-            .setView(input)
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.login_username_save)) { _, _ ->
-                val name = input.text?.toString()?.trim().orEmpty()
-                if (name.length !in 3..32) {
-                    Toast.makeText(this, getString(R.string.login_username_hint), Toast.LENGTH_SHORT).show()
-                    promptForUsername(response)
-                } else {
-                    saveUsername(name, response)
-                }
-            }
-            .setNegativeButton(getString(R.string.login_username_skip)) { _, _ ->
-                persistUsername(response.user.email.substringBefore('@').ifBlank { "Player" })
-                Toast.makeText(this, "Welcome! 🎉", Toast.LENGTH_SHORT).show()
-                goHome()
-            }
-            .show()
-    }
-
-    /** Persist the chosen username (two-step completion). */
-    private fun saveUsername(name: String, response: AuthResponse) {
-        setLoading(true)
-        statusView.text = getString(R.string.login_saving_username)
-        statusView.setTextColor(Color.parseColor("#94A3B8"))
-        lifecycleScope.launch {
-            try {
-                val res = ApiClient.authApi.setUsername(SetUsernameRequest(name))
-                SessionManager.save(response.token, res.user)
-                persistUsername(res.user.username ?: name)
-                setLoading(false)
-                SoundFx.success()
-                Toast.makeText(this@LoginActivity, "Welcome, ${res.user.username ?: name}! 🎉", Toast.LENGTH_SHORT).show()
-                goHome()
-            } catch (e: HttpException) {
-                setLoading(false)
-                Toast.makeText(
-                    this@LoginActivity,
-                    when (e.code()) {
-                        409 -> "That username is already taken"
-                        400 -> "Username must be 3–32 characters"
-                        else -> "Couldn't save username (${e.code()})"
-                    },
-                    Toast.LENGTH_SHORT
-                ).show()
-                promptForUsername(response)
-            } catch (e: Exception) {
-                setLoading(false)
-                Toast.makeText(this@LoginActivity, "Couldn't save username — check your connection", Toast.LENGTH_SHORT).show()
-                promptForUsername(response)
-            }
-        }
-    }
-
-    /** Step 1b: ask for the 6-digit OTP after registration / unverified login. */
-    private fun promptForOtp(email: String, message: String) {
-        val input = TextInputEditText(this).apply {
-            hint = "6-digit code"
-            setTextColor(Color.parseColor("#E2E8F0"))
-            setHintTextColor(Color.parseColor("#64748B"))
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            setSingleLine()
-        }
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.login_otp_title))
-            .setMessage(message)
-            .setView(input)
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.login_otp_verify)) { _, _ ->
-                val otp = input.text?.toString()?.trim().orEmpty()
-                if (otp.length != 6) {
-                    Toast.makeText(this, getString(R.string.login_otp_hint), Toast.LENGTH_SHORT).show()
-                    promptForOtp(email, message)
-                } else {
-                    verifyOtp(email, otp)
-                }
-            }
-            .setNegativeButton(getString(R.string.login_otp_resend)) { _, _ -> resendOtp(email, message) }
-            .show()
-        startResendCountdown(dialog)
-    }
-
-    /** Arm the cooldown whenever a code is actually sent (register/resend/login). */
-    private fun armResendCooldown() {
-        otpResendReadyAt = System.currentTimeMillis() + RESEND_COOLDOWN_MS
-    }
-
-    /** Live countdown on the dialog's Resend button until the cooldown elapses. */
-    private fun startResendCountdown(dialog: androidx.appcompat.app.AlertDialog) {
-        otpCountdownRunnable?.let { otpHandler.removeCallbacks(it) }
-        val btn = dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-        val runnable = object : Runnable {
-            override fun run() {
-                val remaining = otpResendReadyAt - System.currentTimeMillis()
-                if (remaining <= 0) {
-                    btn.isEnabled = true
-                    btn.text = getString(R.string.login_otp_resend)
-                    return
-                }
-                val secs = ((remaining + 999) / 1000).toInt()
-                btn.isEnabled = false
-                btn.text = getString(R.string.login_otp_resend_in, secs)
-                otpHandler.postDelayed(this, 500)
-            }
-        }
-        otpCountdownRunnable = runnable
-        otpHandler.post(runnable)
-    }
-
-    private fun verifyOtp(email: String, otp: String) {
-        setLoading(true)
-        statusView.text = getString(R.string.login_verifying)
-        statusView.setTextColor(Color.parseColor("#94A3B8"))
-        lifecycleScope.launch {
-            try {
-                val response = ApiClient.authApi.verifyOtp(VerifyOtpRequest(email, otp))
-                onAuthSuccess(response)
-            } catch (e: HttpException) {
-                setLoading(false)
-                Toast.makeText(
-                    this@LoginActivity,
-                    if (e.code() == 400) "Invalid or expired code" else "Verification failed (${e.code()})",
-                    Toast.LENGTH_SHORT
-                ).show()
-                promptForOtp(email, "Enter the 6-digit code sent to $email.")
-            } catch (e: Exception) {
-                setLoading(false)
-                Toast.makeText(this@LoginActivity, "Check your connection and try again", Toast.LENGTH_SHORT).show()
-                promptForOtp(email, "Enter the 6-digit code sent to $email.")
-            }
-        }
-    }
-
-    private fun resendOtp(email: String, message: String) {
-        if (System.currentTimeMillis() < otpResendReadyAt) return // still cooling down
-        lifecycleScope.launch {
-            try {
-                ApiClient.authApi.resendOtp(ResendOtpRequest(email))
-                armResendCooldown()
-                Toast.makeText(this@LoginActivity, "New code sent to $email", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Toast.makeText(this@LoginActivity, "Couldn't resend — check your connection", Toast.LENGTH_SHORT).show()
-            }
-            promptForOtp(email, message)
-        }
-    }
-
-    override fun onDestroy() {
-        otpCountdownRunnable?.let { otpHandler.removeCallbacks(it) }
-        otpCountdownRunnable = null
-        super.onDestroy()
-    }
-
-    /** Reads the `unverified` email from a 403 login response body, if present. */
-    private fun parseUnverifiedEmail(e: HttpException): String? = try {
-        val body = e.response()?.errorBody()?.string().orEmpty()
-        val obj = org.json.JSONObject(body)
-        if (obj.optBoolean("unverified", false)) obj.optString("email", "").ifBlank { null } else null
-    } catch (ex: Exception) {
-        null
+        val name = response.user.username ?: "Player"
+        persistUsername(name)
+        Toast.makeText(this, getString(R.string.login_welcome, name), Toast.LENGTH_SHORT).show()
+        goHome()
     }
 
     /** Offline-first fallback: authenticate against the local SQLite store. */
-    private fun offlineAuth(user: String, pass: String) {
+    private fun offlineAuth(username: String, pass: String) {
         val db = AuthDatabase(this)
         val ok = try {
-            if (db.exists(user)) {
-                if (!db.verify(user, pass)) {
+            if (db.exists(username)) {
+                if (!db.verify(username, pass)) {
                     showError(getString(R.string.login_offline_password))
                     false
                 } else true
             } else if (registerMode) {
-                db.register(user, pass)
+                db.register(username, pass)
             } else {
                 showError(getString(R.string.login_no_account))
                 false
@@ -401,8 +195,8 @@ class LoginActivity : AppCompatActivity() {
             db.close()
         }
         if (ok) {
-            persistUsername(user)
-            Toast.makeText(this, "Offline mode — welcome, $user! 🎉", Toast.LENGTH_SHORT).show()
+            persistUsername(username)
+            Toast.makeText(this, "Offline mode — welcome, $username! 🎉", Toast.LENGTH_SHORT).show()
             goHome()
         }
     }
@@ -437,18 +231,20 @@ class LoginActivity : AppCompatActivity() {
         } else {
             btnLogin.text = if (registerMode) getString(R.string.login_create_account) else getString(R.string.login_sign_in)
         }
-        emailInput.isEnabled = !loading
+        usernameInput.isEnabled = !loading
         passwordInput.isEnabled = !loading
         confirmInput.isEnabled = !loading
     }
 
-    private fun validate(ident: String, pass: String, register: Boolean): Boolean {
-        if (ident.isEmpty()) {
-            showError(getString(R.string.login_enter_email))
+    private fun validate(username: String, pass: String, register: Boolean): Boolean {
+        if (username.isEmpty()) {
+            showError(getString(R.string.login_enter_username))
             return false
         }
-        val isEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(ident).matches()
-        if (!isEmail) { showError(getString(R.string.login_invalid_email)); return false }
+        if (!username.matches(Regex("^[A-Za-z0-9_.-]{3,32}$"))) {
+            showError(getString(R.string.login_invalid_username))
+            return false
+        }
         if (pass.isEmpty()) { showError(getString(R.string.login_enter_password)); return false }
         if (register) {
             if (pass.length < 8) { showError(getString(R.string.login_password_len)); return false }

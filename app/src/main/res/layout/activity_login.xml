@@ -59,7 +59,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_email_hint"
+                android:hint="@string/login_username_hint"
                 app:boxBackgroundColor="@color/ps_surface"
                 app:boxStrokeColor="@color/ps_input_stroke"
                 app:boxStrokeWidth="1dp"
@@ -78,7 +78,7 @@
                     android:textColorHint="@color/ps_dim"
                     android:textSize="15sp"
                     android:fontFamily="@font/inter"
-                    android:inputType="textEmailAddress"
+                    android:inputType="text"
                     android:imeOptions="actionNext"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>

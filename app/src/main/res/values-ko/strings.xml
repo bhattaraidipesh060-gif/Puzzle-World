@@ -16,7 +16,7 @@
     <!-- ===== Login / auth ===== -->
     <string name="login_subtitle">계속하려면 로그인하세요</string>
     <string name="login_subtitle_register">계정을 만드세요</string>
-    <string name="login_email_hint">이메일 주소</string>
+    <string name="login_username_hint">사용자 이름</string>
     <string name="login_password_hint">비밀번호</string>
     <string name="login_confirm_hint">비밀번호 확인</string>
     <string name="login_sign_in">🔐  로그인</string>
@@ -26,8 +26,8 @@
     <string name="login_toggle_register">이미 계정이 있으신가요? 로그인</string>
     <string name="login_terms_check">동의합니다 </string>
     <string name="login_terms_link">약관 및 개인정보처리방침</string>
-    <string name="login_enter_email">이메일 주소를 입력하세요</string>
-    <string name="login_invalid_email">유효한 이메일 주소를 입력하세요</string>
+    <string name="login_enter_username">사용자 이름을 입력하세요</string>
+    <string name="login_invalid_username">사용자 이름은 3~32자(영문, 숫자, 점, 대시, 밑줄)여야 합니다</string>
     <string name="login_enter_password">비밀번호를 입력하세요</string>
     <string name="login_password_len">비밀번호는 8자 이상이어야 합니다</string>
     <string name="login_password_policy">비밀번호에 대문자, 소문자, 숫자가 각각 포함되어야 합니다</string>
@@ -35,19 +35,6 @@
     <string name="login_accept_terms">계속하려면 약관 및 개인정보처리방침에 동의해야 합니다</string>
     <string name="login_creating">계정 만드는 중…</string>
     <string name="login_signing">로그인 중…</string>
-    <string name="login_verifying">인증 중…</string>
-    <string name="login_saving_username">사용자 이름 저장 중…</string>
-    <string name="login_otp_title">이메일 인증</string>
-    <string name="login_otp_hint">6자리 코드</string>
-    <string name="login_otp_verify">인증</string>
-    <string name="login_otp_resend">코드 다시 받기</string>
-    <string name="login_otp_resend_in">%1$d초 후 다시 받기</string>
-    <string name="login_otp_invalid">코드가 올바르지 않거나 만료되었습니다</string>
-    <string name="login_username_title">사용자 이름 선택</string>
-    <string name="login_username_hint">사용자 이름 (3–32자)</string>
-    <string name="login_username_message">리더보드에 표시될 고유한 이름을 정하세요.</string>
-    <string name="login_username_save">저장</string>
-    <string name="login_username_skip">나중에</string>
     <string name="login_welcome">환영합니다, %1$s! 🎉</string>
 
     <!-- ===== Home / dashboard ===== -->
@@ -142,13 +129,12 @@
     <string name="game_ok">확인</string>
 
     <!-- ===== Login errors (remaining) ===== -->
-    <string name="login_incorrect">이메일 또는 비밀번호가 올바르지 않습니다</string>
+    <string name="login_incorrect">사용자 이름 또는 비밀번호가 올바르지 않습니다</string>
     <string name="login_offline_password">비밀번호가 올바르지 않습니다 (오프라인)</string>
     <string name="login_no_account">계정을 찾을 수 없습니다. 인터넷에 연결하거나 새로 만드세요.</string>
     <string name="login_unknown_error">문제가 발생했습니다. 다시 시도해 주세요.</string>
-    <string name="login_email_taken">이미 등록된 이메일입니다</string>
-    <string name="login_check_email">이메일과 비밀번호를 확인해 주세요</string>
-    <string name="login_unverified">이메일이 인증되지 않았습니다</string>
+    <string name="login_username_taken">이미 사용 중인 사용자 이름입니다</string>
+    <string name="login_check_credentials">사용자 이름과 비밀번호를 확인해 주세요</string>
     <string name="progress">진행:</string>
 
     <!-- ===== Sudoku ===== -->

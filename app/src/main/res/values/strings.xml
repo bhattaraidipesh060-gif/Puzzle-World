@@ -16,7 +16,7 @@
     <!-- ===== Login / auth ===== -->
     <string name="login_subtitle">Sign in to continue</string>
     <string name="login_subtitle_register">Create your account</string>
-    <string name="login_email_hint">Email address</string>
+    <string name="login_username_hint">Username</string>
     <string name="login_password_hint">Password</string>
     <string name="login_confirm_hint">Confirm password</string>
     <string name="login_sign_in">🔐  SIGN IN</string>
@@ -26,8 +26,8 @@
     <string name="login_toggle_register">Already have an account? Sign in</string>
     <string name="login_terms_check">I agree to the </string>
     <string name="login_terms_link">Terms &amp; Privacy Policy</string>
-    <string name="login_enter_email">Enter your email address</string>
-    <string name="login_invalid_email">Enter a valid email address</string>
+    <string name="login_enter_username">Enter your username</string>
+    <string name="login_invalid_username">Username must be 3–32 characters (letters, numbers, dot, dash, underscore)</string>
     <string name="login_enter_password">Enter a password</string>
     <string name="login_password_len">Password must be at least 8 characters</string>
     <string name="login_password_policy">Password needs an uppercase letter, a lowercase letter, and a number</string>
@@ -35,19 +35,6 @@
     <string name="login_accept_terms">You must accept the Terms &amp; Privacy Policy to continue</string>
     <string name="login_creating">Creating account…</string>
     <string name="login_signing">Signing in…</string>
-    <string name="login_verifying">Verifying…</string>
-    <string name="login_saving_username">Saving username…</string>
-    <string name="login_otp_title">Verify your email</string>
-    <string name="login_otp_hint">6-digit code</string>
-    <string name="login_otp_verify">Verify</string>
-    <string name="login_otp_resend">Resend code</string>
-    <string name="login_otp_resend_in">Resend in %1$ds</string>
-    <string name="login_otp_invalid">Invalid or expired code</string>
-    <string name="login_username_title">Choose your username</string>
-    <string name="login_username_hint">Username (3–32 characters)</string>
-    <string name="login_username_message">Pick a unique name for the leaderboard.</string>
-    <string name="login_username_save">Save</string>
-    <string name="login_username_skip">Skip for now</string>
     <string name="login_welcome">Welcome, %1$s! 🎉</string>
 
     <!-- ===== Home / dashboard ===== -->
@@ -142,13 +129,12 @@
     <string name="game_ok">OK</string>
 
     <!-- ===== Login errors (remaining) ===== -->
-    <string name="login_incorrect">Incorrect email or password</string>
+    <string name="login_incorrect">Incorrect username or password</string>
     <string name="login_offline_password">Incorrect password (offline)</string>
     <string name="login_no_account">No account found. Connect to the internet, or create one.</string>
     <string name="login_unknown_error">Something went wrong. Please try again.</string>
-    <string name="login_email_taken">An account with that email already exists</string>
-    <string name="login_check_email">Please check your email and password</string>
-    <string name="login_unverified">Your email isn\'t verified yet</string>
+    <string name="login_username_taken">That username is already taken</string>
+    <string name="login_check_credentials">Please check your username and password</string>
     <string name="progress">Progress:</string>
 
     <!-- ===== Sudoku ===== -->
