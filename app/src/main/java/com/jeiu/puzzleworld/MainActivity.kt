@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnDaily: Button
     private lateinit var btnNext: Button
     private lateinit var btnRestart: TextView
+    private lateinit var btnPulse: Button
+    private lateinit var btnBreakdown: Button
     private lateinit var levelStrip: LinearLayout
     private lateinit var stripScroll: HorizontalScrollView
     private lateinit var rootLayout: LinearLayout
@@ -84,6 +86,8 @@ class MainActivity : AppCompatActivity() {
         btnDaily         = findViewById(R.id.btn_daily)
         btnNext          = findViewById(R.id.btn_next)
         btnRestart       = findViewById(R.id.btn_restart)
+        btnPulse         = findViewById(R.id.btn_pulse)
+        btnBreakdown     = findViewById(R.id.btn_breakdown)
         levelStrip       = findViewById(R.id.level_strip)
         stripScroll      = findViewById(R.id.strip_scroll)
         rootLayout       = findViewById(R.id.root_layout)
@@ -147,6 +151,8 @@ class MainActivity : AppCompatActivity() {
         btnDaily.setOnClickListener { startActivity(android.content.Intent(this, DailyChallengeActivity::class.java)) }
         btnNext.setOnClickListener { navigate(+1) }
         btnRestart.setOnClickListener { showRestartDialog() }
+        btnPulse.setOnClickListener { chronoPulse() }
+        btnBreakdown.setOnClickListener { cipherBreakdown() }
 
         findViewById<TextView>(R.id.btn_help).setOnClickListener {
             val lvl = currentRoom?.levelNumber(currentLevelNum)
@@ -336,6 +342,13 @@ class MainActivity : AppCompatActivity() {
                 displayPuzzlePrompt(m)
             }
         }
+
+        // Optional tools row: Chrono Pulse (all) + Cipher Breakdown (cipher only)
+        val unsolved = !state.isSolved(level.levelId)
+        btnPulse.visibility = if (unsolved) View.VISIBLE else View.GONE
+        btnBreakdown.visibility = if (unsolved && (level.mechanic is PuzzleMechanic.Cipher
+                || level.mechanic is PuzzleMechanic.CipherWheel)) View.VISIBLE else View.GONE
+
         highlightStrip()
     }
 
@@ -817,5 +830,64 @@ class MainActivity : AppCompatActivity() {
             bootstrap()
         }
         Toast.makeText(this, "🎮 Progress cleared!", Toast.LENGTH_SHORT).show()
+    }
+
+    // ── Chrono Pulse (risk-reward visual clue) ──────────────────────────────
+
+    private fun chronoPulse() {
+        val level = currentRoom?.levelNumber(currentLevelNum) ?: return
+        if (state.isSolved(level.levelId)) return
+        if (state.score < 5) {
+            Toast.makeText(this, "⚡ Chrono Pulse costs 5 pts — keep solving!", Toast.LENGTH_SHORT).show()
+            return
+        }
+        state.score -= 5
+        val stage: View = if (puzzlePrompt.visibility == View.VISIBLE) puzzlePrompt else puzzleStage
+        stage.animate().scaleX(1.06f).scaleY(1.06f).alpha(0.72f).setDuration(130)
+            .withEndAction {
+                stage.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(230).start()
+            }.start()
+        stage.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        Toast.makeText(this, "⚡ ${pulseCue(level.mechanic)}", Toast.LENGTH_LONG).show()
+        puzzleInfo.text = (puzzleInfo.text?.toString()?.substringBeforeLast("⭐") ?: "") + "⭐${state.score}"
+        SoundFx.click()
+        lifecycleScope.launch { storage.saveState(state) }
+    }
+
+    private fun pulseCue(m: PuzzleMechanic): String = when (m) {
+        is PuzzleMechanic.Cipher -> "The air hums — count letters, not words."
+        is PuzzleMechanic.Riddle -> "Look past the obvious — every word is a clue."
+        is PuzzleMechanic.MechanicalLock -> "Run your thumb over the dials — listen for the click."
+        is PuzzleMechanic.DeductionGrid -> "The grid wants balance — match, don't guess."
+        is PuzzleMechanic.WireMaze -> "Follow the current — begin where the spark starts."
+        is PuzzleMechanic.PatternLock -> "Trace the shape the room remembers."
+        is PuzzleMechanic.ColorSequence -> "Close your eyes — let the colors echo."
+        else -> "The room shifts — trust your first instinct."
+    }
+
+    // ── Cipher Breakdown (frequency / shift-step pattern clue) ──────────────
+
+    private fun cipherBreakdown() {
+        val level = currentRoom?.levelNumber(currentLevelNum) ?: return
+        val text = when (val m = level.mechanic) {
+            is PuzzleMechanic.Cipher -> m.cipherText
+            is PuzzleMechanic.CipherWheel -> m.cipherText
+            else -> return
+        }
+        val freq = text.uppercase().filter { it in 'A'..'Z' }
+            .groupingBy { it }.eachCount()
+            .entries.sortedByDescending { it.value }.take(3)
+            .joinToString("  ") { "${it.key} ×${it.value}" }
+        val msg = buildString {
+            append("📊 Letter frequency (top 3):\n   ")
+            append(freq.ifBlank { "—" })
+            append("\n\n🔁 Shift-step: in a Caesar-style shift every letter moves by the same step — compare the most common cipher letter to 'E' (English) to estimate it.")
+            append("\n\n🧩 Multi-stage: decode layer by layer — each stage usually hides the next.")
+        }
+        AlertDialog.Builder(this, R.style.HintDialog)
+            .setTitle("🔬 Cipher Breakdown")
+            .setMessage(msg)
+            .setPositiveButton(getString(R.string.game_got_it), null)
+            .show()
     }
 }

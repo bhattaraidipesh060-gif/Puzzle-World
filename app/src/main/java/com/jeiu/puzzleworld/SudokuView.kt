@@ -10,6 +10,12 @@ import android.view.View
  * Interactive 9x9 Sudoku board with pencil-mark (candidate notes) support.
  * Tap a cell to select; use an external number pad to enter digits or toggle
  * notes when note-mode is on. Given clues are locked; conflicts are tinted red.
+ *
+ * Smart-assist toggles (both default ON):
+ *  - highlightDuplicates: live tint of cells whose value is repeated in its
+ *    row / column / 3×3 box (independent of the solution check).
+ *  - highlightCandidates: gold-highlights pencil marks that match the selected
+ *    cell's value, so you can see where a number can still go.
  */
 class SudokuView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -22,6 +28,13 @@ class SudokuView @JvmOverloads constructor(
         set(v) { field = v; invalidate() }
 
     var noteMode = false
+        set(v) { field = v; invalidate() }
+
+    // Optional smart-assist toggles (default ON).
+    var highlightDuplicates = true
+        set(v) { field = v; invalidate() }
+
+    var highlightCandidates = true
         set(v) { field = v; invalidate() }
 
     var onBoardChanged: ((Array<IntArray>) -> Unit)? = null
@@ -38,6 +51,8 @@ class SudokuView @JvmOverloads constructor(
     private val cellSelected = Color.parseColor("#1E3A5C")
     private val cellSame = Color.parseColor("#16303F")
     private val cellConflict = Color.parseColor("#3A1A1A")
+    private val cellDuplicate = Color.parseColor("#3A2A10")
+    private val cellCandidate = Color.parseColor("#143226")
     private val givenText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#E6EDF3"); textAlign = Paint.Align.CENTER
         textSize = 40f; typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
@@ -50,9 +65,17 @@ class SudokuView @JvmOverloads constructor(
         color = Color.parseColor("#FF4081"); textAlign = Paint.Align.CENTER
         textSize = 40f; typeface = Typeface.create("sans-serif", Typeface.NORMAL)
     }
+    private val duplicateText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#FFB300"); textAlign = Paint.Align.CENTER
+        textSize = 40f; typeface = Typeface.create("sans-serif", Typeface.BOLD)
+    }
     private val noteText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#6E7A8A"); textAlign = Paint.Align.CENTER
         textSize = 14f; typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
+    }
+    private val noteMatchText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#FFD740"); textAlign = Paint.Align.CENTER
+        textSize = 14f; typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
     }
     private val selectedStroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#FFD740"); strokeWidth = 4f; style = Paint.Style.STROKE
@@ -99,6 +122,18 @@ class SudokuView @JvmOverloads constructor(
         selected = Pair(r, c); invalidate()
     }
 
+    /** True if the value in (r,c) appears elsewhere in its row, column, or 3×3 box. */
+    private fun isDuplicate(r: Int, c: Int): Boolean {
+        val v = puzzle[r][c]
+        if (v == 0) return false
+        for (cc in 0 until 9) if (cc != c && puzzle[r][cc] == v) return true
+        for (rr in 0 until 9) if (rr != r && puzzle[rr][c] == v) return true
+        val br = (r / 3) * 3; val bc = (c / 3) * 3
+        for (rr in br until br + 3) for (cc in bc until bc + 3)
+            if ((rr != r || cc != c) && puzzle[rr][cc] == v) return true
+        return false
+    }
+
     /** Reveal one empty cell with its correct solution value (hint).
      *  The revealed cell is locked in as a given. Returns true if revealed. */
     fun hint(): Boolean {
@@ -122,6 +157,16 @@ class SudokuView @JvmOverloads constructor(
         val w = width.toFloat(); val h = height.toFloat()
         val cw = w / 9f; val ch = h / 9f
         canvas.drawRect(0f, 0f, w, h, bgP)
+
+        // live duplicate-conflict shading (always visible when highlightDuplicates)
+        if (highlightDuplicates) {
+            for (r in 0 until 9) for (cc in 0 until 9) {
+                if (!given[r][cc] && isDuplicate(r, cc)) {
+                    canvas.drawRect(cc * cw, r * ch, (cc + 1) * cw, (r + 1) * ch,
+                        Paint().apply { color = cellDuplicate })
+                }
+            }
+        }
 
         // selection & same-value shading
         val sel = selected
@@ -158,14 +203,21 @@ class SudokuView @JvmOverloads constructor(
             val v = puzzle[r][cc]
             if (v != 0) {
                 val conflict = !given[r][cc] && solution[r][cc] != 0 && v != solution[r][cc]
-                val p = when { conflict -> conflictText; given[r][cc] -> givenText; else -> entryText }
+                val dup = highlightDuplicates && !given[r][cc] && isDuplicate(r, cc)
+                val p = when {
+                    conflict -> conflictText
+                    dup -> duplicateText
+                    given[r][cc] -> givenText
+                    else -> entryText
+                }
                 val cx = (cc + 0.5f) * cw
                 val cy = (r + 0.5f) * ch - (p.ascent() + p.descent()) / 2f
                 canvas.drawText(v.toString(), cx, cy, p)
             }
         }
 
-        // pencil marks (notes) for empty cells
+        // pencil marks (notes) for empty cells — matching candidates highlighted
+        val selVal = selected?.let { puzzle[it.first][it.second] } ?: 0
         for (r in 0 until 9) for (cc in 0 until 9) {
             if (puzzle[r][cc] != 0 || notes[r][cc].isEmpty()) continue
             val nset = notes[r][cc]
@@ -174,10 +226,12 @@ class SudokuView @JvmOverloads constructor(
             val nx = cw / n3.toFloat(); val ny = ch / n3.toFloat()
             for (d in 1..9) {
                 if (d !in nset) continue
+                val match = highlightCandidates && selVal != 0 && selVal == d
+                val p = if (match) noteMatchText else noteText
                 val mr = (d - 1) / n3; val mc = (d - 1) % n3
                 val cx = cc * cw + (mc + 0.5f) * nx
-                val cy = r * ch + (mr + 0.5f) * ny - (noteText.ascent() + noteText.descent()) / 2f
-                canvas.drawText(d.toString(), cx, cy, noteText)
+                val cy = r * ch + (mr + 0.5f) * ny - (p.ascent() + p.descent()) / 2f
+                canvas.drawText(d.toString(), cx, cy, p)
             }
         }
 

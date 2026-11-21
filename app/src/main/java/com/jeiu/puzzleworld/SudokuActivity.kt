@@ -13,7 +13,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 /**
- * Sudoku mini-game with pencil marks, undo, and timer.
+ * Sudoku mini-game with pencil marks, undo, timer, smart-assist toggles,
+ * and a Zen / Speed pacing indicator.
  */
 class SudokuActivity : AppCompatActivity() {
 
@@ -30,11 +31,13 @@ class SudokuActivity : AppCompatActivity() {
     private lateinit var btnUndo: Button
     private lateinit var btnNotes: Button
     private lateinit var btnHint: Button
+    private lateinit var btnAssist: Button
     private lateinit var celebration: CelebrationView
 
     private var solution: Array<IntArray> = Array(9) { IntArray(9) }
     private var difficulty = "Medium"
     private var finished = false
+    private var assistOn = true
     private val undoStack = mutableListOf<Array<IntArray>>()
     private var elapsedSec = 0
     private val handler = Handler(Looper.getMainLooper())
@@ -64,6 +67,7 @@ class SudokuActivity : AppCompatActivity() {
         btnUndo     = findViewById(R.id.sudoku_btn_undo)
         btnNotes    = findViewById(R.id.sudoku_btn_notes)
         btnHint     = findViewById(R.id.sudoku_btn_hint)
+        btnAssist   = findViewById(R.id.sudoku_btn_assist)
         celebration = findViewById(R.id.sudoku_celebration)
 
         btnNew.setOnClickListener { chooseDifficulty() }
@@ -81,6 +85,14 @@ class SudokuActivity : AppCompatActivity() {
             }
         }
         btnHint.setOnClickListener { giveHint() }
+        btnAssist.setOnClickListener {
+            assistOn = !assistOn
+            boardView.highlightDuplicates = assistOn
+            boardView.highlightCandidates = assistOn
+            btnAssist.text = if (assistOn) "🔍  ASSIST ON" else "🔍  ASSIST"
+            btnAssist.setTextColor(if (assistOn) Color.parseColor("#FFD740") else Color.WHITE)
+            statusView.text = if (assistOn) "Assist: duplicates + candidates highlighted" else "Assist off"
+        }
 
         for (i in 1..9) {
             val id = resources.getIdentifier("sudoku_pad_$i", "id", packageName)
@@ -201,8 +213,19 @@ class SudokuActivity : AppCompatActivity() {
         Toast.makeText(this, "🏆 Sudoku complete!", Toast.LENGTH_SHORT).show()
     }
 
+    /** Zen / Speed pacing glyph based on elapsed time vs. a difficulty par. */
+    private fun paceGlyph(): String {
+        if (elapsedSec < 5) return ""
+        val target = when (difficulty) { "Easy" -> 180; "Medium" -> 360; "Hard" -> 600; else -> 900 }
+        return when {
+            elapsedSec < target / 2 -> "  ⚡"
+            elapsedSec < target -> "  🧘"
+            else -> "  🐢"
+        }
+    }
+
     private fun updateTimer() {
-        timerView.text = "⏱ ${formatTime(elapsedSec)}"
+        timerView.text = "⏱ ${formatTime(elapsedSec)}${paceGlyph()}"
     }
 
     private fun formatTime(s: Int): String {

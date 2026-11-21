@@ -16,7 +16,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 /**
- * Word Descrambler with timer, difficulty tiers, and graded hints.
+ * Word Descrambler with timer, difficulty tiers, graded hints, themed category
+ * tags, a streak multiplier, and an optional letter-position peek.
  */
 class WordDescramblerActivity : AppCompatActivity() {
 
@@ -35,6 +36,7 @@ class WordDescramblerActivity : AppCompatActivity() {
     private lateinit var answerInput: EditText
     private lateinit var btnCheck: Button
     private lateinit var btnHint: Button
+    private lateinit var btnPeek: Button
     private lateinit var btnNext: Button
     private lateinit var btnDifficulty: Button
     private lateinit var celebration: CelebrationView
@@ -47,6 +49,7 @@ class WordDescramblerActivity : AppCompatActivity() {
     private var streak = 0
     private var roundNum = 1
     private var elapsedSec = 0
+    private val revealed = mutableSetOf<Int>()
     private val handler = Handler(Looper.getMainLooper())
     private val ticker = object : Runnable {
         override fun run() {
@@ -69,6 +72,7 @@ class WordDescramblerActivity : AppCompatActivity() {
         answerInput  = findViewById(R.id.wd_answer_input)
         btnCheck     = findViewById(R.id.wd_btn_check)
         btnHint      = findViewById(R.id.wd_btn_hint)
+        btnPeek      = findViewById(R.id.wd_btn_peek)
         btnNext      = findViewById(R.id.wd_btn_next)
         btnDifficulty = findViewById(R.id.wd_btn_difficulty)
         celebration  = findViewById(R.id.wd_celebration)
@@ -80,6 +84,7 @@ class WordDescramblerActivity : AppCompatActivity() {
 
         btnCheck.setOnClickListener { checkAnswer() }
         btnHint.setOnClickListener { showHint() }
+        btnPeek.setOnClickListener { peek() }
         btnNext.setOnClickListener { nextRound() }
         btnDifficulty.setOnClickListener { chooseDifficulty() }
 
@@ -96,6 +101,7 @@ class WordDescramblerActivity : AppCompatActivity() {
         hintIndex = 0
         solved = false
         elapsedSec = 0
+        revealed.clear()
         renderTiles(currentRound!!.scrambled)
         hintView.text = ""
         hintView.visibility = android.view.View.GONE
@@ -103,7 +109,7 @@ class WordDescramblerActivity : AppCompatActivity() {
         answerInput.isEnabled = true
         btnCheck.isEnabled = true
         statusView.setTextColor(Color.parseColor("#B0B8C4"))
-        statusView.text = "Round $roundNum — ${currentRound!!.word.length} letters [$difficulty]"
+        statusView.text = "Round $roundNum — ${currentRound!!.word.length} letters [$difficulty]  ·  🏷 ${currentRound!!.category}"
         updateTimer()
         handler.removeCallbacks(ticker)
         handler.postDelayed(ticker, 1000L)
@@ -193,6 +199,25 @@ class WordDescramblerActivity : AppCompatActivity() {
         hintIndex++
     }
 
+    /** Letter-position peek: reveal one unrevealed letter's position at a small score cost. */
+    private fun peek() {
+        val round = currentRound ?: return
+        if (solved) return
+        val candidates = round.word.indices.filter { it !in revealed }
+        if (candidates.isEmpty()) {
+            statusView.text = "All positions revealed — you've got this!"
+            return
+        }
+        val idx = candidates.random()
+        revealed.add(idx)
+        score = (score - 5).coerceAtLeast(0)
+        hintView.text = "👁 Letter at position ${idx + 1} is '${round.word[idx]}'"
+        hintView.visibility = android.view.View.VISIBLE
+        statusView.text = "Peek used (−5 pts)  ·  ⭐$score"
+        SoundFx.click()
+        savePrefs(); updateHud()
+    }
+
     private fun chooseDifficulty() {
         handler.removeCallbacks(ticker)
         val items = arrayOf("Easy (3-5 letters)", "Medium (5-7 letters)", "Hard (7-9 letters)", "Expert (9-12 letters)")
@@ -208,7 +233,8 @@ class WordDescramblerActivity : AppCompatActivity() {
     }
 
     private fun updateHud() {
-        headerTitle.text = "🔤 Word Descrambler — $difficulty"
+        val streakTag = if (streak >= 2) "  🔥×$streak" else ""
+        headerTitle.text = "🔤 Word Descrambler — $difficulty$streakTag"
     }
 
     private fun updateTimer() {

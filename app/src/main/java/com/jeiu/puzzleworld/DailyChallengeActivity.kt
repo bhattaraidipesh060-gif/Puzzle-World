@@ -8,6 +8,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +37,10 @@ import java.net.URL
  *     "mechanic": { "mechanic_type": "cipher_wheel|terminal_hack" (legacy: cipher|riddle|mechanical_lock|deduction_grid|wire_maze), ... }
  *   }
  * }
+ *
+ * Light advancement: deterministic daily modifier badges (par time / streak
+ * shield / speed-run, derived from the challenge date) plus a completion
+ * summary card on success.
  */
 class DailyChallengeActivity : AppCompatActivity() {
 
@@ -72,6 +77,7 @@ class DailyChallengeActivity : AppCompatActivity() {
     private var solved = false
     private var challengeDate: String = ""
     private var attempts = 0
+    private var startTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,6 +139,7 @@ class DailyChallengeActivity : AppCompatActivity() {
         val mechanic = level.optJSONObject("mechanic") ?: JSONObject()
         mechanicType = mechanic.optString("mechanic_type", "")
         challengeDate = root.optString("challenge_date", "")
+        startTime = System.currentTimeMillis()
 
         // header
         headerTitle.text = level.optString("title", "Daily Puzzle")
@@ -143,6 +150,8 @@ class DailyChallengeActivity : AppCompatActivity() {
             append(level.optString("difficulty", "Medium"))
             val room = level.optString("room_name", "")
             if (room.isNotEmpty()) { append("  ·  "); append(room) }
+            append("\n")
+            append(modifierBadges(root.optString("challenge_date", ""), level.optString("difficulty", "Medium")))
         }
 
         // prompt
@@ -265,6 +274,7 @@ class DailyChallengeActivity : AppCompatActivity() {
                     answerInput.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                     answerInput.startAnimation(AnimationUtils.loadAnimation(this@DailyChallengeActivity, R.anim.pop))
                     SoundFx.win()
+                    showSummaryCard()
                 }
                 SUBMIT_INCORRECT -> {
                     statusText.setTextColor(Color.parseColor(COLOR_ERROR))
@@ -338,6 +348,55 @@ class DailyChallengeActivity : AppCompatActivity() {
         val existing = if (hintsView.text.isNullOrEmpty()) "" else "${hintsView.text}\n\n"
         hintsView.text = existing + "💡 $hint"
         hintsView.visibility = android.view.View.VISIBLE
+    }
+
+    // ── Daily modifier badges + completion summary ───────────────────────────
+
+    /** Deterministic daily modifier badge (derived from date) + par time. */
+    private fun modifierBadges(date: String, difficulty: String): String {
+        val par = when (difficulty) { "Easy" -> "2:00"; "Medium" -> "3:00"; "Hard" -> "5:00"; else -> "7:00" }
+        val pool = listOf(
+            "🛡️ Streak shield — first miss is free",
+            "⚡ Speed run — beat par $par for bonus",
+            "🧠 No-hint run — solve with fewer hints",
+            "🎯 Par time $par — beat the target",
+            "🔁 One-shot — nail it in one attempt"
+        )
+        val pick = pool[Math.floorMod(date.hashCode(), pool.size)]
+        return "$pick  ·  🏅 Day ${dayOfYear(date)}"
+    }
+
+    private fun dayOfYear(date: String): Int {
+        val parts = date.substringBefore('T').split("-")
+        if (parts.size >= 3) {
+            val m = parts[1].toIntOrNull()
+            val d = parts[2].toIntOrNull()
+            if (m != null && d != null && m in 1..12) {
+                val daysBefore = intArrayOf(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
+                return (daysBefore[m - 1] + d).coerceIn(1, 365)
+            }
+        }
+        return Math.floorMod(date.hashCode(), 365) + 1
+    }
+
+    private fun formatTime(s: Int): String {
+        val m = s / 60; val sec = s % 60
+        return "$m:${sec.toString().padStart(2, '0')}"
+    }
+
+    private fun showSummaryCard() {
+        val secs = ((System.currentTimeMillis() - startTime) / 1000).toInt().coerceAtLeast(0)
+        val msg = buildString {
+            append("⏱ Time: ").append(formatTime(secs)).append("\n")
+            append("🎯 Attempts: ").append(attempts).append("\n")
+            append("💡 Hints used: ").append(hintIndex).append("\n")
+            append("🗓️ ").append(challengeDate)
+        }
+        AlertDialog.Builder(this, R.style.HintDialog)
+            .setTitle("🏆 Daily Challenge Complete")
+            .setMessage(msg)
+            .setPositiveButton("Nice!", null)
+            .show()
     }
 
     private fun showError(e: Throwable) {

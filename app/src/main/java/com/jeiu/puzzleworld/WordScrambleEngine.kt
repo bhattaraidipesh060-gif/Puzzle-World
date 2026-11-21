@@ -5,7 +5,8 @@ import kotlin.random.Random
 /**
  * Seed-based word scramble generator with difficulty tiers based on word length.
  * "Easy" = 3-5 letters, "Medium" = 5-7 letters, "Hard" = 7-9 letters.
- * Graded hints reveal letters progressively.
+ * Graded hints reveal letters progressively. Each round carries a themed
+ * category tag used by the HUD (cosmetic — does not affect solving).
  */
 object WordScrambleEngine {
 
@@ -48,8 +49,32 @@ object WordScrambleEngine {
     data class Round(
         val word: String,
         val scrambled: String,
-        val hintLayers: List<String>
+        val hintLayers: List<String>,
+        val category: String
     )
+
+    /** Lightweight theme tag for the streak/category HUD — cosmetic only. */
+    fun categoryFor(word: String): String {
+        val w = word.lowercase()
+        return when {
+            w in setOf("star", "moon", "time", "planet", "rocket", "galaxy", "cosmos",
+                "nebula", "comet", "orbit", "sphere", "quasar", "photon", "vortex",
+                "eclipse", "constellation", "gravity", "energy", "signal", "beacon",
+                "lantern", "horizon", "magnet") -> "Space"
+            w in setOf("cipher", "code", "riddle", "puzzle", "logic", "matrix", "vector",
+                "circuit", "cryptic", "cryptogram", "enigmatic", "conundrum", "perplexing",
+                "brainteaser", "obscure", "phantom", "genius", "wisdom", "secret", "trivia") -> "Cipher"
+            w in setOf("treasure", "adventure", "mystery", "legend", "compass", "map",
+                "fortune", "discovery", "challenge", "timekeeper", "labyrinth", "kaleidoscope",
+                "illumination", "miracle", "paradox", "clue", "hint") -> "Quest"
+            w in setOf("castle", "bridge", "temple", "fortress", "machine", "engine", "gate",
+                "door", "lock", "vault", "key", "shield", "mask", "marble", "gear", "wand") -> "Machinery"
+            w in setOf("jungle", "garden", "volcano", "rainbow", "crystal", "diamond", "amber",
+                "crimson", "silver", "golden", "gem", "fire", "wind", "lens", "orb", "gold",
+                "snap", "cube", "jigsaw") -> "Nature"
+            else -> "Mystery"
+        }
+    }
 
     fun generate(seed: Long, difficulty: String = "Medium"): Round {
         val rng = Random(seed)
@@ -65,6 +90,6 @@ object WordScrambleEngine {
             val reveal = (word.length * frac).toInt().coerceAtLeast(1)
             word.mapIndexed { i, ch -> if (i < reveal) ch else '_' }.joinToString("")
         }
-        return Round(word, scrambled, hintLayers)
+        return Round(word, scrambled, hintLayers, categoryFor(word))
     }
 }
