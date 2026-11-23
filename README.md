@@ -7,6 +7,12 @@ race a global leaderboard while unlocking **15 rank badges**.
 
 > **Stack:** Kotlin/Android · Express.js · SQLite (better-sqlite3) · Web Audio API
 
+## 🌐 Live Demo
+
+- 🕹️ **Web portal** — https://puzzleworld-backend.onrender.com/
+- 📲 **Download the Android app (APK)** — https://puzzleworld-backend.onrender.com/download.html
+- 🎬 **Demo video** — https://youtube.com/shorts/O7_pDuFy-tE
+
 ---
 
 ## ✨ Features
@@ -155,6 +161,17 @@ The portal is served statically by the backend at **http://localhost:3000/**
 The APK is written to `app/build/outputs/apk/`. To share a standalone build,
 attach the `.apk` to a **GitHub Release** (Releases → *Create a new release* →
 upload the APK), which gives you a permanent download link.
+
+---
+
+## 👥 Team
+
+- **Bivash Pokhrel**
+- **Dipesh Bhattarai**
+- **Nitesh Bhattarai**
+- **Gaurab Giri**
+- **Anil Singh Goyala**
+- **Bishal Joshi**
 
 ---
 
