@@ -50,6 +50,10 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var adapter: GameCardAdapter
     private lateinit var roomAdapter: GameCardAdapter
     private lateinit var world: HttpWorldService
+    private lateinit var gamesGrid: RecyclerView
+    private lateinit var roomsGrid: RecyclerView
+    private var gridSpanCount = 2
+    private var cardHeightPx = 0
 
     private data class RoomCard(
         val id: String, val name: String, val icon: String,
@@ -152,12 +156,12 @@ class HomeActivity : AppCompatActivity() {
             SoundFx.click(); go(AchievementsActivity::class.java)
         }
 
-        val spanCount = if (resources.configuration.screenWidthDp >= 600) 3 else 2
+        gridSpanCount = if (resources.configuration.screenWidthDp >= 600) 3 else 2
 
         // ---- Games grid ----
-        val grid = findViewById<RecyclerView>(R.id.games_grid)
-        grid.layoutManager = GridLayoutManager(this, spanCount)
-        grid.addItemDecoration(GridSpacingItemDecoration(dp(12)))
+        gamesGrid = findViewById<RecyclerView>(R.id.games_grid)
+        gamesGrid.layoutManager = GridLayoutManager(this, gridSpanCount)
+        gamesGrid.addItemDecoration(GridSpacingItemDecoration(dp(12)))
         adapter = GameCardAdapter(emptyList()) { item ->
             SoundFx.click()
             when (item.id) {
@@ -167,12 +171,12 @@ class HomeActivity : AppCompatActivity() {
                 "daily" -> go(DailyChallengeActivity::class.java)
             }
         }
-        grid.adapter = adapter
+        gamesGrid.adapter = adapter
         applyFilter()
 
         // ---- Escape-Rooms grid ----
-        val roomsGrid = findViewById<RecyclerView>(R.id.rooms_grid)
-        roomsGrid.layoutManager = GridLayoutManager(this, spanCount)
+        roomsGrid = findViewById<RecyclerView>(R.id.rooms_grid)
+        roomsGrid.layoutManager = GridLayoutManager(this, gridSpanCount)
         roomsGrid.addItemDecoration(GridSpacingItemDecoration(dp(12)))
         roomAdapter = GameCardAdapter(emptyList()) { item -> openRoom(item.id) }
         roomsGrid.adapter = roomAdapter
@@ -367,6 +371,7 @@ class HomeActivity : AppCompatActivity() {
             )
         }
         roomAdapter.update(items)
+        setGridHeight(roomsGrid, items.size)
     }
 
     private fun applyFilter() {
@@ -375,6 +380,34 @@ class HomeActivity : AppCompatActivity() {
                 (query.isEmpty() || it.searchText.contains(query, true) || it.title.contains(query, true))
         }
         adapter.update(filtered)
+        setGridHeight(gamesGrid, filtered.size)
+    }
+
+    /**
+     * RecyclerViews nested inside a vertical ScrollView mis-measure with `wrap_content`
+     * height (only the first row renders). Measure the card once and pin the grid to an
+     * exact height for its row count, so every row shows.
+     */
+    private fun setGridHeight(grid: RecyclerView, itemCount: Int) {
+        val lp = grid.layoutParams
+        if (itemCount == 0) {
+            lp.height = 0
+            grid.layoutParams = lp
+            return
+        }
+        if (cardHeightPx <= 0) {
+            val card = layoutInflater.inflate(R.layout.item_game_card, grid, false)
+            val colWidth = (resources.displayMetrics.widthPixels - dp(44)) / gridSpanCount.coerceAtLeast(1)
+            card.measure(
+                View.MeasureSpec.makeMeasureSpec(colWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            cardHeightPx = card.measuredHeight
+        }
+        val rows = (itemCount + gridSpanCount - 1) / gridSpanCount
+        val spacing = dp(12)
+        lp.height = rows * cardHeightPx + rows * spacing
+        grid.layoutParams = lp
     }
 
     private fun selectChip(cat: String) {
