@@ -81,69 +81,6 @@
                 android:focusable="true" />
         </LinearLayout>
 
-        <!-- ================= TABS ================= -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/ps_appbar"
-            android:paddingHorizontal="12dp"
-            android:paddingBottom="10dp">
-
-            <TextView android:id="@+id/tab_games"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="🎮 All Games"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/ps_on_accent"
-                android:background="@drawable/ps_chip_active"
-                android:layout_marginEnd="4dp"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <TextView android:id="@+id/tab_board"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="🏆 Leaderboard"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/ps_muted"
-                android:layout_marginHorizontal="4dp"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <TextView android:id="@+id/tab_stats"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="📊 My Stats"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/ps_muted"
-                android:layout_marginHorizontal="4dp"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <TextView android:id="@+id/tab_settings"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="⚙️ Settings"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/ps_muted"
-                android:layout_marginStart="4dp"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-
         <!-- ================= PANEL HOST ================= -->
         <FrameLayout
             android:layout_width="match_parent"

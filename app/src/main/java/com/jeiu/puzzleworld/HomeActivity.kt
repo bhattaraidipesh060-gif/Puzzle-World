@@ -184,11 +184,7 @@ class HomeActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.btn_surprise).setOnClickListener { surpriseMe() }
 
-        // ---- Tabs + nav + leaderboard ----
-        findViewById<TextView>(R.id.tab_games).setOnClickListener { switchTab("games") }
-        findViewById<TextView>(R.id.tab_board).setOnClickListener { switchTab("board") }
-        findViewById<TextView>(R.id.tab_stats).setOnClickListener { switchTab("stats") }
-        findViewById<TextView>(R.id.tab_settings).setOnClickListener { switchTab("settings") }
+        // ---- Nav + leaderboard ----
         findViewById<TextView>(R.id.nav_games).setOnClickListener { switchTab("games") }
         findViewById<TextView>(R.id.nav_board).setOnClickListener { switchTab("board") }
         findViewById<TextView>(R.id.nav_stats).setOnClickListener { switchTab("stats") }
@@ -241,22 +237,12 @@ class HomeActivity : AppCompatActivity() {
             "games" to R.id.panel_games, "board" to R.id.panel_board,
             "stats" to R.id.panel_stats, "settings" to R.id.panel_settings
         )
-        val tabs = mapOf(
-            "games" to R.id.tab_games, "board" to R.id.tab_board,
-            "stats" to R.id.tab_stats, "settings" to R.id.tab_settings
-        )
         val navs = mapOf(
             "games" to R.id.nav_games, "board" to R.id.nav_board,
             "stats" to R.id.nav_stats, "settings" to R.id.nav_settings
         )
         panels.forEach { (n, id) ->
             findViewById<View>(id).visibility = if (n == name) View.VISIBLE else View.GONE
-        }
-        tabs.forEach { (n, id) ->
-            val tv = findViewById<TextView>(id)
-            val on = n == name
-            tv.setBackgroundResource(if (on) R.drawable.ps_chip_active else 0)
-            tv.setTextColor(getColor(if (on) R.color.ps_on_accent else R.color.ps_muted))
         }
         navs.forEach { (n, id) ->
             findViewById<TextView>(id).setTextColor(
