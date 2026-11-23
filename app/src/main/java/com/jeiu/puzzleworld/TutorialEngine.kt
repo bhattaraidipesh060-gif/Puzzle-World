@@ -35,9 +35,9 @@ object TutorialEngine {
             else -> "Complete the puzzle to advance!"
         }
         AlertDialog.Builder(ctx, R.style.HintDialog)
-            .setTitle("📖 How to Play")
+            .setTitle(ctx.getString(R.string.how_to_play))
             .setMessage(text)
-            .setPositiveButton("Got it!", null)
+            .setPositiveButton(ctx.getString(R.string.game_got_it), null)
             .show()
     }
 

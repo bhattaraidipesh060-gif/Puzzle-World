@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🏠 Escape Rooms"
+        android:text="@string/rooms_picker_title"
         android:textSize="20sp"
         android:textStyle="bold"
         android:fontFamily="@font/sora_bold"
@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tap a room to jump straight in"
+        android:text="@string/rooms_picker_hint"
         android:textSize="12sp"
         android:fontFamily="@font/inter"
         android:textColor="@color/ps_muted"
@@ -43,7 +43,7 @@
         android:id="@+id/room_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cancel"
+        android:text="@string/action_cancel"
         android:textSize="15sp"
         android:textStyle="bold"
         android:fontFamily="@font/inter"

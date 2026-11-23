@@ -33,6 +33,7 @@ function getOrCreateChallenge(db, date) {
       SELECT level_id, room_id FROM levels
       WHERE json_extract(mechanic, '$.mechanic_type') = 'cipher_wheel'
          OR (json_extract(mechanic, '$.mechanic_type') = 'terminal_hack' AND json_extract(mechanic, '$.mode') = 'bin_to_hex')
+         OR json_extract(mechanic, '$.mechanic_type') = 'riddle'
       ORDER BY sort_order
     `).all();
     if (!levels.length) return { error: 'no_gradable_levels' };

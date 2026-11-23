@@ -22,7 +22,7 @@
             <TextView android:id="@+id/sudoku_header_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🧩 Sudoku — Medium"
+                android:text="@string/sudoku_title_medium"
                 android:textColor="@color/ps_text"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -43,7 +43,7 @@
                     android:textColor="@color/ps_muted"
                     android:textSize="13sp"
                     android:gravity="start"
-                    android:text="Tap a cell, then enter a number" />
+                    android:text="@string/sudoku_instruction" />
 
                 <TextView android:id="@+id/sudoku_timer"
                     android:layout_width="wrap_content"
@@ -148,19 +148,19 @@
 
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/sudoku_btn_undo"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                android:text="🔄  UNDO" android:textSize="13sp" android:textColor="@color/ps_text"
+                android:text="@string/sudoku_undo" android:textSize="13sp" android:textColor="@color/ps_text"
                 android:layout_marginEnd="4dp" android:background="@drawable/ps_btn_ghost"
                 android:fontFamily="sans-serif-medium" />
 
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/sudoku_btn_hint"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                android:text="💡  HINT" android:textSize="13sp" android:textColor="@color/ps_on_accent"
+                android:text="@string/daily_hint" android:textSize="13sp" android:textColor="@color/ps_on_accent"
                 android:layout_marginEnd="4dp" android:background="@drawable/ps_btn_gold"
                 android:fontFamily="sans-serif-medium" />
 
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/sudoku_btn_notes"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                android:text="✎  NOTES" android:textSize="13sp" android:textColor="@color/ps_text"
+                android:text="@string/sudoku_notes" android:textSize="13sp" android:textColor="@color/ps_text"
                 android:background="@drawable/ps_btn_purple"
                 android:fontFamily="sans-serif-medium" />
         </LinearLayout>
@@ -177,20 +177,20 @@
 
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/sudoku_btn_new"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                android:text="🎯  NEW" android:textSize="12sp" android:textColor="@color/ps_text"
+                android:text="@string/sudoku_new" android:textSize="12sp" android:textColor="@color/ps_text"
                 android:layout_marginEnd="4dp" android:background="@drawable/ps_btn_ghost"
                 android:fontFamily="sans-serif-medium" />
 
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/sudoku_btn_assist"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                android:text="🔍  ASSIST ON" android:textSize="12sp" android:textColor="@color/ps_amber"
+                android:text="@string/sudoku_assist_on" android:textSize="12sp" android:textColor="@color/ps_amber"
                 android:layout_marginStart="4dp" android:layout_marginEnd="4dp"
                 android:background="@drawable/ps_btn_ghost"
                 android:fontFamily="sans-serif-medium" />
 
             <androidx.appcompat.widget.AppCompatButton android:id="@+id/sudoku_btn_check"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                android:text="✓  CHECK" android:textSize="13sp" android:textColor="@color/ps_on_accent"
+                android:text="@string/daily_check" android:textSize="13sp" android:textColor="@color/ps_on_accent"
                 android:layout_marginStart="4dp" android:background="@drawable/ps_btn_emerald"
                 android:fontFamily="sans-serif-medium" />
         </LinearLayout>

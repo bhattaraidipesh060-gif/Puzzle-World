@@ -196,7 +196,7 @@ class LoginActivity : AppCompatActivity() {
         }
         if (ok) {
             persistUsername(username)
-            Toast.makeText(this, "Offline mode — welcome, $username! 🎉", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.login_welcome_offline, username), Toast.LENGTH_SHORT).show()
             goHome()
         }
     }

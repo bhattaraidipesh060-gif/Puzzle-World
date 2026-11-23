@@ -90,7 +90,7 @@
         <EditText android:id="@+id/dc_answer_input"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="🔑 Enter your answer…"
+            android:hint="@string/daily_answer_hint"
             android:textColor="@color/ps_text"
             android:textColorHint="@color/ps_dim"
             android:background="@drawable/ps_search"

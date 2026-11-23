@@ -37,7 +37,7 @@
                 android:id="@+id/profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Player"
+                android:text="@string/default_username"
                 android:textSize="19sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/sora_bold"
@@ -46,7 +46,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Signed in"
+                android:text="@string/profile_signed_in"
                 android:textSize="12sp"
                 android:fontFamily="@font/inter"
                 android:textColor="@color/ps_muted" />
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="14dp"
-            android:text="My Stats"
+            android:text="@string/tab_stats"
             android:textSize="15sp"
             android:fontFamily="@font/inter"
             android:textColor="@color/ps_text" />
@@ -122,7 +122,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="14dp"
-            android:text="Settings"
+            android:text="@string/tab_settings"
             android:textSize="15sp"
             android:fontFamily="@font/inter"
             android:textColor="@color/ps_text" />
@@ -160,7 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="14dp"
-            android:text="Sign out"
+            android:text="@string/settings_logout"
             android:textSize="15sp"
             android:fontFamily="@font/inter"
             android:textColor="@color/ps_rose" />
@@ -198,7 +198,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="14dp"
-            android:text="Terms &amp; Privacy"
+            android:text="@string/profile_terms"
             android:textSize="15sp"
             android:fontFamily="@font/inter"
             android:textColor="@color/ps_text" />

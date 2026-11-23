@@ -1,0 +1,181 @@
+{
+  "room_id": "room_10_riddles",
+  "room_name": "The Riddle Vault",
+  "theme": "riddle",
+  "description": "A quiet antechamber where the curator left ten riddles etched into brass plates. Answer each riddle to prove your wit and earn passage — these enigmas feed the Daily Challenge for sharp-minded solvers.",
+  "puzzle_type": "riddle",
+  "room_graph": {
+    "room_10_riddles_01": ["room_10_riddles_02"],
+    "room_10_riddles_02": ["room_10_riddles_03"],
+    "room_10_riddles_03": ["room_10_riddles_04"],
+    "room_10_riddles_04": ["room_10_riddles_05"],
+    "room_10_riddles_05": ["room_10_riddles_06"],
+    "room_10_riddles_06": ["room_10_riddles_07"],
+    "room_10_riddles_07": ["room_10_riddles_08"],
+    "room_10_riddles_08": ["room_10_riddles_09"],
+    "room_10_riddles_09": ["room_10_riddles_10"],
+    "room_10_riddles_10": []
+  },
+  "levels": [
+    {
+      "level_id": "room_10_riddles_01",
+      "title": "The Voiceless Voice",
+      "difficulty": "Easy",
+      "hints": [
+        "🤔 I repeat everything you say.",
+        "🤔 You find me in canyons and empty halls.",
+        "🤔 A sound that bounces back — an 'echo'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
+        "hint": "A reflected sound",
+        "answer": "echo"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_02",
+      "title": "The Leaving Trail",
+      "difficulty": "Easy",
+      "hints": [
+        "🤔 Think about going for a walk.",
+        "🤔 Every step you take leaves something behind.",
+        "🤔 They are 'footsteps'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "The more you take, the more you leave behind. What are they?",
+        "hint": "Made while walking",
+        "answer": "footsteps"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_03",
+      "title": "Keys Without Locks",
+      "difficulty": "Easy",
+      "hints": [
+        "🤔 You use it every day to type.",
+        "🤔 It has letter keys and a space bar.",
+        "🤔 It's a 'keyboard'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "I have keys but no locks, space but no room. You can enter, but you can't go inside. What am I?",
+        "hint": "Found in front of a screen",
+        "answer": "keyboard"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_04",
+      "title": "Cities Without Houses",
+      "difficulty": "Medium",
+      "hints": [
+        "🤔 I show places without being them.",
+        "🤔 You unfold me to find your way.",
+        "🤔 I'm a 'map'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "I have cities but no houses, forests but no trees, and water but no fish. What am I?",
+        "hint": "A cartographer's tool",
+        "answer": "map"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_05",
+      "title": "Runs But Never Moves",
+      "difficulty": "Medium",
+      "hints": [
+        "🤔 It surrounds a yard.",
+        "🤔 It marks a boundary.",
+        "🤔 It's a 'fence'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "What runs all around a yard, yet never moves?",
+        "hint": "A boundary around a house",
+        "answer": "fence"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_06",
+      "title": "Lighter Than Air",
+      "difficulty": "Medium",
+      "hints": [
+        "🤔 You take it in and let it out.",
+        "🤔 You can't hold it forever.",
+        "🤔 It's your 'breath'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "I'm light as a feather, yet even the strongest person can't hold me for long. What am I?",
+        "hint": "Life-giving air",
+        "answer": "breath"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_07",
+      "title": "A Neck, No Head",
+      "difficulty": "Hard",
+      "hints": [
+        "🤔 It holds a drink.",
+        "🤔 It has a long top part.",
+        "🤔 It's a 'bottle'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "What has a neck but no head?",
+        "hint": "A container for liquid",
+        "answer": "bottle"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_08",
+      "title": "Wetter When It Dries",
+      "difficulty": "Hard",
+      "hints": [
+        "🤔 You use it after a shower.",
+        "🤔 It soaks up water.",
+        "🤔 It's a 'towel'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "What gets wetter the more it dries?",
+        "hint": "A bathroom cloth",
+        "answer": "towel"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_09",
+      "title": "Branches, No Leaves",
+      "difficulty": "Expert",
+      "hints": [
+        "🤔 Think of a place, not a tree.",
+        "🤔 It handles money.",
+        "🤔 It's a 'bank'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "I have branches, but no fruit, trunk, or leaves. What am I?",
+        "hint": "A financial institution",
+        "answer": "bank"
+      }
+    },
+    {
+      "level_id": "room_10_riddles_10",
+      "title": "Always Ahead",
+      "difficulty": "Expert",
+      "hints": [
+        "🤔 It hasn't happened yet.",
+        "🤔 It's the opposite of the past.",
+        "🤔 It's the 'future'."
+      ],
+      "mechanic": {
+        "mechanic_type": "riddle",
+        "riddle_text": "What is always in front of you but can never be seen?",
+        "hint": "Time yet to come",
+        "answer": "future"
+      }
+    }
+  ]
+}

@@ -43,7 +43,7 @@ class LeaderboardActivity : AppCompatActivity() {
     }
 
     private fun loadLeaderboard() {
-        statusText.text = "Loading leaderboard…"
+        statusText.text = getString(R.string.lb_loading)
         lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) { fetchLeaderboard() }
             result.onSuccess { render(it) }
@@ -89,10 +89,10 @@ class LeaderboardActivity : AppCompatActivity() {
     private fun render(rows: List<Row>) {
         listContainer.removeAllViews()
         if (rows.isEmpty()) {
-            statusText.text = "No players yet — solve a puzzle to appear here!"
+            statusText.text = getString(R.string.lb_no_players)
             return
         }
-        statusText.text = "${rows.size} player${if (rows.size == 1) "" else "s"}"
+        statusText.text = getString(R.string.lb_players_count, rows.size)
         rows.forEach { r -> listContainer.addView(rowView(r)) }
     }
 
@@ -112,7 +112,7 @@ class LeaderboardActivity : AppCompatActivity() {
     private fun renderError(e: Throwable) {
         listContainer.removeAllViews()
         statusText.setTextColor(Color.parseColor("#FFD740"))
-        statusText.text = "📴 Offline — showing local scores"
+        statusText.text = getString(R.string.lb_offline)
         renderLocal()
     }
 
@@ -121,7 +121,7 @@ class LeaderboardActivity : AppCompatActivity() {
         val board = GameStats.leaderboard(this)
         if (board.isEmpty()) {
             listContainer.addView(TextView(this).apply {
-                text = "No local scores yet — solve a puzzle!"
+                text = getString(R.string.lb_no_local_scores)
                 textSize = 15f
                 setTextColor(Color.parseColor("#94A3B8"))
                 gravity = Gravity.CENTER

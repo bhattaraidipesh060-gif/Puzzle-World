@@ -75,13 +75,13 @@ class SudokuActivity : AppCompatActivity() {
         btnUndo.setOnClickListener { undo() }
         btnNotes.setOnClickListener {
             boardView.noteMode = !boardView.noteMode
-            btnNotes.text = if (boardView.noteMode) "✎  NOTES ON" else "✎  NOTES"
+            btnNotes.text = if (boardView.noteMode) getString(R.string.sudoku_notes_on) else getString(R.string.sudoku_notes)
             if (boardView.noteMode) {
                 btnNotes.setTextColor(Color.parseColor("#FFD740"))
-                statusView.text = "Note mode: tap digit to toggle pencil mark"
+                statusView.text = getString(R.string.sudoku_mode_note)
             } else {
                 btnNotes.setTextColor(Color.WHITE)
-                statusView.text = "Enter mode: tap digit to set cell value"
+                statusView.text = getString(R.string.sudoku_mode_enter)
             }
         }
         btnHint.setOnClickListener { giveHint() }
@@ -109,7 +109,7 @@ class SudokuActivity : AppCompatActivity() {
 
         boardView.onBoardChanged = {
             statusView.setTextColor(Color.parseColor("#B0B8C4"))
-            statusView.text = "Solving…"
+            statusView.text = getString(R.string.sudoku_solving)
         }
         boardView.onSolved = { onSolved() }
 
@@ -129,7 +129,7 @@ class SudokuActivity : AppCompatActivity() {
         if (finished || undoStack.isEmpty()) return
         boardView.restoreSnapshot(undoStack.removeAt(undoStack.lastIndex))
         statusView.setTextColor(Color.parseColor("#FFD740"))
-        statusView.text = "🔄 Undo (${undoStack.size} steps left)"
+        statusView.text = getString(R.string.sudoku_undo_fmt, undoStack.size)
     }
 
     private fun giveHint() {
@@ -137,9 +137,9 @@ class SudokuActivity : AppCompatActivity() {
         if (boardView.hint()) {
             boardView.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             statusView.setTextColor(Color.parseColor("#FFD740"))
-            statusView.text = "💡 Hint: a cell filled in"
+            statusView.text = getString(R.string.sudoku_hint_cell)
         } else {
-            statusView.text = "No empty cells left — tap CHECK!"
+            statusView.text = getString(R.string.sudoku_no_empty)
         }
     }
 
@@ -149,16 +149,16 @@ class SudokuActivity : AppCompatActivity() {
         elapsedSec = 0
         undoStack.clear()
         boardView.noteMode = false
-        btnNotes.text = "✎  NOTES"
+        btnNotes.text = getString(R.string.sudoku_notes)
         btnNotes.setTextColor(Color.WHITE)
         val givens = DIFFICULTY_GIVENS[diff] ?: 36
         val (puzzle, sol) = SudokuEngine.generate(System.currentTimeMillis(), givens)
         solution = sol
         boardView.puzzle = puzzle
         boardView.solution = sol
-        headerTitle.text = "🧩 Sudoku — $diff"
+        headerTitle.text = getString(R.string.sudoku_title_fmt, Labels.difficulty(this, diff))
         statusView.setTextColor(Color.parseColor("#B0B8C4"))
-        statusView.text = "Tap a cell, then enter a number"
+        statusView.text = getString(R.string.sudoku_instruction)
         updateTimer()
         handler.removeCallbacks(ticker)
         handler.postDelayed(ticker, 1000L)
@@ -166,11 +166,12 @@ class SudokuActivity : AppCompatActivity() {
 
     private fun chooseDifficulty() {
         handler.removeCallbacks(ticker)
-        val items = arrayOf("Easy", "Medium", "Hard", "Expert")
+        val keys = arrayOf("Easy", "Medium", "Hard", "Expert")
+        val items = keys.map { Labels.difficulty(this, it) }.toTypedArray()
         AlertDialog.Builder(this, R.style.HintDialog)
-            .setTitle("🎯 Difficulty")
-            .setItems(items) { _, i -> newGame(items[i]) }
-            .setNegativeButton("Cancel") { _, _ -> handler.postDelayed(ticker, 1000L) }
+            .setTitle(getString(R.string.sudoku_difficulty))
+            .setItems(items) { _, i -> newGame(keys[i]) }
+            .setNegativeButton(getString(R.string.action_cancel)) { _, _ -> handler.postDelayed(ticker, 1000L) }
             .show()
     }
 
@@ -187,11 +188,11 @@ class SudokuActivity : AppCompatActivity() {
             SudokuEngine.isSolved(board) -> onSolved()
             empty == 0 -> {
                 statusView.setTextColor(Color.parseColor("#FF4081"))
-                statusView.text = "❌ $conflicts cell(s) wrong — fix the red cells"
+                statusView.text = getString(R.string.sudoku_wrong_fmt, conflicts)
             }
             else -> {
                 statusView.setTextColor(Color.parseColor("#FFD740"))
-                statusView.text = "⚠️ $empty empty, $conflicts wrong — keep going!"
+                statusView.text = getString(R.string.sudoku_partial_fmt, empty, conflicts)
                 SoundFx.error()
             }
         }
@@ -205,12 +206,12 @@ class SudokuActivity : AppCompatActivity() {
         val points = when (difficulty) { "Easy" -> 50; "Medium" -> 100; "Hard" -> 150; else -> 200 }
         GameStats.recordSolve(this, "sudoku", points)
         statusView.setTextColor(Color.parseColor("#00E676"))
-        statusView.text = "🎉 Solved in ${formatTime(elapsedSec)}!"
+        statusView.text = getString(R.string.sudoku_solved_fmt, formatTime(elapsedSec))
         boardView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         boardView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pop))
         celebration.burst(70)
         SoundFx.win()
-        Toast.makeText(this, "🏆 Sudoku complete!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.sudoku_complete), Toast.LENGTH_SHORT).show()
     }
 
     /** Zen / Speed pacing glyph based on elapsed time vs. a difficulty par. */

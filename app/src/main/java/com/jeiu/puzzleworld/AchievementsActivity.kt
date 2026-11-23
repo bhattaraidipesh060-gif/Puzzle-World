@@ -59,7 +59,7 @@ class AchievementsActivity : AppCompatActivity() {
         world = HttpWorldService(ApiClient.BASE_URL, SessionManager.userId() ?: username, SessionManager.token())
 
         listContainer.addView(TextView(this).apply {
-            text = "Loading badges…"
+            text = getString(R.string.lb_loading_badges)
             textSize = 14f
             setTextColor(Color.parseColor(TEXT_MUTE))
             gravity = Gravity.CENTER
@@ -79,7 +79,7 @@ class AchievementsActivity : AppCompatActivity() {
     private fun renderOffline() {
         listContainer.removeAllViews()
         listContainer.addView(TextView(this).apply {
-            text = "⚠️ Offline — badges sync from the cloud.\nConnect to see your rank badges."
+            text = getString(R.string.achievements_offline_sync)
             textSize = 14f
             setTextColor(Color.parseColor(TEXT_MUTE))
             gravity = Gravity.CENTER
@@ -88,7 +88,7 @@ class AchievementsActivity : AppCompatActivity() {
     }
 
     private fun render(profile: BadgeProfile) {
-        headerCount.text = "${profile.unlockedCount} / ${profile.totalBadges} unlocked"
+        headerCount.text = getString(R.string.achievements_count_fmt, profile.unlockedCount, profile.totalBadges)
         listContainer.removeAllViews()
 
         val cache = getSharedPreferences(BADGE_CACHE, MODE_PRIVATE)
@@ -152,7 +152,7 @@ class AchievementsActivity : AppCompatActivity() {
 
         if (unlocked) {
             card.addView(TextView(this).apply {
-                text = "✅ Unlocked"
+                text = getString(R.string.achievements_unlocked)
                 textSize = 11f
                 setTextColor(Color.parseColor(GREEN))
                 gravity = Gravity.CENTER

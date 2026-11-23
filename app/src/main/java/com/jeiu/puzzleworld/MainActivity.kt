@@ -117,18 +117,18 @@ class MainActivity : AppCompatActivity() {
         patternLockView.onPatternComplete = { correct ->
             val level = currentRoom?.levelNumber(currentLevelNum)
             if (correct && level != null && !state.isSolved(level.levelId))
-                completeLevel(level, "🔓 Pattern matched!")
+                completeLevel(level, getString(R.string.solve_pattern_matched))
             else if (!correct)
-                Toast.makeText(this, "❌ Wrong pattern — try again", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.pl_wrong_pattern), Toast.LENGTH_SHORT).show()
         }
 
         // Color sequence listener
         colorSequenceView.onSequenceComplete = { correct ->
             val level = currentRoom?.levelNumber(currentLevelNum)
             if (correct && level != null && !state.isSolved(level.levelId))
-                completeLevel(level, "🎨 Flawless memory!")
+                completeLevel(level, getString(R.string.solve_flawless_memory))
             else
-                Toast.makeText(this, "Wrong sequence — watch again…", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.cs_wrong_sequence), Toast.LENGTH_SHORT).show()
         }
         colorSequenceView.onPhaseChange = { msg -> puzzleInfo.text = msg }
 
@@ -216,19 +216,20 @@ class MainActivity : AppCompatActivity() {
         val icon = mechanicIcon(level.mechanic)
 
         headerTitle.text = "${room.roomName} — ${level.title}"
-        puzzleInfo.text  = "$icon  ${level.difficulty}$solved  ·  ${level.mechanic.mechanicType.replace('_',' ')}  ·  ⭐${state.score}"
+        puzzleInfo.text  = "$icon  ${Labels.difficulty(this, level.difficulty)}$solved  ·  ${Labels.mechanic(this, level.mechanic.mechanicType)}  ·  ⭐${state.score}"
         answerInput.isEnabled = !state.isSolved(level.levelId)
         btnSubmit.isEnabled   = !state.isSolved(level.levelId)
         answerInput.text.clear()
         answerInput.hint = when (level.mechanic) {
-            is PuzzleMechanic.Cipher         -> "🔐 Decode the cipher..."
-            is PuzzleMechanic.Riddle         -> "🤔 Your answer..."
-            is PuzzleMechanic.MechanicalLock -> "🔒 Enter combination..."
-            is PuzzleMechanic.DeductionGrid  -> "🧩 Enter solution..."
-            is PuzzleMechanic.WireMaze       -> "🎯 Connect the wires!"
-            is PuzzleMechanic.PatternLock    -> "🔓 Draw the pattern..."
-            is PuzzleMechanic.ColorSequence  -> "🎨 Tap the colors..."
-            else -> "🔑 Enter your answer..."
+            is PuzzleMechanic.Cipher         -> getString(R.string.hint_cipher)
+            is PuzzleMechanic.CipherWheel    -> getString(R.string.hint_cipher_wheel)
+            is PuzzleMechanic.Riddle         -> getString(R.string.hint_riddle)
+            is PuzzleMechanic.MechanicalLock -> getString(R.string.hint_mechanical_lock)
+            is PuzzleMechanic.DeductionGrid  -> getString(R.string.hint_deduction_grid)
+            is PuzzleMechanic.WireMaze       -> getString(R.string.hint_wire_maze)
+            is PuzzleMechanic.PatternLock    -> getString(R.string.hint_pattern_lock)
+            is PuzzleMechanic.ColorSequence  -> getString(R.string.hint_color_sequence)
+            else -> getString(R.string.game_answer_hint)
         }
 
         val isVisual = level.mechanic is PuzzleMechanic.WireMaze
@@ -248,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         // Visual state for solved
         if (state.isSolved(level.levelId)) {
             answerInput.setBackgroundColor(Color.parseColor("#1A3320"))
-            answerInput.hint = "✅ Solved!"
+            answerInput.hint = getString(R.string.hint_solved)
         } else {
             answerInput.setBackgroundColor(Color.parseColor("#263449"))
         }
@@ -285,55 +286,49 @@ class MainActivity : AppCompatActivity() {
             is PuzzleMechanic.VaultDial -> setupMinigame(level) {
                 VaultDialView(this).apply {
                     setDial(m.combination.toIntArray())
-                    onSolved = { completeLevel(level, "🔒 Vault cracked!") }
-                }
-            }
-            is PuzzleMechanic.CipherWheel -> setupMinigame(level) {
-                CipherWheelView(this).apply {
-                    setPuzzle(m.cipherText, m.answer, m.shift)
-                    onSolved = { completeLevel(level, "🔐 Cipher decoded!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_vault_cracked)) }
                 }
             }
             is PuzzleMechanic.GearAlignment -> setupMinigame(level) {
                 GearView(this).apply {
                     setGears(m.gears.map { it.angle }.toIntArray(), m.gears.map { it.target }.toIntArray())
-                    onSolved = { completeLevel(level, "⚙️ Mechanism aligned!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_mechanism_aligned)) }
                 }
             }
             is PuzzleMechanic.SlidingTile -> setupMinigame(level) {
                 SlidingTileView(this).apply {
                     setPuzzle(m.size, m.tiles.toIntArray())
-                    onSolved = { completeLevel(level, "📚 Tiles ordered!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_tiles_ordered)) }
                 }
             }
             is PuzzleMechanic.TerminalHack -> setupMinigame(level) {
                 TerminalHackView(this).apply {
                     setPuzzle(m.mode, m.input, m.answer, m.nodes.toIntArray())
-                    onSolved = { completeLevel(level, "💻 Access granted!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_access_granted)) }
                 }
             }
             is PuzzleMechanic.PotionMix -> setupMinigame(level) {
                 PotionMixView(this).apply {
                     setPuzzle(m.beakers.map { it.cap }.toIntArray(), m.target)
-                    onSolved = { completeLevel(level, "⚗️ Elixir measured!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_elixir_measured)) }
                 }
             }
             is PuzzleMechanic.CoordinateMaze -> setupMinigame(level) {
                 CoordinateMazeView(this).apply {
                     setGrid(m.grid)
-                    onSolved = { completeLevel(level, "🧭 Destination reached!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_destination_reached)) }
                 }
             }
             is PuzzleMechanic.LockPin -> setupMinigame(level) {
                 LockPinView(this).apply {
                     setPins(m.pins.toIntArray())
-                    onSolved = { completeLevel(level, "🔑 Lock picked!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_lock_picked)) }
                 }
             }
             is PuzzleMechanic.NeonSimon -> setupMinigame(level) {
                 NeonSimonView(this).apply {
                     setSequence(m.sequence.toIntArray(), m.speedMs)
-                    onSolved = { completeLevel(level, "🕹️ Beat the machine!") }
+                    onSolved = { completeLevel(level, getString(R.string.solve_beat_machine)) }
                 }
             }
             else -> {
@@ -359,7 +354,17 @@ class MainActivity : AppCompatActivity() {
                 append("🔐  ")
                 append(m.cipherText)
                 append("\n")
-                append("    — ${m.cipherType.uppercase()} CIPHER —")
+                append(getString(R.string.dc_cipher_type_heading, m.cipherType.uppercase()))
+            }
+            is PuzzleMechanic.CipherWheel -> buildString {
+                append("🔐  ")
+                append(m.cipherText)
+                append("\n")
+                append(getString(R.string.dc_cipher_type_heading, m.cipherType.uppercase()))
+                if (m.hint.isNotBlank()) {
+                    append("\n\n💡 ")
+                    append(m.hint)
+                }
             }
             is PuzzleMechanic.Riddle -> buildString {
                 append("🤔  ")
@@ -372,27 +377,27 @@ class MainActivity : AppCompatActivity() {
                 append(m.categories.joinToString(" · "))
                 append("\n\n")
                 append(m.clues.joinToString("\n") { "• $it" })
-                append("\n\n📋 items: ")
+                append(getString(R.string.dc_items_label_prefixed))
                 append(m.items.joinToString(", "))
             }
             is PuzzleMechanic.MechanicalLock -> buildString {
                 append("🔒  ")
                 append(m.lockType.uppercase())
-                append(" LOCK\n\n")
+                append(getString(R.string.dc_lock_label_plain))
                 append("🔢 ")
                 append("▣ ".repeat(m.combination.size).trim())
                 append("\n   (")
                 append(m.combination.size)
-                append(" digits)")
+                append(getString(R.string.dc_digits_suffix))
             }
             is PuzzleMechanic.WireMaze -> ""
             is PuzzleMechanic.PatternLock -> buildString {
-                append("🔓  Pattern Lock\\n\\n")
-                append("Draw the secret pattern across the 3×3 grid")
+                append(getString(R.string.pl_pattern_lock_label))
+                append(getString(R.string.pl_draw_pattern))
             }
             is PuzzleMechanic.ColorSequence -> buildString {
-                append("🎨  Color Sequence\\n\\n")
-                append("Watch the panels light up, then\\ntap them in the same order")
+                append(getString(R.string.cs_color_sequence_label))
+                append(getString(R.string.cs_watch_panels))
             }
         else -> ""
         }
@@ -415,12 +420,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun onWireMazeComplete(level: PuzzleLevel) {
         if (state.isSolved(level.levelId)) return
-        completeLevel(level, "💡 Circuit complete!")
+        completeLevel(level, getString(R.string.solve_circuit_complete))
     }
 
     private fun updateWireMazeInfo(level: PuzzleLevel, moves: Int) {
         val solved = if (state.isSolved(level.levelId)) " ✓" else ""
-        puzzleInfo.text = "🔌  ${level.difficulty}$solved  ·  wire maze  ·  moves $moves / par $wireMazePar  ·  ⭐${state.score}"
+        puzzleInfo.text = "🔌  ${Labels.difficulty(this, level.difficulty)}$solved  ·  ${Labels.mechanic(this, "wire_maze")}  ·  ${getString(R.string.wire_maze_moves_fmt, moves, wireMazePar)}  ·  ⭐${state.score}"
     }
 
     private fun completeLevel(level: PuzzleLevel, toastPrefix: String) {
@@ -435,8 +440,8 @@ class MainActivity : AppCompatActivity() {
         state.score += earned
         state.markSolved(level.levelId)
         GameStats.recordSolve(this, "escape_room", earned)
-        val streakMsg = if (state.streak >= 3) " 🔥${state.streak}x streak!" else ""
-        Toast.makeText(this, "$toastPrefix +$earned pts$streakMsg", Toast.LENGTH_SHORT).show()
+        val streakMsg = if (state.streak >= 3) getString(R.string.streak_fmt, state.streak) else ""
+        Toast.makeText(this, getString(R.string.points_toast_fmt, toastPrefix, earned, streakMsg), Toast.LENGTH_SHORT).show()
         answerInput.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         celebration.burst(40)
         SoundFx.win()
@@ -462,7 +467,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isMinigame(m: PuzzleMechanic): Boolean = when (m) {
-        is PuzzleMechanic.VaultDial, is PuzzleMechanic.CipherWheel, is PuzzleMechanic.GearAlignment,
+        is PuzzleMechanic.VaultDial, is PuzzleMechanic.GearAlignment,
         is PuzzleMechanic.SlidingTile, is PuzzleMechanic.TerminalHack, is PuzzleMechanic.PotionMix,
         is PuzzleMechanic.CoordinateMaze, is PuzzleMechanic.LockPin, is PuzzleMechanic.NeonSimon -> true
         else -> false
@@ -475,7 +480,7 @@ class MainActivity : AppCompatActivity() {
         answerInput.visibility = View.GONE
         if (state.isSolved(level.levelId)) {
             puzzlePrompt.visibility = View.VISIBLE
-            puzzlePrompt.text = "✅  Solved!"
+            puzzlePrompt.text = getString(R.string.game_solved)
             minigameView = null
             return
         }
@@ -492,6 +497,7 @@ class MainActivity : AppCompatActivity() {
         val input = answerInput.text.toString().trim()
         val correct = when (val m = level.mechanic) {
             is PuzzleMechanic.Cipher -> input.equals(m.answer, ignoreCase = true)
+            is PuzzleMechanic.CipherWheel -> input.equals(m.answer, ignoreCase = true)
             is PuzzleMechanic.Riddle          -> input.equals(m.answer, ignoreCase = true)
             is PuzzleMechanic.MechanicalLock  -> input == m.combination.joinToString("")
             is PuzzleMechanic.DeductionGrid   -> input.replace(" ", "").equals(
@@ -504,7 +510,7 @@ class MainActivity : AppCompatActivity() {
 
         state.totalAttempts++
         if (correct) {
-            completeLevel(level, "🎉 Correct!")
+            completeLevel(level, getString(R.string.solve_correct))
         } else {
             state.streak = 0
             answerInput.performHapticFeedback(HapticFeedbackConstants.REJECT)
@@ -515,7 +521,7 @@ class MainActivity : AppCompatActivity() {
                 if (currentRoom?.levelNumber(currentLevelNum)?.let { !state.isSolved(it.levelId) } == true)
                     answerInput.setBackgroundColor(Color.parseColor("#263449"))
             }, 400)
-            Toast.makeText(this, "❌ Not quite. Streak reset.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.game_streak_reset), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -568,7 +574,7 @@ class MainActivity : AppCompatActivity() {
         val room = currentRoom ?: return
         val target = (currentLevelNum + delta).coerceIn(1, 10)
         if (target > currentLevelNum && !isLevelUnlocked(room, target)) {
-            Toast.makeText(this, "🔒 Complete the current level first!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.game_complete_level_first), Toast.LENGTH_SHORT).show()
             return
         }
         currentLevelNum = target
@@ -678,7 +684,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 setOnClickListener {
                     if (!isLevelUnlocked(room, i)) {
-                        Toast.makeText(this@MainActivity, "🔒 Complete level ${i - 1} first!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, getString(R.string.game_complete_level_fmt, i - 1), Toast.LENGTH_SHORT).show()
                     } else {
                         currentLevelNum = i
                         loadCurrentLevel()
@@ -829,7 +835,7 @@ class MainActivity : AppCompatActivity() {
             storage.saveState(state)
             bootstrap()
         }
-        Toast.makeText(this, "🎮 Progress cleared!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.game_progress_cleared), Toast.LENGTH_SHORT).show()
     }
 
     // ── Chrono Pulse (risk-reward visual clue) ──────────────────────────────
@@ -838,7 +844,7 @@ class MainActivity : AppCompatActivity() {
         val level = currentRoom?.levelNumber(currentLevelNum) ?: return
         if (state.isSolved(level.levelId)) return
         if (state.score < 5) {
-            Toast.makeText(this, "⚡ Chrono Pulse costs 5 pts — keep solving!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.pulse_costs), Toast.LENGTH_SHORT).show()
             return
         }
         state.score -= 5
@@ -855,14 +861,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun pulseCue(m: PuzzleMechanic): String = when (m) {
-        is PuzzleMechanic.Cipher -> "The air hums — count letters, not words."
-        is PuzzleMechanic.Riddle -> "Look past the obvious — every word is a clue."
-        is PuzzleMechanic.MechanicalLock -> "Run your thumb over the dials — listen for the click."
-        is PuzzleMechanic.DeductionGrid -> "The grid wants balance — match, don't guess."
-        is PuzzleMechanic.WireMaze -> "Follow the current — begin where the spark starts."
-        is PuzzleMechanic.PatternLock -> "Trace the shape the room remembers."
-        is PuzzleMechanic.ColorSequence -> "Close your eyes — let the colors echo."
-        else -> "The room shifts — trust your first instinct."
+        is PuzzleMechanic.Cipher -> getString(R.string.pulse_cipher)
+        is PuzzleMechanic.Riddle -> getString(R.string.pulse_riddle)
+        is PuzzleMechanic.MechanicalLock -> getString(R.string.pulse_mechanical_lock)
+        is PuzzleMechanic.DeductionGrid -> getString(R.string.pulse_deduction_grid)
+        is PuzzleMechanic.WireMaze -> getString(R.string.pulse_wire_maze)
+        is PuzzleMechanic.PatternLock -> getString(R.string.pulse_pattern_lock)
+        is PuzzleMechanic.ColorSequence -> getString(R.string.pulse_color_sequence)
+        else -> getString(R.string.pulse_default)
     }
 
     // ── Cipher Breakdown (frequency / shift-step pattern clue) ──────────────
@@ -879,13 +885,13 @@ class MainActivity : AppCompatActivity() {
             .entries.sortedByDescending { it.value }.take(3)
             .joinToString("  ") { "${it.key} ×${it.value}" }
         val msg = buildString {
-            append("📊 Letter frequency (top 3):\n   ")
+            append(getString(R.string.cipher_freq_label))
             append(freq.ifBlank { "—" })
-            append("\n\n🔁 Shift-step: in a Caesar-style shift every letter moves by the same step — compare the most common cipher letter to 'E' (English) to estimate it.")
-            append("\n\n🧩 Multi-stage: decode layer by layer — each stage usually hides the next.")
+            append(getString(R.string.cipher_shift_hint))
+            append(getString(R.string.cipher_multistage_hint))
         }
         AlertDialog.Builder(this, R.style.HintDialog)
-            .setTitle("🔬 Cipher Breakdown")
+            .setTitle(getString(R.string.cipher_breakdown))
             .setMessage(msg)
             .setPositiveButton(getString(R.string.game_got_it), null)
             .show()

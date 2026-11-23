@@ -109,7 +109,7 @@ class WordDescramblerActivity : AppCompatActivity() {
         answerInput.isEnabled = true
         btnCheck.isEnabled = true
         statusView.setTextColor(Color.parseColor("#B0B8C4"))
-        statusView.text = "Round $roundNum — ${currentRound!!.word.length} letters [$difficulty]  ·  🏷 ${currentRound!!.category}"
+        statusView.text = getString(R.string.word_round_fmt, roundNum, currentRound!!.word.length, Labels.difficulty(this, difficulty), currentRound!!.category)
         updateTimer()
         handler.removeCallbacks(ticker)
         handler.postDelayed(ticker, 1000L)
@@ -154,7 +154,7 @@ class WordDescramblerActivity : AppCompatActivity() {
         val input = answerInput.text.toString().trim().uppercase()
         if (input.isEmpty()) {
             statusView.setTextColor(Color.parseColor("#B0B8C4"))
-            statusView.text = "Type a word first"
+            statusView.text = getString(R.string.word_type_first)
             return
         }
         if (input == round.word) {
@@ -169,7 +169,7 @@ class WordDescramblerActivity : AppCompatActivity() {
             answerInput.isEnabled = false
             btnCheck.isEnabled = false
             statusView.setTextColor(Color.parseColor("#00E676"))
-            statusView.text = "✅ Correct! +${base + diffBonus + streakBonus} pts in ${formatTime(elapsedSec)}${if (streak >= 3) " 🔥${streak}x streak" else ""}"
+            statusView.text = getString(R.string.word_correct_fmt, base + diffBonus + streakBonus, formatTime(elapsedSec), if (streak >= 3) getString(R.string.word_streak_fmt, streak) else "")
             answerInput.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
             answerInput.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pop))
             celebration.burst(50)
@@ -178,7 +178,7 @@ class WordDescramblerActivity : AppCompatActivity() {
         } else {
             streak = 0
             statusView.setTextColor(Color.parseColor("#FF4081"))
-            statusView.text = "❌ Not quite — try again"
+            statusView.text = getString(R.string.word_not_quite)
             answerInput.performHapticFeedback(HapticFeedbackConstants.REJECT)
             answerInput.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake_x))
             SoundFx.error()
@@ -191,7 +191,7 @@ class WordDescramblerActivity : AppCompatActivity() {
         val round = currentRound ?: return
         if (solved) return
         if (hintIndex >= round.hintLayers.size) {
-            statusView.text = "No more hints — you're close!"
+            statusView.text = getString(R.string.game_no_more_hints)
             return
         }
         hintView.text = "💡 ${round.hintLayers[hintIndex]}"
@@ -205,36 +205,37 @@ class WordDescramblerActivity : AppCompatActivity() {
         if (solved) return
         val candidates = round.word.indices.filter { it !in revealed }
         if (candidates.isEmpty()) {
-            statusView.text = "All positions revealed — you've got this!"
+            statusView.text = getString(R.string.word_all_revealed)
             return
         }
         val idx = candidates.random()
         revealed.add(idx)
         score = (score - 5).coerceAtLeast(0)
-        hintView.text = "👁 Letter at position ${idx + 1} is '${round.word[idx]}'"
+        hintView.text = getString(R.string.word_peek_letter_fmt, idx + 1, round.word[idx])
         hintView.visibility = android.view.View.VISIBLE
-        statusView.text = "Peek used (−5 pts)  ·  ⭐$score"
+        statusView.text = getString(R.string.word_peek_used_fmt, score)
         SoundFx.click()
         savePrefs(); updateHud()
     }
 
     private fun chooseDifficulty() {
         handler.removeCallbacks(ticker)
-        val items = arrayOf("Easy (3-5 letters)", "Medium (5-7 letters)", "Hard (7-9 letters)", "Expert (9-12 letters)")
+        val keys = arrayOf("Easy", "Medium", "Hard", "Expert")
+        val items = arrayOf(getString(R.string.word_pick_easy), getString(R.string.word_pick_medium), getString(R.string.word_pick_hard), getString(R.string.word_pick_expert))
         AlertDialog.Builder(this, R.style.HintDialog)
-            .setTitle("🎯 Difficulty")
+            .setTitle(getString(R.string.sudoku_difficulty))
             .setItems(items) { _, i ->
-                difficulty = arrayOf("Easy", "Medium", "Hard", "Expert")[i]
+                difficulty = keys[i]
                 roundNum = 1; score = 0; streak = 0
                 savePrefs(); updateHud(); newRound()
             }
-            .setNegativeButton("Cancel") { _, _ -> if (!solved) handler.postDelayed(ticker, 1000L) }
+            .setNegativeButton(getString(R.string.action_cancel)) { _, _ -> if (!solved) handler.postDelayed(ticker, 1000L) }
             .show()
     }
 
     private fun updateHud() {
         val streakTag = if (streak >= 2) "  🔥×$streak" else ""
-        headerTitle.text = "🔤 Word Descrambler — $difficulty$streakTag"
+        headerTitle.text = getString(R.string.word_header_fmt, Labels.difficulty(this, difficulty) + streakTag)
     }
 
     private fun updateTimer() {

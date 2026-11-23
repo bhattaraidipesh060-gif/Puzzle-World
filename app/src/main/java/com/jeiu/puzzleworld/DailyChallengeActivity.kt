@@ -103,7 +103,7 @@ class DailyChallengeActivity : AppCompatActivity() {
     // ── Fetch & parse ────────────────────────────────────────────────────────
 
     private fun loadChallenge() {
-        statusText.text = "Loading daily challenge…"
+        statusText.text = getString(R.string.dc_loading)
         lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) { fetchDailyChallenge() }
             result.onSuccess { renderChallenge(it) }
@@ -147,7 +147,7 @@ class DailyChallengeActivity : AppCompatActivity() {
             append("🗓️ ")
             append(root.optString("challenge_date", "Daily"))
             append("  ·  ")
-            append(level.optString("difficulty", "Medium"))
+            append(Labels.difficulty(this@DailyChallengeActivity, level.optString("difficulty", "Medium")))
             val room = level.optString("room_name", "")
             if (room.isNotEmpty()) { append("  ·  "); append(room) }
             append("\n")
@@ -174,10 +174,10 @@ class DailyChallengeActivity : AppCompatActivity() {
         btnCheck.isEnabled = !visual
         answerInput.text.clear()
         if (visual) {
-            answerInput.hint = "Visual puzzle — no text answer"
-            statusText.text = "Trace the path in the grid above"
+            answerInput.hint = getString(R.string.dc_visual_no_text)
+            statusText.text = getString(R.string.dc_trace_path)
         } else {
-            statusText.text = "Ready"
+            statusText.text = getString(R.string.dc_ready)
         }
 
         Log.d(TAG, "Rendered daily challenge: mechanic=$mechanicType difficulty=${level.optString("difficulty")}")
@@ -189,7 +189,7 @@ class DailyChallengeActivity : AppCompatActivity() {
             append(m.optString("cipher_text", ""))
             append("\n\n    — ")
             append(m.optString("cipher_type", "CIPHER").uppercase())
-            append(" CIPHER —")
+            append(getString(R.string.dc_cipher_label))
         }
         "riddle" -> buildString {
             append("🤔  \"")
@@ -201,25 +201,25 @@ class DailyChallengeActivity : AppCompatActivity() {
             append(m.optString("cipher_text", ""))
             append("\n\n    — ")
             append(m.optString("cipher_type", "CAESAR").uppercase())
-            append(" CIPHER WHEEL —")
+            append(getString(R.string.dc_cipher_wheel_label))
         }
         "terminal_hack" -> buildString {
-            append("💻  TERMINAL HACK — ")
+            append(getString(R.string.dc_terminal_label))
             append(m.optString("mode", "").uppercase())
-            append("\n\nBinary: ")
+            append(getString(R.string.dc_binary_label))
             append(m.optString("input", ""))
-            append("\n\n(convert the binary stream to hex)")
+            append(getString(R.string.dc_convert_hint))
         }
         "mechanical_lock" -> buildString {
             val combo = m.optJSONArray("combination")
             val n = combo?.length() ?: 0
             append("🔒  ")
             append(m.optString("lock_type", "DIAL").uppercase())
-            append(" LOCK\n\n🔢 ")
+            append(getString(R.string.dc_lock_label))
             append("▣ ".repeat(n).trim())
             append("\n   (")
             append(n)
-            append(" digits)")
+            append(getString(R.string.dc_digits_suffix))
         }
         "deduction_grid" -> buildString {
             val cats  = jsonArrayToStrings(m.optJSONArray("categories"))
@@ -229,15 +229,15 @@ class DailyChallengeActivity : AppCompatActivity() {
             append(cats.joinToString(" · "))
             append("\n\n")
             append(clues.joinToString("\n") { "• $it" })
-            append("\n\n📋 items: ")
+            append(getString(R.string.dc_items_label_prefixed))
             append(items.joinToString(", "))
         }
         "wire_maze" -> buildString {
             val cols = m.optInt("gridCols", m.optInt("grid_cols", 8))
             val rows = m.optInt("gridRows", m.optInt("grid_rows", 8))
-            append("🔌  Wire Maze — connect start → end\n\n")
-            append("Grid: ").append(cols).append(" × ").append(rows)
-            append("\n\n(Visual puzzle — solve by tracing the wire path.)")
+            append(getString(R.string.dc_wire_maze_label))
+            append(getString(R.string.dc_grid_label)).append(cols).append(" × ").append(rows)
+            append(getString(R.string.dc_visual_hint))
         }
         else -> "❓ Unknown mechanic"
     }
@@ -254,14 +254,14 @@ class DailyChallengeActivity : AppCompatActivity() {
         val input = answerInput.text.toString().trim()
         if (input.isEmpty()) {
             statusText.setTextColor(Color.parseColor(COLOR_MUTED))
-            statusText.text = "Enter an answer first"
+            statusText.text = getString(R.string.dc_enter_answer)
             SoundFx.error()
             return
         }
 
         attempts++
         statusText.setTextColor(Color.parseColor(COLOR_MUTED))
-        statusText.text = "Checking…"
+        statusText.text = getString(R.string.dc_checking)
         lifecycleScope.launch {
             val outcome = withContext(Dispatchers.IO) { submitAnswer(input) }
             when (outcome) {
@@ -270,7 +270,7 @@ class DailyChallengeActivity : AppCompatActivity() {
                     answerInput.isEnabled = false
                     btnCheck.isEnabled = false
                     statusText.setTextColor(Color.parseColor(COLOR_SUCCESS))
-                    statusText.text = "✅ Correct! Challenge complete."
+                    statusText.text = getString(R.string.dc_correct_complete)
                     answerInput.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                     answerInput.startAnimation(AnimationUtils.loadAnimation(this@DailyChallengeActivity, R.anim.pop))
                     SoundFx.win()
@@ -278,19 +278,19 @@ class DailyChallengeActivity : AppCompatActivity() {
                 }
                 SUBMIT_INCORRECT -> {
                     statusText.setTextColor(Color.parseColor(COLOR_ERROR))
-                    statusText.text = "❌ Not quite — try again"
+                    statusText.text = getString(R.string.word_not_quite)
                     answerInput.performHapticFeedback(HapticFeedbackConstants.REJECT)
                     answerInput.startAnimation(AnimationUtils.loadAnimation(this@DailyChallengeActivity, R.anim.shake_x))
                     SoundFx.error()
                 }
                 SUBMIT_UNAUTH -> {
                     statusText.setTextColor(Color.parseColor(COLOR_ERROR))
-                    statusText.text = "Sign in to submit the daily challenge"
+                    statusText.text = getString(R.string.dc_sign_in_submit)
                     SoundFx.error()
                 }
                 else -> {
                     statusText.setTextColor(Color.parseColor(COLOR_ERROR))
-                    statusText.text = "⚠️ Couldn't reach the backend — try again"
+                    statusText.text = getString(R.string.dc_backend_error)
                     SoundFx.error()
                 }
             }
@@ -338,9 +338,9 @@ class DailyChallengeActivity : AppCompatActivity() {
     // ── Hints ────────────────────────────────────────────────────────────────
 
     private fun showHint() {
-        if (hints.isEmpty()) { statusText.text = "No hints available"; return }
+        if (hints.isEmpty()) { statusText.text = getString(R.string.dc_no_hints); return }
         if (hintIndex >= hints.size) {
-            statusText.text = "No more hints — you're close!"
+            statusText.text = getString(R.string.game_no_more_hints)
             return
         }
         val hint = hints[hintIndex]
@@ -356,14 +356,14 @@ class DailyChallengeActivity : AppCompatActivity() {
     private fun modifierBadges(date: String, difficulty: String): String {
         val par = when (difficulty) { "Easy" -> "2:00"; "Medium" -> "3:00"; "Hard" -> "5:00"; else -> "7:00" }
         val pool = listOf(
-            "🛡️ Streak shield — first miss is free",
-            "⚡ Speed run — beat par $par for bonus",
-            "🧠 No-hint run — solve with fewer hints",
-            "🎯 Par time $par — beat the target",
-            "🔁 One-shot — nail it in one attempt"
+            getString(R.string.modifier_streak_shield),
+            getString(R.string.modifier_speed_run, par),
+            getString(R.string.modifier_no_hint),
+            getString(R.string.modifier_par_time, par),
+            getString(R.string.modifier_one_shot)
         )
         val pick = pool[Math.floorMod(date.hashCode(), pool.size)]
-        return "$pick  ·  🏅 Day ${dayOfYear(date)}"
+        return pick + getString(R.string.modifier_day, dayOfYear(date))
     }
 
     private fun dayOfYear(date: String): Int {
@@ -387,29 +387,29 @@ class DailyChallengeActivity : AppCompatActivity() {
     private fun showSummaryCard() {
         val secs = ((System.currentTimeMillis() - startTime) / 1000).toInt().coerceAtLeast(0)
         val msg = buildString {
-            append("⏱ Time: ").append(formatTime(secs)).append("\n")
-            append("🎯 Attempts: ").append(attempts).append("\n")
-            append("💡 Hints used: ").append(hintIndex).append("\n")
+            append(getString(R.string.dc_time_label)).append(formatTime(secs)).append("\n")
+            append(getString(R.string.dc_attempts_label)).append(attempts).append("\n")
+            append(getString(R.string.dc_hints_label)).append(hintIndex).append("\n")
             append("🗓️ ").append(challengeDate)
         }
         AlertDialog.Builder(this, R.style.HintDialog)
-            .setTitle("🏆 Daily Challenge Complete")
+            .setTitle(getString(R.string.dc_complete_title))
             .setMessage(msg)
-            .setPositiveButton("Nice!", null)
+            .setPositiveButton(getString(R.string.dc_nice), null)
             .show()
     }
 
     private fun showError(e: Throwable) {
         Log.w(TAG, "Daily challenge load failed: ${e.message}")
-        headerTitle.text = "🗓️ Daily Challenge"
-        challengeInfo.text = "Unavailable"
+        headerTitle.text = getString(R.string.daily_title)
+        challengeInfo.text = getString(R.string.dc_unavailable)
         puzzlePrompt.visibility = android.view.View.GONE
         hintsView.visibility = android.view.View.GONE
         answerInput.isEnabled = false
         btnCheck.isEnabled = false
         btnHint.isEnabled = false
         statusText.setTextColor(Color.parseColor(COLOR_ERROR))
-        statusText.text = "⚠️ Couldn't reach the backend — is it running? (${e.message ?: "offline"})"
+        statusText.text = getString(R.string.dc_backend_down_fmt, e.message ?: "offline")
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

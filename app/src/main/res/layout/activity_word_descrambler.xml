@@ -22,7 +22,7 @@
             <TextView android:id="@+id/wd_header_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🔤 Word Descrambler"
+                android:text="@string/word_title"
                 android:textColor="@color/ps_text"
                 android:textSize="22sp"
                 android:textStyle="bold"
@@ -43,7 +43,7 @@
                     android:textColor="@color/ps_muted"
                     android:textSize="13sp"
                     android:gravity="start"
-                    android:text="Unscramble the word!" />
+                    android:text="@string/word_unscramble" />
 
                 <TextView android:id="@+id/wd_timer"
                     android:layout_width="wrap_content"
@@ -98,7 +98,7 @@
             <EditText android:id="@+id/wd_answer_input"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:hint="🔑 Type the word..."
+                android:hint="@string/word_input_hint"
                 android:textColor="@color/ps_text"
                 android:textColorHint="@color/ps_dim"
                 android:background="@drawable/ps_search"
@@ -117,20 +117,20 @@
 
                 <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_check"
                     android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                    android:text="✓  CHECK" android:textSize="12sp" android:textColor="@color/ps_on_accent"
+                    android:text="@string/daily_check" android:textSize="12sp" android:textColor="@color/ps_on_accent"
                     android:layout_marginEnd="4dp" android:background="@drawable/ps_btn_emerald"
                     android:fontFamily="sans-serif-medium" />
 
                 <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_hint"
                     android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                    android:text="💡  HINT" android:textSize="12sp" android:textColor="@color/ps_on_accent"
+                    android:text="@string/daily_hint" android:textSize="12sp" android:textColor="@color/ps_on_accent"
                     android:layout_marginStart="4dp" android:layout_marginEnd="4dp"
                     android:background="@drawable/ps_btn_gold"
                     android:fontFamily="sans-serif-medium" />
 
                 <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_peek"
                     android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                    android:text="👁  PEEK" android:textSize="12sp" android:textColor="@color/ps_text"
+                    android:text="@string/word_peek" android:textSize="12sp" android:textColor="@color/ps_text"
                     android:layout_marginStart="4dp" android:background="@drawable/ps_btn_ghost"
                     android:fontFamily="sans-serif-medium" />
             </LinearLayout>
@@ -144,13 +144,13 @@
 
                 <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_difficulty"
                     android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                    android:text="🎯  Medium" android:textSize="13sp" android:textColor="@color/ps_text"
+                    android:text="@string/word_diff_medium" android:textSize="13sp" android:textColor="@color/ps_text"
                     android:layout_marginEnd="6dp" android:background="@drawable/ps_btn_purple"
                     android:fontFamily="sans-serif-medium" />
 
                 <androidx.appcompat.widget.AppCompatButton android:id="@+id/wd_btn_next"
                     android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp"
-                    android:text="NEXT WORD  ▶" android:textSize="13sp" android:textColor="@color/ps_on_accent"
+                    android:text="@string/word_next" android:textSize="13sp" android:textColor="@color/ps_on_accent"
                     android:layout_marginStart="6dp" android:background="@drawable/ps_btn_primary"
                     android:fontFamily="sans-serif-medium" />
             </LinearLayout>

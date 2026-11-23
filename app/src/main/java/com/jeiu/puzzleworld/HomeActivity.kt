@@ -416,7 +416,7 @@ class HomeActivity : AppCompatActivity() {
             }
             renderLeaderboard(local, username)
             findViewById<TextView>(R.id.lb_status).apply {
-                text = "Offline — showing local scores"
+                text = getString(R.string.home_offline)
                 visibility = View.VISIBLE
             }
         }
@@ -427,7 +427,7 @@ class HomeActivity : AppCompatActivity() {
         val status = findViewById<TextView>(R.id.lb_status)
         list.removeAllViews()
         if (entries.isEmpty()) {
-            status.text = "No scores yet — be the first!"
+            status.text = getString(R.string.home_no_scores)
             status.visibility = View.VISIBLE
             findViewById<LinearLayout>(R.id.mini_board).removeAllViews()
             return
@@ -446,7 +446,7 @@ class HomeActivity : AppCompatActivity() {
         box.removeAllViews()
         if (entries.isEmpty()) {
             box.addView(TextView(this).apply {
-                text = "No scores yet — be the first!"
+                text = getString(R.string.home_no_scores)
                 textSize = 13f; setTextColor(getColor(R.color.ps_muted))
             })
             return
