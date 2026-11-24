@@ -12,7 +12,7 @@
     <color name="surface_light">#FF263449</color>
     <color name="on_primary">#FFE2E8F0</color>
     <color name="on_surface">#FF94A3B8</color>
-    <color name="ic_launcher_background">#FF0F172A</color>
+    <color name="ic_launcher_background">#FF09131F</color>
 
     <!-- Play-Store design tokens -->
     <color name="ps_bg">#FF0F172A</color>

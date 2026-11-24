@@ -4,6 +4,7 @@
     <application android:allowBackup="true"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="PuzzleWorld"
         android:supportsRtl="true"
         android:theme="@style/Theme.PuzzleWorld">
